@@ -1,0 +1,111 @@
+.map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.map-toolbar > span {
+  color: #627568;
+  font-size: 14px;
+}
+
+.map-home-button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #7652a3;
+  color: white;
+  font-weight: 600;
+}
+
+.map-home-button:hover {
+  background: #5d3d85;
+}
+
+.zoo-map-frame {
+  overflow: hidden;
+  border: 1px solid #d8c9e6;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgb(36 61 50 / 8%);
+}
+
+.zoo-map {
+  width: 100%;
+  height: 600px;
+
+  /* Giữ bản đồ nằm dưới header và menu xổ xuống. */
+  position: relative;
+  z-index: 0;
+
+  background: #e8f0e1;
+}
+
+.map-help {
+  margin-top: 14px;
+  color: #627568;
+  font-size: 13px;
+}
+
+/* Màu nút phóng to, thu nhỏ */
+.zoo-map .leaflet-control-zoom a {
+  color: #206a45;
+}
+
+@media (max-width: 768px) {
+  .zoo-map {
+    height: 65vh;
+    min-height: 360px;
+  }
+
+  .map-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+.zoo-map {
+  width: 100%;
+  height: 600px;
+  position: relative;
+  z-index: 0;
+  background: #e8f0e1;
+}
+
+.zoo-map-frame {
+  overflow: hidden;
+  border: 1px solid #d8c9e6;
+  border-radius: 20px;
+}
+
+.map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.map-home-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #7652a3;
+  color: white;
+  cursor: pointer;
+}
+
+.map-help {
+  margin-top: 14px;
+  color: #627568;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .zoo-map {
+    height: 65vh;
+    min-height: 360px;
+  }
+}
