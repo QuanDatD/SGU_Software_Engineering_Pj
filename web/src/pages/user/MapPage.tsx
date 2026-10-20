@@ -1,102 +1,173 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as L from "leaflet";
-
 import "leaflet/dist/leaflet.css";
 import "../../styles/MapPage.css";
+import { spots, type Spot } from "../../data/spots";
+import type { Translations, Lang } from "../../i18n";
+import SpotPanel from "../../components/SpotPanel";
 
-// Tọa độ để mở bản đồ tại khu vực Thảo Cầm Viên.
-// Đây chưa phải tọa độ của từng khu động vật.
-const ZOO_CENTER: L.LatLngTuple = [10.7875, 106.705];
+/*
+ * Kích thước ảnh map.jpg: 1024 × 643 px
+ * Hệ tọa độ CRS.Simple: góc trên-trái = [0,0], góc dưới-phải = [643, 1024]
+ * Trục Y đi từ trên xuống dưới (ngược với lat/lng thông thường)
+ */
+const IMG_W = 1024;
+const IMG_H = 643;
 
-export default function MapPage() {
-  // Phần tử HTML chứa bản đồ.
+/*
+ * Ánh xạ tọa độ thực (lat/lng) → pixel trên ảnh
+ * Góc tây-bắc thực tế của Thảo Cầm Viên ≈ [10.7895, 106.7032]
+ * Góc đông-nam thực tế                    ≈ [10.7855, 106.7075]
+ * Điều chỉnh LAT_MAX, LAT_MIN, LNG_MIN, LNG_MAX nếu ảnh lệch
+ */
+const LAT_MAX = 10.7900; // vĩ độ phía bắc (top)
+const LAT_MIN = 10.7850; // vĩ độ phía nam (bottom)
+const LNG_MIN = 106.7030; // kinh độ phía tây (left)
+const LNG_MAX = 106.7080; // kinh độ phía đông (right)
+
+function latLngToPixel(lat: number, lng: number): [number, number] {
+  const x = ((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * IMG_W;
+  // y tăng từ trên xuống, lat tăng từ dưới lên → đảo ngược
+  const y = ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * IMG_H;
+  return [y, x]; // Leaflet CRS.Simple dùng [y, x]
+}
+
+// Giới hạn bản đồ theo kích thước ảnh
+const BOUNDS: L.LatLngBoundsExpression = [[0, 0], [IMG_H, IMG_W]];
+const MAP_CENTER: L.LatLngTuple = [IMG_H / 2, IMG_W / 2];
+
+const CATEGORY_COLOR: Record<string, string> = {
+  animal:   "#206a45",
+  plant:    "#2d8a2d",
+  facility: "#5d3d85",
+};
+
+function makeIcon(emoji: string, color: string): L.DivIcon {
+  return L.divIcon({
+    className: "",
+    html: `<div class="map-marker" style="background:${color}"><span>${emoji}</span></div>`,
+    iconSize:    [42, 42],
+    iconAnchor:  [21, 42],
+    popupAnchor: [0, -44],
+  });
+}
+
+type MapPageProps = {
+  t: Translations;
+  lang: Lang;
+};
+
+export default function MapPage({ t, lang }: MapPageProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  // Lưu bản đồ để nút "Về Thảo Cầm Viên" sử dụng.
-  const mapRef = useRef<L.Map | null>(null);
+  const mapRef       = useRef<L.Map | null>(null);
+  const [activeSpot, setActiveSpot] = useState<Spot | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Tạo bản đồ.
-    const map = L.map(containerRef.current).setView(
-      ZOO_CENTER,
-      17
-    );
+    /* Tính minZoom để ảnh luôn lấp đầy khung, không thu nhỏ hơn */
+    const containerW = containerRef.current.clientWidth  || IMG_W;
+    const containerH = containerRef.current.clientHeight || 600;
+    const scaleX = containerW / IMG_W;
+    const scaleY = containerH / IMG_H;
+    const fitScale = Math.max(scaleX, scaleY); // chọn cạnh lớn hơn
+    // Leaflet CRS.Simple: zoom 0 = 1px/px, mỗi zoom level nhân đôi
+    const minZoom = Math.log2(fitScale);
+
+    /* Dùng CRS.Simple để load ảnh tĩnh làm bản đồ */
+    const map = L.map(containerRef.current, {
+      crs: L.CRS.Simple,
+      minZoom,
+      maxZoom: 3,
+      zoomSnap: 0.25,
+      maxBoundsViscosity: 1.0, // không cho kéo ra ngoài ảnh
+    });
 
     mapRef.current = map;
 
-    // Thêm lớp hình ảnh bản đồ từ OpenStreetMap.
-    L.tileLayer(
-      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }
-    ).addTo(map);
+    /* Đặt ảnh map.jpg phủ toàn bộ canvas */
+    L.imageOverlay("/images/map.jpg", BOUNDS).addTo(map);
 
-    // Cập nhật kích thước khi khung hiển thị thay đổi.
-    const observer = new ResizeObserver(() => {
-      map.invalidateSize();
+    /* Fit toàn bộ ảnh vào khung, chừa padding nhỏ */
+    map.fitBounds(BOUNDS, { padding: [0, 0] });
+
+    /* Giới hạn không kéo ra ngoài ảnh */
+    map.setMaxBounds(BOUNDS);
+
+    /* Thêm marker cho từng điểm tham quan */
+    spots.forEach((spot) => {
+      const color   = CATEGORY_COLOR[spot.category] ?? "#206a45";
+      const icon    = makeIcon(spot.icon, color);
+      const [y, x]  = latLngToPixel(spot.coords[0], spot.coords[1]);
+
+      L.marker([y, x], { icon, title: spot.name[lang] })
+        .addTo(map)
+        .on("click", () => setActiveSpot(spot));
     });
 
-    observer.observe(containerRef.current);
+    const observer = new ResizeObserver(() => map.invalidateSize());
+    observer.observe(containerRef.current!);
 
-    // Dọn bản đồ khi chuyển về trang chủ.
-    // Cũng giúp tránh lỗi tạo bản đồ hai lần trong StrictMode.
     return () => {
       observer.disconnect();
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
-  function returnToZoo() {
-    mapRef.current?.setView(ZOO_CENTER, 17);
+  function returnToCenter() {
+    mapRef.current?.fitBounds(BOUNDS, { padding: [0, 0] });
   }
 
   return (
-    <section className="section map-page">
-      <div className="section__heading">
-        <div>
-          <span className="eyebrow eyebrow--green">
-            HÀNH TRÌNH CỦA BẠN
-          </span>
-
-          <h1>Bản đồ tham quan</h1>
+    <>
+      <section className="section map-page">
+        <div className="section__heading">
+          <div>
+            <span className="eyebrow eyebrow--green">{t.mapEyebrow}</span>
+            <h1>{t.mapTitle}</h1>
+          </div>
+          <p>{t.mapDesc}</p>
         </div>
 
-        <p>
-          Khám phá không gian xanh tại Thảo Cầm Viên.
-        </p>
-      </div>
+        <div className="map-toolbar">
+          <span>{t.mapDrag}</span>
+          <button className="map-home-button" type="button" onClick={returnToCenter}>
+            {t.mapReturnBtn}
+          </button>
+        </div>
 
-      <div className="map-toolbar">
-        <span>Kéo bản đồ để xem các khu vực</span>
+        <div className="zoo-map-frame">
+          <div
+            ref={containerRef}
+            className="zoo-map"
+            role="region"
+            aria-label={t.mapTitle}
+          />
+        </div>
 
-        <button
-          className="map-home-button"
-          type="button"
-          onClick={returnToZoo}
-        >
-          📍 Về Thảo Cầm Viên
-        </button>
-      </div>
+        {/* Chú thích màu marker */}
+        <div className="map-legend">
+          <span style={{ borderLeft: `3px solid ${CATEGORY_COLOR.animal}`, paddingLeft: 8 }}>
+            🐘 {lang === "vi" ? "Động vật" : "Animals"}
+          </span>
+          <span style={{ borderLeft: `3px solid ${CATEGORY_COLOR.plant}`, paddingLeft: 8 }}>
+            🌳 {lang === "vi" ? "Thực vật" : "Plants"}
+          </span>
+          <span style={{ borderLeft: `3px solid ${CATEGORY_COLOR.facility}`, paddingLeft: 8 }}>
+            🏛️ {lang === "vi" ? "Tiện ích" : "Facilities"}
+          </span>
+        </div>
 
-      <div className="zoo-map-frame">
-        <div
-          ref={containerRef}
-          className="zoo-map"
-          role="region"
-          aria-label="Bản đồ khu vực Thảo Cầm Viên"
-        />
-      </div>
+        <p className="map-help">{t.mapHelp}</p>
+      </section>
 
-      <p className="map-help">
-        Dùng nút + / − để phóng to hoặc thu nhỏ.
-        Trên điện thoại, dùng hai ngón tay để thay đổi độ phóng đại.
-      </p>
-    </section>
+      <SpotPanel
+        spot={activeSpot}
+        lang={lang}
+        onClose={() => setActiveSpot(null)}
+      />
+    </>
   );
 }

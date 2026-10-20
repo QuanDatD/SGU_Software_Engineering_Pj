@@ -1,6 +1,7 @@
 import { useState } from "react";
 import HomePage from "./pages/user/HomePage";
 import MapPage from "./pages/user/MapPage";
+import { type Lang, translations } from "./i18n";
 import "./styles/global.css";
 
 type Page = "home" | "map";
@@ -8,11 +9,20 @@ type Page = "home" | "map";
 export default function App() {
   const [page, setPage] = useState<Page>("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [lang, setLang] = useState<Lang>("vi");
+  const [langOpen, setLangOpen] = useState(false);
+
+  const t = translations[lang];
 
   function changePage(nextPage: Page) {
     setPage(nextPage);
     setMenuOpen(false);
     window.scrollTo({ top: 0 });
+  }
+
+  function chooseLang(l: Lang) {
+    setLang(l);
+    setLangOpen(false);
   }
 
   return (
@@ -36,15 +46,63 @@ export default function App() {
             onClick={() => changePage("home")}
           >
             <span className="brand__icon" aria-hidden="true">🌿</span>
-
             <span>
               <strong>THẢO CẦM VIÊN</strong>
-              <small>Khám phá thiên nhiên</small>
+              <small>{t.brandTagline}</small>
             </span>
           </button>
         </div>
 
-        <span className="language">🇻🇳 Tiếng Việt</span>
+        {/* Nút chọn ngôn ngữ */}
+        <div className="lang-picker">
+          <button
+            className="lang-picker__btn"
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded={langOpen}
+            onClick={() => setLangOpen(!langOpen)}
+          >
+            {t.langLabel}
+            <span className="lang-picker__arrow" aria-hidden="true">
+              {langOpen ? "▲" : "▼"}
+            </span>
+          </button>
+
+          {langOpen && (
+            <>
+              <button
+                className="lang-picker__overlay"
+                type="button"
+                aria-label="Đóng menu ngôn ngữ"
+                onClick={() => setLangOpen(false)}
+              />
+              <ul className="lang-picker__menu" role="listbox">
+                <li>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={lang === "vi"}
+                    className={lang === "vi" ? "is-active" : ""}
+                    onClick={() => chooseLang("vi")}
+                  >
+                    🇻🇳 Tiếng Việt
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={lang === "en"}
+                    className={lang === "en" ? "is-active" : ""}
+                    onClick={() => chooseLang("en")}
+                  >
+                    🇬🇧 English
+                  </button>
+                </li>
+              </ul>
+            </>
+          )}
+        </div>
       </header>
 
       {menuOpen && (
@@ -64,7 +122,7 @@ export default function App() {
               if (event.key === "Escape") setMenuOpen(false);
             }}
           >
-            <p className="navigation__title">CÙNG KHÁM PHÁ</p>
+            <p className="navigation__title">{t.navExplore}</p>
 
             <button
               type="button"
@@ -72,7 +130,7 @@ export default function App() {
               aria-current={page === "home" ? "page" : undefined}
               onClick={() => changePage("home")}
             >
-              <span aria-hidden="true">⌂</span> Trang chủ
+              <span aria-hidden="true">⌂</span> {t.navHome}
             </button>
 
             <button
@@ -81,13 +139,13 @@ export default function App() {
               aria-current={page === "map" ? "page" : undefined}
               onClick={() => changePage("map")}
             >
-              <span aria-hidden="true">🗺️</span> Bản đồ tham quan
+              <span aria-hidden="true">🗺️</span> {t.navMap}
             </button>
 
             <div className="navigation__note">
-              Một hành trình nhỏ,
-              <br />
-              nhiều điều thú vị.
+              {t.navNote.split("\n").map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br />}</span>
+              ))}
             </div>
           </nav>
         </>
@@ -95,15 +153,15 @@ export default function App() {
 
       <main>
         {page === "home" ? (
-          <HomePage onOpenMap={() => changePage("map")} />
+          <HomePage onOpenMap={() => changePage("map")} t={t} />
         ) : (
-          <MapPage />
+          <MapPage t={t} lang={lang} />
         )}
       </main>
 
       <footer className="footer">
         <strong>🌿 Thảo Cầm Viên</strong>
-        <span>Khám phá · Lắng nghe · Yêu thiên nhiên</span>
+        <span>{t.footerTagline}</span>
       </footer>
     </div>
   );
