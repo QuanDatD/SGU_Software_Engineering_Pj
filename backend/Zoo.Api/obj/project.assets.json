@@ -1111,6 +1111,16 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
+      "Zoo.BUS/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/Zoo.BUS.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Zoo.BUS.dll": {}
+        }
+      },
       "Zoo.DAL/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -3221,6 +3231,11 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Zoo.BUS/1.0.0": {
+      "type": "project",
+      "path": "../Zoo.BUS/Zoo.BUS.csproj",
+      "msbuildProject": "../Zoo.BUS/Zoo.BUS.csproj"
+    },
     "Zoo.DAL/1.0.0": {
       "type": "project",
       "path": "../Zoo.DAL/Zoo.DAL.csproj",
@@ -3232,27 +3247,28 @@
       "Microsoft.AspNetCore.OpenApi >= 10.0.12",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.13",
       "Microsoft.EntityFrameworkCore.Tools >= 10.0.13",
+      "Zoo.BUS >= 1.0.0",
       "Zoo.DAL >= 1.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\khuon\\.nuget\\packages\\": {},
+    "C:\\Users\\Asami\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Learning\\Software_technology\\SGU_Software_Engineering_Pj\\backend\\Zoo.Api\\Zoo.Api.csproj",
+      "projectUniqueName": "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.Api\\Zoo.Api.csproj",
       "projectName": "Zoo.Api",
-      "projectPath": "D:\\Learning\\Software_technology\\SGU_Software_Engineering_Pj\\backend\\Zoo.Api\\Zoo.Api.csproj",
-      "packagesPath": "C:\\Users\\khuon\\.nuget\\packages\\",
-      "outputPath": "D:\\Learning\\Software_technology\\SGU_Software_Engineering_Pj\\backend\\Zoo.Api\\obj\\",
+      "projectPath": "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.Api\\Zoo.Api.csproj",
+      "packagesPath": "C:\\Users\\Asami\\.nuget\\packages\\",
+      "outputPath": "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.Api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\khuon\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Asami\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -3269,8 +3285,11 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "D:\\Learning\\Software_technology\\SGU_Software_Engineering_Pj\\backend\\Zoo.DAL\\Zoo.DAL.csproj": {
-              "projectPath": "D:\\Learning\\Software_technology\\SGU_Software_Engineering_Pj\\backend\\Zoo.DAL\\Zoo.DAL.csproj"
+            "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.BUS\\Zoo.BUS.csproj": {
+              "projectPath": "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.BUS\\Zoo.BUS.csproj"
+            },
+            "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.DAL\\Zoo.DAL.csproj": {
+              "projectPath": "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.DAL\\Zoo.DAL.csproj"
             }
           }
         }
