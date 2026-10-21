@@ -13,3 +13,18 @@ D:\Learning\Software_technology\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\
 D:\Learning\Software_technology\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.pdb
 D:\Learning\Software_technology\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.genruntimeconfig.cache
 D:\Learning\Software_technology\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\ref\Zoo.DAL.dll
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\bin\Debug\net10.0\Zoo.DAL.deps.json
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\bin\Debug\net10.0\Zoo.DAL.runtimeconfig.json
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\bin\Debug\net10.0\Zoo.DAL.dll
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\bin\Debug\net10.0\Zoo.DAL.pdb
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.csproj.AssemblyReference.cache
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.GeneratedMSBuildEditorConfig.editorconfig
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.AssemblyInfoInputs.cache
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.AssemblyInfo.cs
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.csproj.CoreCompileInputs.cache
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.sourcelink.json
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.dll
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\refint\Zoo.DAL.dll
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.pdb
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\Zoo.DAL.genruntimeconfig.cache
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.DAL\obj\Debug\net10.0\ref\Zoo.DAL.dll

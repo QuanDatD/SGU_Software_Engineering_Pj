@@ -1,0 +1,12 @@
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\bin\Debug\net10.0\Zoo.BUS.deps.json
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\bin\Debug\net10.0\Zoo.BUS.dll
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\bin\Debug\net10.0\Zoo.BUS.pdb
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\Zoo.BUS.GeneratedMSBuildEditorConfig.editorconfig
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\Zoo.BUS.AssemblyInfoInputs.cache
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\Zoo.BUS.AssemblyInfo.cs
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\Zoo.BUS.csproj.CoreCompileInputs.cache
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\Zoo.BUS.sourcelink.json
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\Zoo.BUS.dll
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\refint\Zoo.BUS.dll
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\Zoo.BUS.pdb
+D:\Learning PJ\SGU_Software_Engineering_Pj\backend\Zoo.BUS\obj\Debug\net10.0\ref\Zoo.BUS.dll
