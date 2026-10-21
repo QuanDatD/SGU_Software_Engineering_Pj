@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Zoo.BUS.Interfaces;
 using Zoo.BUS.Services;
 using Zoo.DAL.Entities;
+using Zoo.DAL.Data;
+using Zoo.DAL.Interfaces;
+using Zoo.DAL.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
