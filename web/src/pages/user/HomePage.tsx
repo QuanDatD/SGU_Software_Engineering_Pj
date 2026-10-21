@@ -133,16 +133,7 @@ export default function HomePage({ onOpenMap }: Props) {
             <span>{t("tag3")}</span><span>{t("tag4")}</span>
           </div>
         </div>
-        <div className="hero-visual" aria-hidden="true">
-          <div className="hero-art">
-            <div className="hero-art__circle" />
-            <span className="hero-art__tree">🌳</span>
-            <span className="hero-art__elephant">🐘</span>
-            <span className="hero-art__giraffe">🦒</span>
-            <span className="hero-art__leaf">🌿</span>
-            <div className="hero-art__label">{t("artLabel")}</div>
-          </div>
-        </div>
+
       </section>
 
       {/* ── STATS ── */}

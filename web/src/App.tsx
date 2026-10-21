@@ -107,6 +107,13 @@ export default function App() {
       <footer className="footer">
         <strong>🌿 Thảo Cầm Viên</strong>
         <span>{t("footer")}</span>
+        <a
+          href="/admin/login"
+          style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", textDecoration: "none" }}
+          aria-label="Admin"
+        >
+          ⚙️
+        </a>
       </footer>
     </div>
   );
