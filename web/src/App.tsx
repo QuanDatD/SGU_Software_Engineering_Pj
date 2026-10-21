@@ -1,29 +1,32 @@
 import { useState } from "react";
 import HomePage from "./pages/user/HomePage";
-import MapPage from "./pages/user/MapPage";
-import { type Lang, translations } from "./i18n";
+import MapPage  from "./pages/user/MapPage";
+import { useLang } from "./contexts/LanguageContext";
+import LanguageSelector from "./components/LanguageSelector";
 import "./styles/global.css";
 
 type Page = "home" | "map";
 
 export default function App() {
-  const [page, setPage] = useState<Page>("home");
+  const [page,     setPage]     = useState<Page>("home");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [lang, setLang] = useState<Lang>("vi");
-  const [langOpen, setLangOpen] = useState(false);
+  const { lang } = useLang();
 
-  const t = translations[lang];
-
-  function changePage(nextPage: Page) {
-    setPage(nextPage);
+  function changePage(next: Page) {
+    setPage(next);
     setMenuOpen(false);
     window.scrollTo({ top: 0 });
   }
 
-  function chooseLang(l: Lang) {
-    setLang(l);
-    setLangOpen(false);
-  }
+  const NAV = {
+    explore: { vi: "CÙNG KHÁM PHÁ", en: "EXPLORE", zh: "一起探索", ko: "함께 탐험", ja: "一緒に探検" },
+    home:    { vi: "Trang chủ",     en: "Home",    zh: "主页",    ko: "홈",      ja: "ホーム" },
+    map:     { vi: "Bản đồ",        en: "Map",     zh: "地图",    ko: "지도",    ja: "マップ" },
+    note:    { vi: "Một hành trình nhỏ,\nnhiều điều thú vị.", en: "A small journey,\nmany great discoveries.", zh: "小小旅程，\n大大发现。", ko: "작은 여정,\n큰 발견.", ja: "小さな旅、\n大きな発見。" },
+    tagline: { vi: "Khám phá thiên nhiên", en: "Explore nature", zh: "探索自然", ko: "자연 탐험", ja: "自然を探検" },
+    footer:  { vi: "Khám phá · Lắng nghe · Yêu thiên nhiên", en: "Explore · Listen · Love Nature", zh: "探索 · 倾听 · 热爱自然", ko: "탐험 · 듣기 · 자연 사랑", ja: "探検 · 聞く · 自然愛" },
+  };
+  const t = (k: keyof typeof NAV) => NAV[k]?.[lang] ?? NAV[k]?.["en"] ?? "";
 
   return (
     <div className="app">
@@ -40,69 +43,16 @@ export default function App() {
             {menuOpen ? "✕" : "☰"}
           </button>
 
-          <button
-            className="brand"
-            type="button"
-            onClick={() => changePage("home")}
-          >
+          <button className="brand" type="button" onClick={() => changePage("home")}>
             <span className="brand__icon" aria-hidden="true">🌿</span>
             <span>
               <strong>THẢO CẦM VIÊN</strong>
-              <small>{t.brandTagline}</small>
+              <small>{t("tagline")}</small>
             </span>
           </button>
         </div>
 
-        {/* Nút chọn ngôn ngữ */}
-        <div className="lang-picker">
-          <button
-            className="lang-picker__btn"
-            type="button"
-            aria-haspopup="listbox"
-            aria-expanded={langOpen}
-            onClick={() => setLangOpen(!langOpen)}
-          >
-            {t.langLabel}
-            <span className="lang-picker__arrow" aria-hidden="true">
-              {langOpen ? "▲" : "▼"}
-            </span>
-          </button>
-
-          {langOpen && (
-            <>
-              <button
-                className="lang-picker__overlay"
-                type="button"
-                aria-label="Đóng menu ngôn ngữ"
-                onClick={() => setLangOpen(false)}
-              />
-              <ul className="lang-picker__menu" role="listbox">
-                <li>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={lang === "vi"}
-                    className={lang === "vi" ? "is-active" : ""}
-                    onClick={() => chooseLang("vi")}
-                  >
-                    🇻🇳 Tiếng Việt
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={lang === "en"}
-                    className={lang === "en" ? "is-active" : ""}
-                    onClick={() => chooseLang("en")}
-                  >
-                    🇬🇧 English
-                  </button>
-                </li>
-              </ul>
-            </>
-          )}
-        </div>
+        <LanguageSelector />
       </header>
 
       {menuOpen && (
@@ -110,19 +60,16 @@ export default function App() {
           <button
             className="menu-overlay"
             type="button"
-            aria-label="Đóng menu điều hướng"
+            aria-label="Đóng menu"
             onClick={() => setMenuOpen(false)}
           />
-
           <nav
             id="navigation"
             className="navigation"
             aria-label="Điều hướng chính"
-            onKeyDown={(event) => {
-              if (event.key === "Escape") setMenuOpen(false);
-            }}
+            onKeyDown={(e) => { if (e.key === "Escape") setMenuOpen(false); }}
           >
-            <p className="navigation__title">{t.navExplore}</p>
+            <p className="navigation__title">{t("explore")}</p>
 
             <button
               type="button"
@@ -130,7 +77,7 @@ export default function App() {
               aria-current={page === "home" ? "page" : undefined}
               onClick={() => changePage("home")}
             >
-              <span aria-hidden="true">⌂</span> {t.navHome}
+              <span aria-hidden="true">⌂</span> {t("home")}
             </button>
 
             <button
@@ -139,11 +86,11 @@ export default function App() {
               aria-current={page === "map" ? "page" : undefined}
               onClick={() => changePage("map")}
             >
-              <span aria-hidden="true">🗺️</span> {t.navMap}
+              <span aria-hidden="true">🗺️</span> {t("map")}
             </button>
 
             <div className="navigation__note">
-              {t.navNote.split("\n").map((line, i) => (
+              {t("note").split("\n").map((line, i) => (
                 <span key={i}>{line}{i === 0 && <br />}</span>
               ))}
             </div>
@@ -152,16 +99,21 @@ export default function App() {
       )}
 
       <main>
-        {page === "home" ? (
-          <HomePage onOpenMap={() => changePage("map")} t={t} />
-        ) : (
-          <MapPage t={t} lang={lang} />
-        )}
+        {page === "home"
+          ? <HomePage onOpenMap={() => changePage("map")} />
+          : <MapPage />}
       </main>
 
       <footer className="footer">
         <strong>🌿 Thảo Cầm Viên</strong>
-        <span>{t.footerTagline}</span>
+        <span>{t("footer")}</span>
+        <a
+          href="/admin/login"
+          style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", textDecoration: "none" }}
+          aria-label="Admin"
+        >
+          ⚙️
+        </a>
       </footer>
     </div>
   );

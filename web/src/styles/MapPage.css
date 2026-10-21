@@ -109,3 +109,222 @@
     min-height: 360px;
   }
 }
+
+/* ── GPS Status ── */
+.gps-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  border: 1px solid #e0e8da;
+  background: #f3f8f0;
+  flex-wrap: wrap;
+}
+.gps-status--active   { background: #e8f4ec; border-color: #b8dfc8; }
+.gps-status--denied,
+.gps-status--unavailable { background: #fff5f5; border-color: #f5c6cb; }
+.gps-status--requesting  { background: #fff8e6; border-color: #f0d080; }
+
+.gps-status__icon     { font-size: 18px; }
+.gps-status__label    { flex: 1; font-weight: 600; color: #143e2b; }
+.gps-status__accuracy { font-size: 12px; color: #627568; }
+.gps-status__btn {
+  padding: 5px 12px;
+  border: 1px solid #b8dfc8;
+  border-radius: 8px;
+  background: white;
+  color: #206a45;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.gps-status__btn--stop { border-color: #f5c6cb; color: #c0392b; }
+
+/* ── Illustrated Map ── */
+.illu-map {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #e8f0e2;
+  min-height: 400px;
+}
+.illu-map__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+}
+.illu-map__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: 80px;
+  color: #7aaa6a;
+}
+.illu-map__marker {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50% 50% 50% 0;
+  rotate: -45deg;
+  border: 2px solid rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  z-index: 5;
+}
+.illu-map__marker:hover,
+.illu-map__marker.is-active {
+  transform: translate(-50%, -100%) scale(1.2);
+  box-shadow: 0 5px 16px rgba(0,0,0,0.35);
+}
+.illu-map__marker span {
+  display: block;
+  font-size: 20px;
+  rotate: 45deg;
+  line-height: 1;
+}
+
+/* ── Audio Player Bar (cố định dưới màn hình) ── */
+.audio-player-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+.audio-player-bar > * {
+  pointer-events: auto;
+}
+
+/* ── Audio Player ── */
+.audio-player {
+  background: #1a3528;
+  color: white;
+  padding: 12px 20px 10px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+}
+.audio-player__track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.audio-player__icon { font-size: 20px; }
+.audio-player__title { flex: 1; font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.audio-player__loading { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.audio-player__error { color: #f88; }
+
+.audio-player__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.audio-player__time { font-size: 11px; color: #8aad94; min-width: 36px; text-align: center; }
+.audio-player__range {
+  flex: 1;
+  height: 4px;
+  accent-color: #f4cf68;
+  cursor: pointer;
+}
+
+.audio-player__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.audio-player__ctrl {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+}
+.audio-player__ctrl:hover { background: rgba(255,255,255,0.2); }
+.audio-player__ctrl--main {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: #f4cf68;
+  color: #1a3528;
+  font-size: 18px;
+  display: grid;
+  place-items: center;
+}
+.audio-player__ctrl--main:disabled { opacity: 0.5; cursor: not-allowed; }
+.audio-player__ctrl--stop { color: #f88; }
+
+.audio-player__progress {
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.audio-player__fill {
+  height: 100%;
+  background: #f4cf68;
+  border-radius: 2px;
+  transition: width 500ms linear;
+}
+
+/* ── SpotPanel play button ── */
+.spot-panel__play-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: #206a45;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 150ms ease;
+}
+.spot-panel__play-btn:hover  { background: #185636; }
+.spot-panel__play-btn.is-playing { background: #5d3d85; }
+
+@media (max-width: 768px) {
+  .audio-player { padding: 10px 14px 8px; }
+  .audio-player__ctrl { padding: 5px 8px; font-size: 12px; }
+}
+
+/* Offline notice */
+.map-offline-note {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #fff8e6;
+  border: 1px solid #f0d080;
+  color: #7a5820;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* Map loading/error fallback */
+.map-loading, .map-error {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #627568;
+}

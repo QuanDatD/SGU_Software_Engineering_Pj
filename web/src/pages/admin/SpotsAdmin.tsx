@@ -1,206 +1,225 @@
-import { useState } from "react";
-import { type Spot } from "../../data/spots";
+import { useEffect, useState } from "react";
+import { placeApi } from "../../services/placeApi";
+import type { Place } from "../../types/place";
 
-type Props = {
-  spots: Spot[];
-  onChange: (spots: Spot[]) => void;
+const EMPTY: Omit<Place, "id"> = {
+  slug: "", icon: "📍", category: "facility",
+  lat: 10.7875, lng: 106.705, radiusMeters: 30,
+  mapX: 50, mapY: 50, imageUrl: null,
+  name: { vi: "", en: "", zh: "", ko: "", ja: "" },
+  desc: { vi: "", en: "", zh: "", ko: "", ja: "" },
 };
 
-const EMPTY_SPOT: Omit<Spot, "id"> = {
-  coords:   [10.7875, 106.705],
-  icon:     "📍",
-  category: "facility",
-  img:      "",
-  name:     { vi: "", en: "" },
-  desc:     { vi: "", en: "" },
-  details:  { vi: "", en: "" },
+const CAT_LABEL: Record<Place["category"], string> = {
+  animal: "🐘 Động vật", plant: "🌳 Thực vật", facility: "🏛️ Tiện ích",
 };
+const LANGS = ["vi", "en", "zh", "ko", "ja"];
 
-type FormSpot = Spot;
+export default function SpotsAdmin() {
+  const [places,  setPlaces]  = useState<Place[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState<string | null>(null);
+  const [editing, setEditing] = useState<Partial<Place> & { id?: number } | null>(null);
+  const [saving,  setSaving]  = useState(false);
+  const [confirm, setConfirm] = useState<number | null>(null);
 
-function generateId(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || `spot-${Date.now()}`;
-}
+  useEffect(() => {
+    placeApi.adminList()
+      .then(setPlaces)
+      .catch(() => setError("Không tải được dữ liệu. Kiểm tra kết nối backend."))
+      .finally(() => setLoading(false));
+  }, []);
 
-export default function SpotsAdmin({ spots, onChange }: Props) {
-  const [editing, setEditing] = useState<FormSpot | null>(null);
-  const [isNew,   setIsNew]   = useState(false);
-  const [confirm, setConfirm] = useState<string | null>(null); // id cần xoá
-
-  function openNew() {
-    setEditing({ id: "", ...EMPTY_SPOT });
-    setIsNew(true);
-  }
-
-  function openEdit(spot: Spot) {
-    setEditing({ ...spot });
-    setIsNew(false);
-  }
-
-  function handleSave() {
+  async function handleSave() {
     if (!editing) return;
-    const spot = { ...editing };
-    if (isNew) {
-      spot.id = generateId(spot.name.vi || spot.name.en);
-      onChange([...spots, spot]);
-    } else {
-      onChange(spots.map((s) => (s.id === spot.id ? spot : s)));
+    setSaving(true);
+    try {
+      if (editing.id) {
+        const updated = await placeApi.update(editing.id as string, editing);
+        setPlaces((prev) => prev.map((p) => p.id === updated.id ? updated : p));
+      } else {
+        const created = await placeApi.create(editing);
+        setPlaces((prev) => [...prev, created]);
+      }
+      setEditing(null);
+    } catch {
+      alert("Lưu thất bại. Vui lòng thử lại.");
+    } finally {
+      setSaving(false);
     }
-    setEditing(null);
   }
 
-  function handleDelete(id: string) {
-    onChange(spots.filter((s) => s.id !== id));
+  async function handleDelete(id: number) {
+    try {
+      await placeApi.hide(id as unknown as string);
+      setPlaces((prev) => prev.filter((p) => p.id !== id));
+    } catch {
+      alert("Ẩn khu thất bại.");
+    }
     setConfirm(null);
   }
 
-  function set<K extends keyof FormSpot>(key: K, value: FormSpot[K]) {
+  function set<K extends keyof Place>(key: K, value: Place[K]) {
     setEditing((prev) => prev ? { ...prev, [key]: value } : prev);
   }
 
-  function setNested(key: "name" | "desc" | "details", lang: "vi" | "en", value: string) {
+  function setLang(field: "name" | "desc", lang: string, value: string) {
     setEditing((prev) =>
-      prev ? { ...prev, [key]: { ...prev[key], [lang]: value } } : prev
+      prev ? { ...prev, [field]: { ...(prev[field] ?? {}), [lang]: value } } : prev
     );
   }
 
-  const CATEGORIES: Spot["category"][] = ["animal", "plant", "facility"];
-  const CAT_LABEL: Record<Spot["category"], string> = {
-    animal: "🐘 Động vật", plant: "🌳 Thực vật", facility: "🏛️ Tiện ích",
-  };
+  if (loading) return <div className="admin-section"><p>⏳ Đang tải…</p></div>;
+
+  if (error) return (
+    <div className="admin-section">
+      <div className="admin-notice admin-notice--warning">
+        <span>⚠️</span><div><strong>Chưa kết nối backend</strong><p>{error}</p></div>
+      </div>
+      <p style={{ color: "#627568", fontSize: 14 }}>
+        Giao diện admin sẽ hoạt động đầy đủ sau khi backend C# được khởi động.
+      </p>
+    </div>
+  );
 
   return (
     <div className="admin-section">
       <div className="admin-section__header">
-        <h2>Điểm tham quan</h2>
-        <button className="admin-btn admin-btn--primary" onClick={openNew}>
+        <h2>Điểm tham quan ({places.length})</h2>
+        <button className="admin-btn admin-btn--primary" onClick={() => setEditing({ ...EMPTY })}>
           + Thêm điểm mới
         </button>
       </div>
 
-      {/* Danh sách */}
+      {/* Table */}
       <div className="spots-table">
         <div className="spots-table__head">
-          <span>Icon</span>
-          <span>Tên (VI)</span>
-          <span>Tên (EN)</span>
-          <span>Loại</span>
-          <span>Tọa độ</span>
-          <span></span>
+          <span>Icon</span><span>Tên (VI)</span><span>Tên (EN)</span>
+          <span>Loại</span><span>Bán kính</span><span></span>
         </div>
-
-        {spots.map((s) => (
-          <div className="spots-table__row" key={s.id}>
-            <span className="spots-table__icon">{s.icon}</span>
-            <span>{s.name.vi}</span>
-            <span>{s.name.en}</span>
-            <span><span className={`admin-tag admin-tag--${s.category}`}>{CAT_LABEL[s.category]}</span></span>
-            <span className="spots-table__coords">
-              {s.coords[0].toFixed(4)}, {s.coords[1].toFixed(4)}
-            </span>
+        {places.map((p) => (
+          <div className="spots-table__row" key={p.id}>
+            <span className="spots-table__icon">{p.icon}</span>
+            <span>{p.name?.vi}</span>
+            <span>{p.name?.en}</span>
+            <span><span className={`admin-tag admin-tag--${p.category}`}>{CAT_LABEL[p.category]}</span></span>
+            <span className="spots-table__coords">{p.radiusMeters}m</span>
             <span className="spots-table__actions">
-              <button className="admin-btn admin-btn--sm" onClick={() => openEdit(s)}>Sửa</button>
-              <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => setConfirm(s.id)}>Xoá</button>
+              <button className="admin-btn admin-btn--sm" onClick={() => setEditing({ ...p })}>Sửa</button>
+              <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => setConfirm(p.id)}>Xoá</button>
             </span>
           </div>
         ))}
       </div>
 
       {/* Confirm xoá */}
-      {confirm && (
+      {confirm !== null && (
         <div className="admin-modal-overlay">
           <div className="admin-modal">
             <h3>Xác nhận xoá</h3>
-            <p>Bạn chắc chắn muốn xoá điểm <strong>{spots.find(s => s.id === confirm)?.name.vi}</strong>?</p>
+            <p>Xoá <strong>{places.find(p => p.id === confirm)?.name?.vi}</strong>?</p>
             <div className="admin-modal__actions">
               <button className="admin-btn" onClick={() => setConfirm(null)}>Huỷ</button>
-              <button className="admin-btn admin-btn--danger" onClick={() => handleDelete(confirm)}>Xoá</button>
+              <button className="admin-btn admin-btn--danger" onClick={() => handleDelete(confirm!)}>Xoá</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Form thêm/sửa */}
+      {/* Form */}
       {editing && (
         <div className="admin-modal-overlay">
           <div className="admin-modal admin-modal--wide">
-            <h3>{isNew ? "Thêm điểm tham quan" : `Sửa: ${editing.name.vi}`}</h3>
-
+            <h3>{editing.id ? "Sửa điểm tham quan" : "Thêm điểm tham quan"}</h3>
             <div className="admin-form">
-              {/* Icon & Loại */}
+              {/* Icon, Loại, Slug */}
               <div className="admin-form__row">
                 <label className="admin-form__field">
                   <span>Icon (emoji)</span>
-                  <input value={editing.icon} onChange={(e) => set("icon", e.target.value)} maxLength={4} />
+                  <input value={editing.icon ?? ""} onChange={(e) => set("icon", e.target.value)} maxLength={4} />
                 </label>
                 <label className="admin-form__field">
                   <span>Loại</span>
-                  <select value={editing.category} onChange={(e) => set("category", e.target.value as Spot["category"])}>
-                    {CATEGORIES.map((c) => <option key={c} value={c}>{CAT_LABEL[c]}</option>)}
+                  <select value={editing.category ?? "facility"} onChange={(e) => set("category", e.target.value as Place["category"])}>
+                    {(["animal","plant","facility"] as Place["category"][]).map(c =>
+                      <option key={c} value={c}>{CAT_LABEL[c]}</option>
+                    )}
                   </select>
                 </label>
-              </div>
-
-              {/* Tên */}
-              <div className="admin-form__row">
                 <label className="admin-form__field">
-                  <span>Tên tiếng Việt</span>
-                  <input value={editing.name.vi} onChange={(e) => setNested("name", "vi", e.target.value)} />
-                </label>
-                <label className="admin-form__field">
-                  <span>Tên tiếng Anh</span>
-                  <input value={editing.name.en} onChange={(e) => setNested("name", "en", e.target.value)} />
+                  <span>Slug (mã khu)</span>
+                  <input value={editing.slug ?? ""} onChange={(e) => set("slug", e.target.value)} placeholder="elephant" />
                 </label>
               </div>
 
-              {/* Ảnh */}
-              <label className="admin-form__field">
-                <span>Đường dẫn ảnh (ví dụ: /images/spots/elephant.jpg)</span>
-                <input value={editing.img} onChange={(e) => set("img", e.target.value)} placeholder="/images/..." />
-              </label>
-
-              {/* Tọa độ */}
+              {/* Tên theo ngôn ngữ */}
+              <p className="admin-form__section-label">Tên khu</p>
               <div className="admin-form__row">
-                <label className="admin-form__field">
-                  <span>Vĩ độ (Latitude)</span>
-                  <input type="number" step="0.00001" value={editing.coords[0]}
-                    onChange={(e) => set("coords", [parseFloat(e.target.value), editing.coords[1]])} />
-                </label>
-                <label className="admin-form__field">
-                  <span>Kinh độ (Longitude)</span>
-                  <input type="number" step="0.00001" value={editing.coords[1]}
-                    onChange={(e) => set("coords", [editing.coords[0], parseFloat(e.target.value)])} />
-                </label>
+                {LANGS.map((l) => (
+                  <label key={l} className="admin-form__field">
+                    <span>{l.toUpperCase()}</span>
+                    <input value={(editing.name as Record<string,string>)?.[l] ?? ""}
+                      onChange={(e) => setLang("name", l, e.target.value)} />
+                  </label>
+                ))}
               </div>
 
               {/* Mô tả ngắn */}
+              <p className="admin-form__section-label">Mô tả ngắn</p>
+              <div className="admin-form__row">
+                {LANGS.map((l) => (
+                  <label key={l} className="admin-form__field">
+                    <span>{l.toUpperCase()}</span>
+                    <textarea rows={2} value={(editing.desc as Record<string,string>)?.[l] ?? ""}
+                      onChange={(e) => setLang("desc", l, e.target.value)} />
+                  </label>
+                ))}
+              </div>
+
+              {/* Tọa độ & vùng */}
               <div className="admin-form__row">
                 <label className="admin-form__field">
-                  <span>Mô tả ngắn (VI)</span>
-                  <textarea rows={2} value={editing.desc.vi} onChange={(e) => setNested("desc", "vi", e.target.value)} />
+                  <span>Vĩ độ (lat)</span>
+                  <input type="number" step="0.00001" value={editing.lat ?? 0}
+                    onChange={(e) => set("lat", parseFloat(e.target.value))} />
                 </label>
                 <label className="admin-form__field">
-                  <span>Mô tả ngắn (EN)</span>
-                  <textarea rows={2} value={editing.desc.en} onChange={(e) => setNested("desc", "en", e.target.value)} />
+                  <span>Kinh độ (lng)</span>
+                  <input type="number" step="0.00001" value={editing.lng ?? 0}
+                    onChange={(e) => set("lng", parseFloat(e.target.value))} />
+                </label>
+                <label className="admin-form__field">
+                  <span>Bán kính vùng (mét)</span>
+                  <input type="number" min={5} max={200} value={editing.radiusMeters ?? 30}
+                    onChange={(e) => set("radiusMeters", parseInt(e.target.value))} />
                 </label>
               </div>
 
-              {/* Nội dung chi tiết */}
+              {/* Vị trí trên sơ đồ ảnh */}
               <div className="admin-form__row">
                 <label className="admin-form__field">
-                  <span>Nội dung chi tiết (VI)</span>
-                  <textarea rows={4} value={editing.details.vi} onChange={(e) => setNested("details", "vi", e.target.value)} />
+                  <span>Vị trí X trên ảnh (%)</span>
+                  <input type="number" min={0} max={100} value={editing.mapX ?? 50}
+                    onChange={(e) => set("mapX", parseFloat(e.target.value))} />
                 </label>
                 <label className="admin-form__field">
-                  <span>Nội dung chi tiết (EN)</span>
-                  <textarea rows={4} value={editing.details.en} onChange={(e) => setNested("details", "en", e.target.value)} />
+                  <span>Vị trí Y trên ảnh (%)</span>
+                  <input type="number" min={0} max={100} value={editing.mapY ?? 50}
+                    onChange={(e) => set("mapY", parseFloat(e.target.value))} />
+                </label>
+                <label className="admin-form__field">
+                  <span>URL ảnh</span>
+                  <input value={editing.imageUrl ?? ""} onChange={(e) => set("imageUrl", e.target.value || null)}
+                    placeholder="/images/spots/elephant.jpg" />
                 </label>
               </div>
             </div>
 
             <div className="admin-modal__actions">
               <button className="admin-btn" onClick={() => setEditing(null)}>Huỷ</button>
-              <button className="admin-btn admin-btn--primary" onClick={handleSave}>Lưu</button>
+              <button className="admin-btn admin-btn--primary" onClick={handleSave} disabled={saving}>
+                {saving ? "Đang lưu…" : "Lưu"}
+              </button>
             </div>
           </div>
         </div>
