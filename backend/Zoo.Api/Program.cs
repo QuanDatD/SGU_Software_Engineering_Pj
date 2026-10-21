@@ -1,41 +1,46 @@
+using Microsoft.EntityFrameworkCore;
+using Zoo.DAL.Data;
+using Zoo.DAL.Interfaces;
+using Zoo.DAL.Repositories;
+using Zoo.DAL.Integrations.Azure;
+using Zoo.DAL.Storage;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// 1. Kết nối CSDL SQL Server
+builder.Services.AddDbContext<ZooDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") 
+        ?? "Server=localhost;Database=SaigonZooDb;Trusted_Connection=True;TrustServerCertificate=True;"));
+
+// 2. Nạp cấu hình Options
+builder.Services.Configure<TranslatorOptions>(builder.Configuration.GetSection("TranslatorOptions"));
+builder.Services.Configure<SpeechOptions>(builder.Configuration.GetSection("SpeechOptions"));
+builder.Services.Configure<MediaStorageOptions>(builder.Configuration.GetSection("MediaStorageOptions"));
+
+// 3. Đăng ký Repositories & Storage (DAL)
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
+builder.Services.AddScoped<INarrationRepository, NarrationRepository>();
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<ISiteTextRepository, SiteTextRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IMediaStorage, LocalMediaStorage>();
+
+// 4. Đăng ký Azure Clients
+builder.Services.AddHttpClient<ITranslationClient, AzureTranslationClient>();
+builder.Services.AddHttpClient<ISpeechClient, AzureSpeechClient>();
+
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
