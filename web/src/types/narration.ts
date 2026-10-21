@@ -1,22 +1,31 @@
-export type JobStatus = "queued" | "processing" | "done" | "failed";
+export type JobStatus = "queued" | "processing" | "succeeded" | "failed";
+export type JobStage  = "translate" | "synthesize" | "store";
+export type RevisionStatus = "draft" | "published" | "archived";
 
 export interface GenerationJob {
-  id: number;
+  id: string;          // Guid
   lang: string;
   status: JobStatus;
-  stage: string | null;
+  stage: JobStage | null;
   errorMessage: string | null;
-  audioUrl: string | null;
+  audioUrl: string | null;   // URL công khai khi succeeded
   createdAt: string;
   updatedAt: string;
 }
 
+export interface NarrationTranslation {
+  lang: string;
+  text: string;
+  isApproved: boolean;
+}
+
 export interface NarrationRevision {
-  id: number;
-  placeId: number;
+  id: string;          // Guid
+  placeId: string;
   version: number;
-  status: "draft" | "published" | "archived";
-  sourceText: string;
+  status: RevisionStatus;
+  sourceText: string;          // bản gốc tiếng Việt
+  translations: NarrationTranslation[];
   jobs: GenerationJob[];
   createdAt: string;
 }

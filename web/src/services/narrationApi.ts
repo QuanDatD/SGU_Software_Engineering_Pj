@@ -1,16 +1,35 @@
 import { api } from "./api";
-import type { NarrationRevision } from "../types/narration";
+import type { NarrationRevision, NarrationTranslation } from "../types/narration";
 
 export const narrationApi = {
-  listRevisions: (placeId: number) =>
-    api.get<NarrationRevision[]>(`/api/admin/places/${placeId}/narrations`),
+  /* Lấy danh sách phiên bản của một khu */
+  listRevisions: (placeId: string) =>
+    api.get<NarrationRevision[]>(`/api/admin/places/${placeId}/revisions`),
 
-  createRevision: (placeId: number, sourceText: string) =>
-    api.post<NarrationRevision>(`/api/admin/places/${placeId}/narrations`, { sourceText }),
+  /* Tạo phiên bản nháp mới */
+  createRevision: (placeId: string, sourceText: string) =>
+    api.post<NarrationRevision>(`/api/admin/places/${placeId}/revisions`, { sourceText }),
 
-  publish: (revisionId: number) =>
-    api.post<NarrationRevision>(`/api/admin/narrations/${revisionId}/publish`, {}),
+  /* Sửa nội dung bản dịch theo ngôn ngữ */
+  updateTranslation: (revisionId: string, lang: string, text: string) =>
+    api.put<NarrationTranslation>(
+      `/api/admin/revisions/${revisionId}/translations/${lang}`,
+      { text },
+    ),
 
-  retryJob: (jobId: number) =>
+  /* Tạo công việc generate audio cho tất cả 5 ngôn ngữ */
+  generate: (revisionId: string) =>
+    api.post<NarrationRevision>(`/api/admin/revisions/${revisionId}/generate`, {}),
+
+  /* Xem tiến độ các job */
+  listJobs: (revisionId: string) =>
+    api.get<NarrationRevision["jobs"]>(`/api/admin/revisions/${revisionId}/jobs`),
+
+  /* Thử lại job lỗi */
+  retryJob: (jobId: string) =>
     api.post<void>(`/api/admin/jobs/${jobId}/retry`, {}),
+
+  /* Xuất bản phiên bản */
+  publish: (revisionId: string) =>
+    api.post<NarrationRevision>(`/api/admin/revisions/${revisionId}/publish`, {}),
 };

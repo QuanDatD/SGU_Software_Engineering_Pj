@@ -1,7 +1,8 @@
 /* ======================================================
-   Base fetch wrapper — kết nối với backend C# API
-   Tất cả request đi qua hàm này để xử lý lỗi thống nhất.
-   VITE_API_BASE trong .env (mặc định trống = cùng origin)
+   Base fetch wrapper
+   - credentials: "include"  → gửi cookie session
+   - CSRF token lấy từ GET /api/auth/csrf, đính vào header
+     X-CSRF-TOKEN cho mọi mutating request (POST/PUT/DELETE)
    ====================================================== */
 
 const BASE = import.meta.env.VITE_API_BASE ?? "";
@@ -13,43 +14,81 @@ export class ApiError extends Error {
     message: string,
   ) {
     super(message);
+    this.name = "ApiError";
   }
+}
+
+/* Cache CSRF token trong memory — lấy lại nếu 403 */
+let csrfToken: string | null = null;
+
+async function fetchCsrf(): Promise<string> {
+  const res = await fetch(`${BASE}/api/auth/csrf`, { credentials: "include" });
+  if (!res.ok) return "";
+  const data = await res.json();
+  return (data.token as string) ?? "";
+}
+
+async function getCsrf(): Promise<string> {
+  if (!csrfToken) csrfToken = await fetchCsrf();
+  return csrfToken;
 }
 
 async function request<T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> {
+  const method = (init?.method ?? "GET").toUpperCase();
+  const mutating = ["POST", "PUT", "PATCH", "DELETE"].includes(method);
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(init?.headers as Record<string, string> ?? {}),
+  };
+
+  if (mutating) {
+    headers["X-CSRF-TOKEN"] = await getCsrf();
+  }
+
   const res = await fetch(`${BASE}${path}`, {
-    credentials: "include", // gửi cookie session
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
+    credentials: "include",
     ...init,
+    headers,
   });
 
+  /* CSRF expired → lấy lại và thử lại 1 lần */
+  if (res.status === 403 && mutating) {
+    csrfToken = await fetchCsrf();
+    headers["X-CSRF-TOKEN"] = csrfToken;
+    const retry = await fetch(`${BASE}${path}`, {
+      credentials: "include",
+      ...init,
+      headers,
+    });
+    return handleResponse<T>(retry);
+  }
+
+  return handleResponse<T>(res);
+}
+
+async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     let code = "UNKNOWN";
     let message = res.statusText;
     try {
       const body = await res.json();
-      code = body.code ?? code;
+      code    = body.code    ?? code;
       message = body.message ?? message;
     } catch { /* ignore */ }
     throw new ApiError(res.status, code, message);
   }
-
-  // 204 No Content
   if (res.status === 204) return undefined as T;
-
   return res.json() as Promise<T>;
 }
 
 export const api = {
-  get:    <T>(path: string)                    => request<T>(path),
-  post:   <T>(path: string, body: unknown)     => request<T>(path, { method: "POST",   body: JSON.stringify(body) }),
-  put:    <T>(path: string, body: unknown)     => request<T>(path, { method: "PUT",    body: JSON.stringify(body) }),
-  patch:  <T>(path: string, body: unknown)     => request<T>(path, { method: "PATCH",  body: JSON.stringify(body) }),
-  delete: <T>(path: string)                    => request<T>(path, { method: "DELETE" }),
+  get:    <T>(path: string)                => request<T>(path),
+  post:   <T>(path: string, body: unknown) => request<T>(path, { method: "POST",   body: JSON.stringify(body) }),
+  put:    <T>(path: string, body: unknown) => request<T>(path, { method: "PUT",    body: JSON.stringify(body) }),
+  patch:  <T>(path: string, body: unknown) => request<T>(path, { method: "PATCH",  body: JSON.stringify(body) }),
+  delete: <T>(path: string)               => request<T>(path, { method: "DELETE" }),
 };

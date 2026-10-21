@@ -24,7 +24,7 @@ export default function SpotsAdmin() {
   const [confirm, setConfirm] = useState<number | null>(null);
 
   useEffect(() => {
-    placeApi.list()
+    placeApi.adminList()
       .then(setPlaces)
       .catch(() => setError("Không tải được dữ liệu. Kiểm tra kết nối backend."))
       .finally(() => setLoading(false));
@@ -35,7 +35,7 @@ export default function SpotsAdmin() {
     setSaving(true);
     try {
       if (editing.id) {
-        const updated = await placeApi.update(editing.id, editing);
+        const updated = await placeApi.update(editing.id as string, editing);
         setPlaces((prev) => prev.map((p) => p.id === updated.id ? updated : p));
       } else {
         const created = await placeApi.create(editing);
@@ -51,10 +51,10 @@ export default function SpotsAdmin() {
 
   async function handleDelete(id: number) {
     try {
-      await placeApi.remove(id);
+      await placeApi.hide(id as unknown as string);
       setPlaces((prev) => prev.filter((p) => p.id !== id));
     } catch {
-      alert("Xoá thất bại.");
+      alert("Ẩn khu thất bại.");
     }
     setConfirm(null);
   }

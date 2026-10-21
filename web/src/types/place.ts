@@ -1,18 +1,21 @@
 export interface Place {
-  id: number;
-  slug: string;           // "elephant", "giraffe" ...
-  icon: string;           // emoji
+  id: string;                        // Guid (string)
+  slug: string;
+  icon: string;
   category: "animal" | "plant" | "facility";
   lat: number;
   lng: number;
-  radiusMeters: number;   // bán kính vùng geofence
-  mapX: number;           // % trên ảnh minh hoạ (0–100)
-  mapY: number;           // % trên ảnh minh hoạ (0–100)
+  radiusMeters: number;
+  mapX: number;                      // pixel trên ảnh gốc
+  mapY: number;
+  priority: number;                  // số lớn hơn ưu tiên hơn
+  isActive: boolean;
   imageUrl: string | null;
-  name: Record<string, string>;   // { vi, en, zh, ko, ja }
+  name: Record<string, string>;      // { vi, en, zh, ko, ja }
   desc: Record<string, string>;
 }
 
 export interface PlaceDetail extends Place {
-  audioUrl: Record<string, string | null>; // { vi: "/audio/...", en: null, ... }
+  /** audioUrl trả về từ API — không lộ đường dẫn vật lý */
+  audioUrl: Record<string, string | null>;
 }

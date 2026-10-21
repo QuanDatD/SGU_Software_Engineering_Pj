@@ -5,9 +5,10 @@ export interface GpsPosition {
   timestamp: number;
 }
 
-export interface ZoneResult {
-  placeId: number | null;  // null = không trong vùng nào
-  distance: number | null; // mét tới tâm vùng gần nhất
+/** Kết quả từ POST /api/visit/evaluate */
+export interface EvaluateResult {
+  placeId: string | null;  // Guid hoặc null
+  distance: number | null; // mét tới tâm vùng
 }
 
 export type GpsState =

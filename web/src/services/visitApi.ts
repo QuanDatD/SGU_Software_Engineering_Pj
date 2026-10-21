@@ -1,8 +1,11 @@
 import { api } from "./api";
-import type { ZoneResult } from "../types/visit";
+import type { EvaluateResult } from "../types/visit";
 
 export const visitApi = {
-  /** Gửi toạ độ GPS lên server, nhận về placeId đang ở trong vùng */
-  checkZone: (lat: number, lng: number, accuracy: number) =>
-    api.post<ZoneResult>("/api/visit/zone", { lat, lng, accuracy }),
+  /**
+   * POST /api/visit/evaluate
+   * Gửi toạ độ GPS, nhận placeId đang ở trong vùng
+   */
+  evaluate: (lat: number, lng: number, accuracy: number) =>
+    api.post<EvaluateResult>("/api/visit/evaluate", { lat, lng, accuracy }),
 };

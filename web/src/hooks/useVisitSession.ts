@@ -12,22 +12,22 @@ import { visitApi } from "../services/visitApi";
 import { useAudio } from "../contexts/AudioContext";
 import type { Lang } from "../types/common";
 
-const POLL_MS         = 5_000;  // gửi GPS mỗi 5 giây
-const STABLE_COUNT    = 2;      // phải ở trong vùng N lần liên tiếp trước khi phát
-const MAX_ACCURACY_M  = 25;     // không xử lý nếu kém hơn
+const POLL_MS         = 5_000;
+const STABLE_COUNT    = 2;
+const MAX_ACCURACY_M  = 25;
 
 interface Options {
   position: GpsPosition | null;
   places: PlaceDetail[];
   lang: Lang;
-  enabled: boolean;             // false khi GPS bị từ chối
+  enabled: boolean;
 }
 
 export function useVisitSession({ position, places, lang, enabled }: Options) {
   const { play, track, state } = useAudio();
 
-  const stableRef   = useRef<{ placeId: number; count: number } | null>(null);
-  const heardSet    = useRef<Set<number>>(new Set()); // khu đã nghe trong session
+  const stableRef   = useRef<{ placeId: string; count: number } | null>(null);
+  const heardSet    = useRef<Set<string>>(new Set());
   const lastPollRef = useRef<number>(0);
   const timerRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -40,7 +40,7 @@ export function useVisitSession({ position, places, lang, enabled }: Options) {
     lastPollRef.current = now;
 
     try {
-      const result = await visitApi.checkZone(position.lat, position.lng, position.accuracy);
+      const result = await visitApi.evaluate(position.lat, position.lng, position.accuracy);
 
       if (result.placeId === null) {
         stableRef.current = null;
