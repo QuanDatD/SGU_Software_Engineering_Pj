@@ -1,123 +1,86 @@
-/* ======================================================
-   MediaAdmin — quản lý ảnh & audio
-   Hiện tại chỉ hiển thị danh sách file đang dùng
-   và hướng dẫn upload thủ công.
-   Khi có backend: thay bằng form upload thật.
-   ====================================================== */
+import { useEffect, useState } from "react";
+import { placeApi } from "../../services/placeApi";
+import type { PlaceDetail } from "../../types/place";
 
-import { type Spot } from "../../data/spots";
+const LANGS = ["vi","en","zh","ko","ja"];
+const LANG_FLAG: Record<string, string> = { vi:"🇻🇳", en:"🇬🇧", zh:"🇨🇳", ko:"🇰🇷", ja:"🇯🇵" };
 
-type Props = { spots: Spot[] };
+export default function MediaAdmin() {
+  const [places,  setPlaces]  = useState<PlaceDetail[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState<string | null>(null);
 
-const HERO_IMAGES = [
-  { path: "/images/hero-bg.jpg",       label: "Ảnh nền Hero" },
-  { path: "/images/cta-bg.jpg",        label: "Ảnh nền CTA" },
-];
+  useEffect(() => {
+    Promise.all(
+      /* Lấy chi tiết từng khu để có audioUrl */
+      [placeApi.list().then((list) =>
+        Promise.all(list.map((p) => placeApi.get(p.id)))
+      )]
+    )
+      .then(([[details]]) => setPlaces(details as unknown as PlaceDetail[]))
+      .catch(() => setError("Không tải được dữ liệu."))
+      .finally(() => setLoading(false));
+  }, []);
 
-const HIGHLIGHT_IMAGES = [
-  { path: "/images/highlight-elephant.jpg", label: "Highlight — Voi châu Á" },
-  { path: "/images/highlight-giraffe.jpg",  label: "Highlight — Hươu cao cổ" },
-  { path: "/images/highlight-lotus.jpg",    label: "Highlight — Hồ Sen" },
-  { path: "/images/highlight-tree.jpg",     label: "Highlight — Cây cổ thụ" },
-];
+  if (loading) return <div className="admin-section"><p>⏳ Đang tải…</p></div>;
 
-const GALLERY_IMAGES = Array.from({ length: 6 }, (_, i) => ({
-  path:  `/images/gallery-${i + 1}.jpg`,
-  label: `Gallery ${i + 1}`,
-}));
-
-function ImageCard({ path, label }: { path: string; label: string }) {
-  return (
-    <div className="media-card">
-      <div className="media-card__preview">
-        <img
-          src={path}
-          alt={label}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-            const ph = (e.currentTarget as HTMLImageElement)
-              .nextElementSibling as HTMLElement | null;
-            if (ph) ph.style.display = "flex";
-          }}
-        />
-        <div className="media-card__placeholder" style={{ display: "none" }}>📷</div>
-      </div>
-      <div className="media-card__info">
-        <strong>{label}</strong>
-        <code>{path}</code>
+  if (error) return (
+    <div className="admin-section">
+      <div className="admin-notice admin-notice--warning">
+        <span>⚠️</span><div><strong>Chưa kết nối backend</strong><p>{error}</p></div>
       </div>
     </div>
   );
-}
 
-export default function MediaAdmin({ spots }: Props) {
   return (
     <div className="admin-section">
-      <div className="admin-section__header">
-        <h2>Quản lý Media</h2>
-      </div>
+      <div className="admin-section__header"><h2>Media — Ảnh & Audio</h2></div>
 
       <div className="admin-notice">
         <span>ℹ️</span>
         <div>
-          <strong>Hướng dẫn upload ảnh thủ công</strong>
-          <p>
-            Đặt file ảnh vào thư mục <code>web/public/images/</code> với đúng tên như bảng bên dưới.
-            Khi có backend, chức năng upload trực tiếp sẽ được tích hợp tại đây.
-          </p>
+          <strong>Upload ảnh</strong>
+          <p>Ảnh được upload qua tab "Điểm tham quan" → trường URL ảnh. File lưu tại <code>storage/images/</code>.</p>
         </div>
       </div>
 
-      {/* Ảnh trang chủ */}
-      <h3 className="admin-subtitle">Ảnh trang chủ</h3>
-      <div className="media-grid">
-        {[...HERO_IMAGES, ...HIGHLIGHT_IMAGES, ...GALLERY_IMAGES].map((img) => (
-          <ImageCard key={img.path} {...img} />
-        ))}
-      </div>
-
-      {/* Ảnh điểm tham quan */}
-      <h3 className="admin-subtitle">Ảnh điểm tham quan</h3>
-      <div className="media-grid">
-        {spots.map((spot) => (
-          <ImageCard
-            key={spot.id}
-            path={spot.img}
-            label={`${spot.icon} ${spot.name.vi}`}
-          />
-        ))}
-      </div>
-
-      {/* Placeholder audio */}
-      <h3 className="admin-subtitle">Audio thuyết minh</h3>
-      <div className="admin-notice admin-notice--warning">
-        <span>🎧</span>
-        <div>
-          <strong>Chưa có audio</strong>
-          <p>
-            Đặt file <code>.mp3</code> vào <code>web/public/audio/&lt;spot-id&gt;.mp3</code>.
-            Ví dụ: <code>audio/elephant.mp3</code>.
-            Tích hợp audio player sẽ được thêm trong bước tiếp theo.
-          </p>
-        </div>
-      </div>
-
-      <div className="media-grid">
-        {spots.map((spot) => (
-          <div className="media-card" key={spot.id}>
-            <div className="media-card__preview media-card__preview--audio">
-              <span>🎧</span>
-            </div>
-            <div className="media-card__info">
-              <strong>{spot.icon} {spot.name.vi}</strong>
-              <code>/audio/{spot.id}.mp3</code>
-              <span className="media-card__status media-card__status--missing">
-                Chưa có file
-              </span>
-            </div>
+      {places.map((p) => (
+        <div className="media-place" key={p.id}>
+          <div className="media-place__header">
+            <span>{p.icon}</span>
+            <h3>{p.name?.vi}</h3>
           </div>
-        ))}
-      </div>
+
+          {/* Ảnh */}
+          <div className="media-place__img">
+            {p.imageUrl ? (
+              <img src={p.imageUrl} alt={p.name?.vi} />
+            ) : (
+              <div className="media-card__placeholder">📷 Chưa có ảnh</div>
+            )}
+          </div>
+
+          {/* Audio theo ngôn ngữ */}
+          <div className="media-place__audios">
+            {LANGS.map((l) => {
+              const url = p.audioUrl?.[l];
+              return (
+                <div key={l} className={`audio-file-row${url ? " audio-file-row--ok" : ""}`}>
+                  <span>{LANG_FLAG[l]} {l.toUpperCase()}</span>
+                  {url ? (
+                    <>
+                      <span className="audio-file-row__ok">✅ Có sẵn</span>
+                      <audio controls src={url} className="audio-file-row__player" />
+                    </>
+                  ) : (
+                    <span className="audio-file-row__missing">⏳ Chưa có</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

@@ -1,107 +1,83 @@
 import { useEffect } from "react";
-import type { Spot } from "../data/spots";
-import type { Lang } from "../i18n";
+import type { PlaceDetail } from "../types/place";
+import type { Lang } from "../types/common";
+import { useAudio } from "../contexts/AudioContext";
 
-type SpotPanelProps = {
-  spot: Spot | null;
+interface Props {
+  place: PlaceDetail | null;
   lang: Lang;
   onClose: () => void;
+}
+
+const CAT_LABEL: Record<string, Record<Lang, string>> = {
+  animal:   { vi: "Động vật", en: "Animal",   zh: "动物", ko: "동물",    ja: "動物" },
+  plant:    { vi: "Thực vật", en: "Plant",    zh: "植物", ko: "식물",    ja: "植物" },
+  facility: { vi: "Tiện ích", en: "Facility", zh: "设施", ko: "시설",    ja: "施設" },
 };
 
-const CATEGORY_LABEL: Record<string, { vi: string; en: string }> = {
-  animal:   { vi: "Động vật", en: "Animal" },
-  plant:    { vi: "Thực vật", en: "Plant"  },
-  facility: { vi: "Tiện ích", en: "Facility" },
-};
-
-const CATEGORY_COLOR: Record<string, string> = {
+const CAT_COLOR: Record<string, string> = {
   animal:   "#206a45",
   plant:    "#2d8a2d",
   facility: "#5d3d85",
 };
 
-export default function SpotPanel({ spot, lang, onClose }: SpotPanelProps) {
-  /* Đóng panel khi nhấn Escape */
+export default function SpotPanel({ place, lang, onClose }: Props) {
+  const { play, track, state, pause, resume } = useAudio();
+
   useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose(); }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  /* Khoá scroll body khi panel mở */
   useEffect(() => {
-    if (spot) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = place ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [spot]);
+  }, [place]);
 
-  if (!spot) return null;
+  if (!place) return null;
 
-  const name     = spot.name[lang];
-  const desc     = spot.desc[lang];
-  const details  = spot.details[lang];
-  const catLabel = CATEGORY_LABEL[spot.category]?.[lang] ?? "";
-  const catColor = CATEGORY_COLOR[spot.category] ?? "#206a45";
+  const name     = place.name?.[lang] ?? place.name?.["vi"] ?? "";
+  const desc     = place.desc?.[lang] ?? place.desc?.["vi"] ?? "";
+  const catLabel = CAT_LABEL[place.category]?.[lang] ?? place.category;
+  const catColor = CAT_COLOR[place.category] ?? "#206a45";
+  const audioUrl = place.audioUrl?.[lang] ?? null;
+
+  const isThisPlaying =
+    track?.placeId === place.id && track?.lang === lang &&
+    (state === "playing" || state === "loading");
+
+  function handlePlayPause() {
+    if (isThisPlaying) {
+      pause();
+    } else if (track?.placeId === place!.id && track?.lang === lang && state === "paused") {
+      resume();
+    } else if (audioUrl) {
+      play({ placeId: place!.id, lang, url: audioUrl, title: name });
+    }
+  }
 
   return (
     <>
-      {/* Overlay tối phía sau panel */}
-      <button
-        className="spot-panel__overlay"
-        type="button"
-        aria-label={lang === "vi" ? "Đóng panel" : "Close panel"}
-        onClick={onClose}
-      />
+      <button className="spot-panel__overlay" type="button" aria-label="Đóng" onClick={onClose} />
 
-      {/* Panel trượt từ phải */}
-      <aside
-        className="spot-panel"
-        role="dialog"
-        aria-modal="true"
-        aria-label={name}
-      >
-        {/* Ảnh đầu panel */}
+      <aside className="spot-panel" role="dialog" aria-modal="true" aria-label={name}>
+        {/* Ảnh */}
         <div className="spot-panel__img-wrap">
-          <img
-            src={spot.img}
-            alt={name}
-            className="spot-panel__img"
-            onError={(e) => {
-              const img = e.currentTarget as HTMLImageElement;
-              img.style.display = "none";
-              const ph = img.nextElementSibling as HTMLElement | null;
-              if (ph) ph.style.display = "flex";
-            }}
-          />
-          {/* Placeholder khi chưa có ảnh */}
-          <div className="spot-panel__img-placeholder" style={{ display: "none" }} aria-hidden="true">
-            <span>{spot.icon}</span>
-          </div>
-
-          {/* Nút đóng nằm trên ảnh */}
-          <button
-            className="spot-panel__close"
-            type="button"
-            aria-label={lang === "vi" ? "Đóng" : "Close"}
-            onClick={onClose}
-          >
-            ✕
-          </button>
+          {place.imageUrl ? (
+            <img src={place.imageUrl} alt={name} className="spot-panel__img" />
+          ) : (
+            <div className="spot-panel__img-placeholder" aria-hidden="true">
+              <span>{place.icon}</span>
+            </div>
+          )}
+          <button className="spot-panel__close" type="button" aria-label="Đóng" onClick={onClose}>✕</button>
         </div>
 
-        {/* Nội dung */}
+        {/* Body */}
         <div className="spot-panel__body">
-          {/* Tag loại */}
-          <span
-            className="spot-panel__tag"
-            style={{ background: catColor }}
-          >
-            {spot.icon} {catLabel}
+          <span className="spot-panel__tag" style={{ background: catColor }}>
+            {place.icon} {catLabel}
           </span>
 
           <h2 className="spot-panel__title">{name}</h2>
@@ -109,26 +85,27 @@ export default function SpotPanel({ spot, lang, onClose }: SpotPanelProps) {
 
           <div className="spot-panel__divider" />
 
-          <p className="spot-panel__details">{details}</p>
-
-          {/*
-           * Audio thuyết minh — placeholder
-           * Khi có file audio, đặt vào /public/audio/<id>.mp3
-           * và bỏ comment phần dưới
-           */}
-          <div className="spot-panel__audio-placeholder">
-            <span>🎧</span>
-            <div>
-              <strong>
-                {lang === "vi" ? "Thuyết minh âm thanh" : "Audio Guide"}
-              </strong>
-              <small>
-                {lang === "vi"
-                  ? "Sắp ra mắt — nội dung đang được chuẩn bị"
-                  : "Coming soon — content is being prepared"}
-              </small>
+          {/* Audio */}
+          {audioUrl ? (
+            <button
+              className={`spot-panel__play-btn${isThisPlaying ? " is-playing" : ""}`}
+              type="button"
+              onClick={handlePlayPause}
+            >
+              {isThisPlaying ? "⏸" : "▶"}
+              {isThisPlaying
+                ? (lang === "vi" ? " Tạm dừng" : " Pause")
+                : (lang === "vi" ? " Nghe thuyết minh" : " Listen to audio guide")}
+            </button>
+          ) : (
+            <div className="spot-panel__audio-placeholder">
+              <span>🎧</span>
+              <div>
+                <strong>{lang === "vi" ? "Thuyết minh sắp ra mắt" : "Audio guide coming soon"}</strong>
+                <small>{lang === "vi" ? "Nội dung đang được chuẩn bị" : "Content is being prepared"}</small>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </aside>
     </>

@@ -513,3 +513,171 @@
 
   .admin-form__row { grid-template-columns: 1fr; }
 }
+
+/* ── Login Page ── */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f6f8;
+}
+.login-form {
+  width: min(400px, 92vw);
+  background: white;
+  border-radius: 18px;
+  padding: 36px 32px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.login-form__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+.login-form__brand strong { display: block; font-size: 14px; color: #143e2b; letter-spacing: 1px; }
+.login-form__brand small  { font-size: 12px; color: #627568; }
+.login-form h1 { margin: 0; font-size: 22px; color: #143e2b; }
+.login-form__error {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fff0f0;
+  border: 1px solid #f5c6cb;
+  color: #c0392b;
+  font-size: 13px;
+}
+.login-form__back { font-size: 13px; color: #627568; text-decoration: none; text-align: center; }
+.login-form__back:hover { color: #206a45; }
+
+/* ── Admin user info ── */
+.admin-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  font-size: 13px;
+  color: #c8dac0;
+  margin-bottom: 4px;
+}
+
+.admin-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 16px;
+  color: #627568;
+  gap: 10px;
+}
+
+.admin-form__section-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #627568;
+  letter-spacing: 0.5px;
+  margin: 4px 0 0;
+}
+
+/* ── Narration Admin ── */
+.narration-create {
+  background: #f8fbf6;
+  border: 1px solid #e0e8da;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.narration-create h3 { margin: 0 0 8px; font-size: 16px; color: #143e2b; }
+
+.revision-card {
+  border: 1px solid #e0e8da;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.revision-card--published { border-color: #b8dfc8; }
+.revision-card--archived  { opacity: 0.6; }
+
+.revision-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f8fbf6;
+  border-bottom: 1px solid #e0e8da;
+  flex-wrap: wrap;
+}
+.revision-card__version { font-weight: 800; color: #143e2b; }
+.revision-card__date    { font-size: 12px; color: #627568; margin-left: auto; }
+.revision-status--published { color: #206a45; font-weight: 700; }
+.revision-status--draft     { color: #7a5820; }
+
+.revision-card__text {
+  padding: 12px 16px;
+  margin: 0;
+  font-size: 13px;
+  color: #3d5246;
+  white-space: pre-wrap;
+  border-bottom: 1px solid #e0e8da;
+}
+
+.revision-card__jobs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.job-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f0f4ee;
+  font-size: 13px;
+}
+.job-item:last-child { border-bottom: none; }
+.job-item--done      { background: #f0faf4; }
+.job-item--failed    { background: #fff5f5; }
+.job-item--processing { background: #fff8e6; }
+.job-item__audio     { height: 32px; flex: 1; max-width: 300px; }
+
+/* ── Media Place ── */
+.media-place {
+  border: 1px solid #e0e8da;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.media-place__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #f8fbf6;
+  border-bottom: 1px solid #e0e8da;
+  font-size: 20px;
+}
+.media-place__header h3 { margin: 0; font-size: 16px; color: #143e2b; }
+.media-place__img {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e8da;
+}
+.media-place__img img { height: 120px; border-radius: 8px; object-fit: cover; }
+.media-place__audios { display: flex; flex-direction: column; }
+.audio-file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #f0f4ee;
+  font-size: 13px;
+}
+.audio-file-row:last-child  { border-bottom: none; }
+.audio-file-row--ok         { background: #f0faf4; }
+.audio-file-row__ok         { color: #206a45; font-weight: 600; }
+.audio-file-row__missing    { color: #627568; }
+.audio-file-row__player     { height: 28px; flex: 1; max-width: 260px; }

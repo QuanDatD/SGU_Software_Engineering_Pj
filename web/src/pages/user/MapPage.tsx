@@ -1,172 +1,122 @@
-import { useEffect, useRef, useState } from "react";
-import * as L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useEffect, useState } from "react";
 import "../../styles/MapPage.css";
-import { spots, type Spot } from "../../data/spots";
-import type { Translations, Lang } from "../../i18n";
+import { placeApi } from "../../services/placeApi";
+import type { Place, PlaceDetail } from "../../types/place";
+import { useLang } from "../../contexts/LanguageContext";
+import { useGeolocation } from "../../hooks/useGeolocation";
+import { useVisitSession } from "../../hooks/useVisitSession";
+import { useAudio } from "../../contexts/AudioContext";
+import IllustratedMap from "../../maps/IllustratedMap";
+import GpsStatus from "../../components/GpsStatus";
+import AudioPlayer from "../../components/AudioPlayer";
 import SpotPanel from "../../components/SpotPanel";
 
-/*
- * Kích thước ảnh map.jpg: 1024 × 643 px
- * Hệ tọa độ CRS.Simple: góc trên-trái = [0,0], góc dưới-phải = [643, 1024]
- * Trục Y đi từ trên xuống dưới (ngược với lat/lng thông thường)
- */
-const IMG_W = 1024;
-const IMG_H = 643;
+export default function MapPage() {
+  const { lang } = useLang();
+  const { gps, start: startGps, stop: stopGps } = useGeolocation();
+  const { track } = useAudio();
 
-/*
- * Ánh xạ tọa độ thực (lat/lng) → pixel trên ảnh
- * Góc tây-bắc thực tế của Thảo Cầm Viên ≈ [10.7895, 106.7032]
- * Góc đông-nam thực tế                    ≈ [10.7855, 106.7075]
- * Điều chỉnh LAT_MAX, LAT_MIN, LNG_MIN, LNG_MAX nếu ảnh lệch
- */
-const LAT_MAX = 10.7900; // vĩ độ phía bắc (top)
-const LAT_MIN = 10.7850; // vĩ độ phía nam (bottom)
-const LNG_MIN = 106.7030; // kinh độ phía tây (left)
-const LNG_MAX = 106.7080; // kinh độ phía đông (right)
+  const [places,      setPlaces]      = useState<Place[]>([]);
+  const [placeDetail, setPlaceDetail] = useState<PlaceDetail | null>(null);
+  const [activeId,    setActiveId]    = useState<number | null>(null);
+  const [loading,     setLoading]     = useState(true);
+  const [error,       setError]       = useState<string | null>(null);
 
-function latLngToPixel(lat: number, lng: number): [number, number] {
-  const x = ((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * IMG_W;
-  // y tăng từ trên xuống, lat tăng từ dưới lên → đảo ngược
-  const y = ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * IMG_H;
-  return [y, x]; // Leaflet CRS.Simple dùng [y, x]
-}
-
-// Giới hạn bản đồ theo kích thước ảnh
-const BOUNDS: L.LatLngBoundsExpression = [[0, 0], [IMG_H, IMG_W]];
-const MAP_CENTER: L.LatLngTuple = [IMG_H / 2, IMG_W / 2];
-
-const CATEGORY_COLOR: Record<string, string> = {
-  animal:   "#206a45",
-  plant:    "#2d8a2d",
-  facility: "#5d3d85",
-};
-
-function makeIcon(emoji: string, color: string): L.DivIcon {
-  return L.divIcon({
-    className: "",
-    html: `<div class="map-marker" style="background:${color}"><span>${emoji}</span></div>`,
-    iconSize:    [42, 42],
-    iconAnchor:  [21, 42],
-    popupAnchor: [0, -44],
-  });
-}
-
-type MapPageProps = {
-  t: Translations;
-  lang: Lang;
-};
-
-export default function MapPage({ t, lang }: MapPageProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef       = useRef<L.Map | null>(null);
-  const [activeSpot, setActiveSpot] = useState<Spot | null>(null);
-
+  // Load danh sách khu
   useEffect(() => {
-    if (!containerRef.current) return;
-
-    /* Tính minZoom để ảnh luôn lấp đầy khung, không thu nhỏ hơn */
-    const containerW = containerRef.current.clientWidth  || IMG_W;
-    const containerH = containerRef.current.clientHeight || 600;
-    const scaleX = containerW / IMG_W;
-    const scaleY = containerH / IMG_H;
-    const fitScale = Math.max(scaleX, scaleY); // chọn cạnh lớn hơn
-    // Leaflet CRS.Simple: zoom 0 = 1px/px, mỗi zoom level nhân đôi
-    const minZoom = Math.log2(fitScale);
-
-    /* Dùng CRS.Simple để load ảnh tĩnh làm bản đồ */
-    const map = L.map(containerRef.current, {
-      crs: L.CRS.Simple,
-      minZoom,
-      maxZoom: 3,
-      zoomSnap: 0.25,
-      maxBoundsViscosity: 1.0, // không cho kéo ra ngoài ảnh
-    });
-
-    mapRef.current = map;
-
-    /* Đặt ảnh map.jpg phủ toàn bộ canvas */
-    L.imageOverlay("/images/map.jpg", BOUNDS).addTo(map);
-
-    /* Fit toàn bộ ảnh vào khung, chừa padding nhỏ */
-    map.fitBounds(BOUNDS, { padding: [0, 0] });
-
-    /* Giới hạn không kéo ra ngoài ảnh */
-    map.setMaxBounds(BOUNDS);
-
-    /* Thêm marker cho từng điểm tham quan */
-    spots.forEach((spot) => {
-      const color   = CATEGORY_COLOR[spot.category] ?? "#206a45";
-      const icon    = makeIcon(spot.icon, color);
-      const [y, x]  = latLngToPixel(spot.coords[0], spot.coords[1]);
-
-      L.marker([y, x], { icon, title: spot.name[lang] })
-        .addTo(map)
-        .on("click", () => setActiveSpot(spot));
-    });
-
-    const observer = new ResizeObserver(() => map.invalidateSize());
-    observer.observe(containerRef.current!);
-
-    return () => {
-      observer.disconnect();
-      map.remove();
-      mapRef.current = null;
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    placeApi.list()
+      .then(setPlaces)
+      .catch(() => setError(lang === "vi" ? "Không tải được dữ liệu." : "Failed to load data."))
+      .finally(() => setLoading(false));
   }, [lang]);
 
-  function returnToCenter() {
-    mapRef.current?.fitBounds(BOUNDS, { padding: [0, 0] });
+  // Load chi tiết khu khi chọn
+  useEffect(() => {
+    if (activeId === null) { setPlaceDetail(null); return; }
+    placeApi.get(activeId)
+      .then(setPlaceDetail)
+      .catch(() => setPlaceDetail(null));
+  }, [activeId]);
+
+  // Tự phát audio theo GPS
+  const gpsPosition = gps.status === "active" ? gps.position : null;
+  useVisitSession({
+    position: gpsPosition,
+    places: places as PlaceDetail[], // cast tạm, audioUrl sẽ load khi cần
+    lang,
+    enabled: gps.status === "active",
+  });
+
+  // Khi player đang phát, highlight khu tương ứng
+  useEffect(() => {
+    if (track) setActiveId(track.placeId);
+  }, [track]);
+
+  function handleSelect(place: Place) {
+    setActiveId(place.id);
   }
+
+  const LABELS = {
+    title:     { vi: "Bản đồ tham quan",              en: "Visit Map",                 zh: "参观地图",         ko: "방문 지도",            ja: "訪問マップ" },
+    eyebrow:   { vi: "HÀNH TRÌNH CỦA BẠN",             en: "YOUR JOURNEY",              zh: "您的旅程",         ko: "당신의 여정",          ja: "あなたの旅" },
+    subtitle:  { vi: "Khám phá không gian xanh.",      en: "Explore the green space.",  zh: "探索绿色空间。",    ko: "녹색 공간을 탐험하세요.", ja: "緑の空間を探検しましょう。" },
+    help:      { vi: "Nhấn vào điểm trên bản đồ để xem thông tin.", en: "Tap a point on the map to view details.", zh: "点击地图上的点查看详情。", ko: "지도의 포인트를 탭하여 세부 정보를 보세요.", ja: "マップのポイントをタップして詳細を表示します。" },
+    animalLeg: { vi: "Động vật", en: "Animals", zh: "动物", ko: "동물", ja: "動物" },
+    plantLeg:  { vi: "Thực vật", en: "Plants",  zh: "植物", ko: "식물", ja: "植物" },
+    facLeg:    { vi: "Tiện ích", en: "Facilities", zh: "设施", ko: "시설", ja: "施設" },
+  };
+  const t = (key: keyof typeof LABELS) => LABELS[key]?.[lang] ?? LABELS[key]?.["en"] ?? "";
 
   return (
     <>
       <section className="section map-page">
         <div className="section__heading">
           <div>
-            <span className="eyebrow eyebrow--green">{t.mapEyebrow}</span>
-            <h1>{t.mapTitle}</h1>
+            <span className="eyebrow eyebrow--green">{t("eyebrow")}</span>
+            <h1>{t("title")}</h1>
           </div>
-          <p>{t.mapDesc}</p>
+          <p>{t("subtitle")}</p>
         </div>
 
-        <div className="map-toolbar">
-          <span>{t.mapDrag}</span>
-          <button className="map-home-button" type="button" onClick={returnToCenter}>
-            {t.mapReturnBtn}
-          </button>
-        </div>
+        {/* GPS status bar */}
+        <GpsStatus gps={gps} onStart={startGps} onStop={stopGps} lang={lang} />
 
+        {/* Bản đồ */}
         <div className="zoo-map-frame">
-          <div
-            ref={containerRef}
-            className="zoo-map"
-            role="region"
-            aria-label={t.mapTitle}
-          />
+          {loading ? (
+            <div className="map-loading">⏳</div>
+          ) : error ? (
+            <div className="map-error">{error}</div>
+          ) : (
+            <IllustratedMap
+              places={places}
+              activePlaceId={activeId}
+              lang={lang}
+              onSelect={handleSelect}
+            />
+          )}
         </div>
 
-        {/* Chú thích màu marker */}
+        {/* Chú thích */}
         <div className="map-legend">
-          <span style={{ borderLeft: `3px solid ${CATEGORY_COLOR.animal}`, paddingLeft: 8 }}>
-            🐘 {lang === "vi" ? "Động vật" : "Animals"}
-          </span>
-          <span style={{ borderLeft: `3px solid ${CATEGORY_COLOR.plant}`, paddingLeft: 8 }}>
-            🌳 {lang === "vi" ? "Thực vật" : "Plants"}
-          </span>
-          <span style={{ borderLeft: `3px solid ${CATEGORY_COLOR.facility}`, paddingLeft: 8 }}>
-            🏛️ {lang === "vi" ? "Tiện ích" : "Facilities"}
-          </span>
+          <span style={{ borderLeft: "3px solid #206a45", paddingLeft: 8 }}>🐘 {t("animalLeg")}</span>
+          <span style={{ borderLeft: "3px solid #2d8a2d", paddingLeft: 8 }}>🌳 {t("plantLeg")}</span>
+          <span style={{ borderLeft: "3px solid #5d3d85", paddingLeft: 8 }}>🏛️ {t("facLeg")}</span>
         </div>
 
-        <p className="map-help">{t.mapHelp}</p>
+        <p className="map-help">{t("help")}</p>
       </section>
 
+      {/* Audio player cố định ở dưới màn hình */}
+      <div className="audio-player-bar">
+        <AudioPlayer lang={lang} />
+      </div>
+
+      {/* Panel chi tiết khu */}
       <SpotPanel
-        spot={activeSpot}
+        place={placeDetail}
         lang={lang}
-        onClose={() => setActiveSpot(null)}
+        onClose={() => setActiveId(null)}
       />
     </>
   );
