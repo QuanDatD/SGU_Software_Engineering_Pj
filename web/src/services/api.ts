@@ -92,3 +92,45 @@ export const api = {
   patch:  <T>(path: string, body: unknown) => request<T>(path, { method: "PATCH",  body: JSON.stringify(body) }),
   delete: <T>(path: string)               => request<T>(path, { method: "DELETE" }),
 };
+export async function uploadForm<T>(
+  path: string,
+  method: "POST" | "PUT",
+  body: FormData,
+): Promise<T> {
+  // Lấy token mới theo phiên đăng nhập hiện tại.
+  const csrfResponse = await fetch(`${BASE}/api/auth/csrf`, {
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!csrfResponse.ok) {
+    throw new ApiError(
+      csrfResponse.status,
+      "CSRF_FAILED",
+      "Không lấy được mã xác thực yêu cầu.",
+    );
+  }
+
+  const csrfData = await csrfResponse.json();
+
+  if (typeof csrfData.token !== "string" || !csrfData.token) {
+    throw new ApiError(
+      500,
+      "CSRF_INVALID",
+      "Mã xác thực yêu cầu không hợp lệ.",
+    );
+  }
+
+  const response = await fetch(`${BASE}${path}`, {
+    method,
+    credentials: "include",
+    headers: {
+      "X-CSRF-TOKEN": csrfData.token,
+    },
+    body,
+  });
+
+  // Không tự đặt Content-Type khi gửi FormData.
+  // Trình duyệt sẽ thêm multipart/form-data cùng boundary.
+  return handleResponse<T>(response);
+}

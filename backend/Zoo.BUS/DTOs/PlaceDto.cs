@@ -20,4 +20,13 @@ public sealed class PlaceDto
 
     public string? ImageUrl { get; init; }
     public string? AudioUrl { get; init; }
+    public double MapX { get; init; }
+
+    public double MapY { get; init; }
+
+    public bool IsActive { get; init; }
+
+    public Dictionary<string, string> Names { get; init; } = new();
+
+    public Dictionary<string, string> Descriptions { get; init; } = new();
 }
