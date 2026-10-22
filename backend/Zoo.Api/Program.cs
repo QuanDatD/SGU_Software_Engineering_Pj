@@ -68,6 +68,7 @@ builder.Services.AddHttpClient<
 // 5. Đăng ký BUS.
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGeofenceService, GeofenceService>();
+builder.Services.AddScoped<INarrationService, NarrationService>();
 
 // Hiện chưa có PlaceService đọc database.
 if (builder.Environment.IsDevelopment())
@@ -175,14 +176,24 @@ else
 {
     app.UseHttpsRedirection();
 }
+var storageOptions = builder.Configuration.GetSection("MediaStorageOptions").Get<MediaStorageOptions>() ?? new MediaStorageOptions();
+var resolvedStoragePath = Path.GetFullPath(storageOptions.RootPath, builder.Environment.ContentRootPath);
 
+if (!Directory.Exists(resolvedStoragePath))
+{
+    Directory.CreateDirectory(resolvedStoragePath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(resolvedStoragePath),
+    RequestPath = "/storage",
+    ServeUnknownFileTypes = true
+});
 app.UseRouting();
-
 app.UseCors("LocalFrontend");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

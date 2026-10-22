@@ -1,37 +1,34 @@
-﻿using Zoo.BUS.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using Zoo.BUS.DTOs;
 using Zoo.BUS.Interfaces;
+using Zoo.DAL.Data;
 using Zoo.DAL.Entities;
-using Zoo.DAL.Enums;
-using Zoo.DAL.Interfaces;
 
 namespace Zoo.BUS.Services;
 
-public sealed class PlaceService :
-    IPlaceService,
-    IAdminPlaceService
+public sealed class PlaceService : IPlaceService
 {
-    private readonly IPlaceRepository _repository;
+    private readonly ZooDbContext _db;
 
-    public PlaceService(IPlaceRepository repository)
+    public PlaceService(ZooDbContext db)
     {
-        _repository = repository;
+        _db = db;
     }
 
-    // Khách chỉ thấy khu đang hoạt động và đã xuất bản.
     public async Task<IReadOnlyList<PlaceDto>> GetPublishedAsync(
         string language,
         CancellationToken cancellationToken = default)
     {
-        var places = await _repository.GetPublishedAsync(
-            cancellationToken);
+        // Lấy tất cả các khu Active và đã có Revision xuất bản
+        var places = await _db.Places
+            .AsNoTracking()
+            .Include(p => p.PublishedRevision)
+                .ThenInclude(r => r!.Translations)
+            .Where(p => p.IsActive && p.PublishedRevisionId != null)
+            .OrderByDescending(p => p.Priority)
+            .ToListAsync(cancellationToken);
 
-        return places
-            .Where(IsPublished)
-            .Select(p => Map(
-                p,
-                p.PublishedRevision,
-                language))
-            .ToList();
+        return places.Select(MapToDto).ToList();
     }
 
     public async Task<PlaceDto?> GetPublishedByIdAsync(
@@ -39,104 +36,81 @@ public sealed class PlaceService :
         string language,
         CancellationToken cancellationToken = default)
     {
-        var place = await _repository.GetByIdAsync(
-            id,
-            cancellationToken);
+        var place = await _db.Places
+            .AsNoTracking()
+            .Include(p => p.PublishedRevision)
+                .ThenInclude(r => r!.Translations)
+            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive && p.PublishedRevisionId != null, cancellationToken);
 
-        if (place is null || !IsPublished(place))
+        return place is null ? null : MapToDto(place);
+    }
+
+    private static PlaceDto MapToDto(Place p)
+    {
+        var names = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var descs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var audios = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+
+        var langs = new[] { "vi", "en", "zh", "ko", "ja" };
+        foreach (var l in langs)
         {
-            return null;
+            names[l] = "";
+            descs[l] = "";
+            audios[l] = null;
         }
 
-        return Map(
-            place,
-            place.PublishedRevision,
-            language);
-    }
-
-    // Admin thấy tất cả khu.
-    public async Task<IReadOnlyList<PlaceDto>> GetAllAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var places = await _repository.GetAllAsync(
-            cancellationToken);
-
-        return places.Select(place =>
+        if (p.PublishedRevision != null)
         {
-            // Admin xem nội dung phiên bản mới nhất,
-            // kể cả khi phiên bản đó còn là bản nháp.
-            var revision = place.Revisions
-                .OrderByDescending(r => r.Version)
-                .FirstOrDefault();
+            foreach (var t in p.PublishedRevision.Translations)
+            {
+                var l = t.Language.ToLowerInvariant();
+                names[l] = t.Title;
+                descs[l] = string.IsNullOrWhiteSpace(t.ScriptText) ? t.Description : t.ScriptText;
 
-            return Map(place, revision, "vi");
-        }).ToList();
-    }
-
-    private static bool IsPublished(Place place)
-    {
-        var revision = place.PublishedRevision;
-
-        return place.IsActive
-            && revision is not null
-            && place.PublishedRevisionId == revision.Id
-            && revision.PlaceId == place.Id
-            && revision.Status == RevisionStatus.Published;
-    }
-
-    private static PlaceDto Map(
-        Place place,
-        NarrationRevision? revision,
-        string language)
-    {
-        var translations = revision?.Translations
-            .ToList() ?? new List<NarrationTranslation>();
-
-        var names = translations.ToDictionary(
-            t => t.Language,
-            t => t.Title);
-
-        var descriptions = translations.ToDictionary(
-            t => t.Language,
-            t => t.Description);
-
-        // Nếu chưa nhập tên tiếng Việt, admin vẫn thấy mã khu.
-        if (!names.TryGetValue("vi", out var viName)
-            || string.IsNullOrWhiteSpace(viName))
-        {
-            names["vi"] = place.Code;
+                if (!string.IsNullOrEmpty(t.AudioPath))
+                {
+                    audios[l] = $"/storage/{t.AudioPath.TrimStart('/')}";
+                }
+            }
         }
-
-        var selected = translations
-            .FirstOrDefault(t => t.Language == language);
 
         return new PlaceDto
         {
-            Id = place.Id,
-            Code = place.Code,
-            Category = place.Category,
-            Language = language,
+            Id = p.Id,
+            Slug = p.Code.ToLowerInvariant().Replace('_', '-'),
+            Code = p.Code,
+            Icon = GetIconForCategory(p.Code, p.Category),
+            Category = p.Category.ToLowerInvariant(),
+            Lat = p.Latitude,
+            Lng = p.Longitude,
+            RadiusMeters = p.RadiusMeters,
+            MapX = p.MapX,
+            MapY = p.MapY,
+            Priority = p.Priority,
+            IsActive = p.IsActive,
+            ImageUrl = p.ImageUrl ?? $"/images/{p.Code.ToLowerInvariant().Replace('_', '-')}.jpg",
+            Name = names,
+            Desc = descs,
+            AudioUrl = audios
+        };
+    }
 
-            Name = selected?.Title ?? place.Code,
-            Summary = selected?.Description ?? "",
-            Script = selected?.ScriptText ?? "",
-
-            Latitude = place.Latitude,
-            Longitude = place.Longitude,
-            RadiusMeters = place.RadiusMeters,
-            Priority = place.Priority,
-
-            MapX = place.MapX,
-            MapY = place.MapY,
-            IsActive = place.IsActive,
-
-            ImageUrl = place.ImageUrl,
-
-            // Sẽ nối URL khi có API phục vụ âm thanh.
-            AudioUrl = null,
-
-            Names = names,
-            Descriptions = descriptions
+    private static string GetIconForCategory(string code, string category)
+    {
+        return code.ToUpperInvariant() switch
+        {
+            var c when c.Contains("ELEPHANT") => "🐘",
+            var c when c.Contains("TIGER") => "🐯",
+            var c when c.Contains("GIRAFFE") => "🦒",
+            var c when c.Contains("BIRD") || c.Contains("REPTILE") => "🐊",
+            var c when c.Contains("MUSEUM") || c.Contains("ENTRANCE") => "🏛️",
+            var c when c.Contains("TREE") || c.Contains("BOTANICAL") => "🌳",
+            _ => category.ToLowerInvariant() switch
+            {
+                "animal" => "🐾",
+                "plant" => "🌿",
+                _ => "📍"
+            }
         };
     }
 }

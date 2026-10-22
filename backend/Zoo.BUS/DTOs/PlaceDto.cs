@@ -3,30 +3,25 @@ namespace Zoo.BUS.DTOs;
 public sealed class PlaceDto
 {
     public Guid Id { get; init; }
-
+    public string Slug { get; init; } = "";
     public string Code { get; init; } = "";
-    public string Category { get; init; } = "";
-    public string Language { get; init; } = "";
+    public string Icon { get; init; } = "📍";
+    public string Category { get; init; } = "animal"; // animal | plant | facility
 
-    public string Name { get; init; } = "";
-    public string Summary { get; init; } = "";
-    public string Script { get; init; } = "";
-
-    public double Latitude { get; init; }
-    public double Longitude { get; init; }
-
+    // Tọa độ GPS thực tế & Bán kính nhận diện
+    public double Lat { get; init; }
+    public double Lng { get; init; }
     public double RadiusMeters { get; init; }
-    public int Priority { get; init; }
 
-    public string? ImageUrl { get; init; }
-    public string? AudioUrl { get; init; }
+    // Tọa độ hiển thị trên sơ đồ vẽ (Illustrated Map 1024x643)
     public double MapX { get; init; }
-
     public double MapY { get; init; }
+    public int Priority { get; init; } = 1;
+    public bool IsActive { get; init; } = true;
+    public string? ImageUrl { get; init; }
 
-    public bool IsActive { get; init; }
-
-    public Dictionary<string, string> Names { get; init; } = new();
-
-    public Dictionary<string, string> Descriptions { get; init; } = new();
+    // Đa ngôn ngữ: { "vi": "...", "en": "...", "zh": "...", "ko": "...", "ja": "..." }
+    public Dictionary<string, string> Name { get; init; } = new();
+    public Dictionary<string, string> Desc { get; init; } = new();
+    public Dictionary<string, string?> AudioUrl { get; init; } = new();
 }
