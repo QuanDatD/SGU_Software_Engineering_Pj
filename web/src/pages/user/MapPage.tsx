@@ -75,12 +75,14 @@ export default function MapPage({ t, lang }: MapPageProps) {
     const mapInstanceRef = useRef<L.Map | null>(null);
     const userMarkerRef = useRef<L.Marker | null>(null);
     const userAccuracyCircleRef = useRef<L.Circle | null>(null);
+    const [places, setPlaces] = useState<PlaceDetail[]>([]);
+    const [placeDetail, setPlaceDetail] = useState<PlaceDetail | null>(null);
+    const [activeId, setActiveId] = useState<string | null>(null); // Dùng string cho Guid SQL Server
+    const [isOffline, setIsOffline] = useState(false);
 
     const [userCoords, setUserCoords] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
     const [gpsStatus, setGpsStatus] = useState<"idle" | "requesting" | "active" | "error">("idle");
-    const [activeSpot, setActiveSpot] = useState<typeof ZOO_SPOTS[0] | null>(null);
     const [watchId, setWatchId] = useState<number | null>(null);
-
     // 1. Khởi tạo bản đồ Leaflet
     useEffect(() => {
         if (!mapContainerRef.current || mapInstanceRef.current) return;

@@ -8,8 +8,11 @@ public interface IPlaceService
         string language,
         CancellationToken cancellationToken = default);
 
-    Task<PlaceDto?> GetPublishedByIdAsync(
+    Task<PlaceDto?> GetPublishedByIdAsync   
         Guid id,
         string language,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<PlaceDto>> GetAllForAdminAsync(
         CancellationToken cancellationToken = default);
 }

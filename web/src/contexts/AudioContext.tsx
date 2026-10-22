@@ -8,7 +8,7 @@ import {
 } from "react";
 
 export interface TrackInfo {
-  placeId: number;
+  placeId: string;
   lang: string;
   url: string;
   title: string;
@@ -59,20 +59,31 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     return audioRef.current;
   }
 
-  const play = useCallback((newTrack: TrackInfo) => {
-    const el = getAudio();
+    const play = useCallback((next: TrackInfo) => {
+        const el = getAudio();
 
-    // Không phát lại bài đang phát
-    if (track?.url === newTrack.url && (state === "playing" || state === "loading")) return;
+        // Không phát lại bài đang phát
+        if (track?.url === next.url && (state === "playing" || state === "loading")) return;
 
-    el.pause();
-    el.src = newTrack.url;
-    el.currentTime = 0;
-    setTrack(newTrack);
-    setState("loading");
-    el.play().catch(() => setState("error"));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [track, state]);
+        el.pause();
+
+        // Xử lý nối domain Backend nếu là đường dẫn tương đối
+        const fullAudioUrl = next.url.startsWith("http")
+            ? next.url
+            : `${API_BASE}${next.url.startsWith("/") ? "" : "/"}${next.url}`;
+
+        const currentTrack = { ...next, url: fullAudioUrl };
+
+        setTrack(currentTrack);
+        setCurrentTime(0);
+        setDuration(0);
+        setState("loading");
+
+        el.src = fullAudioUrl;
+        el.currentTime = 0;
+        el.load();
+        el.play().catch(() => setState("error"));
+    }, [track, state]);
 
   const resume = useCallback(() => {
     audioRef.current?.play().catch(() => setState("error"));
