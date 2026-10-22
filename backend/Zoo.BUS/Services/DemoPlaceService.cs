@@ -36,6 +36,9 @@ public sealed class DemoPlaceService : IPlaceService
         return Task.FromResult(place);
     }
 
+    public Task<IReadOnlyList<PlaceDto>> GetAllForAdminAsync(CancellationToken cancellationToken = default)
+        => GetPublishedAsync("vi", cancellationToken);
+
     private static PlaceDto CreateDemoPlace(string language)
     {
         // Bản dịch mẫu để kiểm tra API, không phải kết quả Azure.
@@ -75,21 +78,21 @@ public sealed class DemoPlaceService : IPlaceService
             Id = ElephantId,
             Code = "elephant",
             Category = "animal",
-            Language = language,
 
-            Name = content.Name,
-            Summary = content.Summary,
-            Script = content.Script,
+
+            Name = new() { [language] = content.Name },
+            Desc = new() { [language] = content.Summary },
+            Script = new() { [language] = content.Script },
 
             // Tọa độ minh họa, chưa được xác minh thực địa.
-            Latitude = 10.7882,
-            Longitude = 106.7042,
+            Lat = 10.7882,
+            Lng = 106.7042,
 
             RadiusMeters = 30,
             Priority = 1,
 
             ImageUrl = null,
-            AudioUrl = null
+            AudioUrl = new()
         };
     }
 }

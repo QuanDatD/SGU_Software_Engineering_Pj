@@ -1,101 +1,23 @@
-import { api, uploadForm } from "./api";
+import { api, uploadForm, mediaUrl } from "./api";
 import type { Place, PlaceDetail } from "../types/place";
 
-interface ApiPlace {
-  id: string;
-  code: string;
-  category: Place["category"];
-  language: string;
-
-  name: string;
-  summary: string;
-  script: string;
-
-  latitude: number;
-  longitude: number;
-  radiusMeters: number;
-  priority: number;
-
-  mapX: number;
-  mapY: number;
-  isActive: boolean;
-
-  imageUrl: string | null;
-  audioUrl: string | null;
-
-  names: Record<string, string>;
-  descriptions: Record<string, string>;
-}
-
-function toPlace(item: ApiPlace): PlaceDetail {
-  const icons: Record<Place["category"], string> = {
-    animal: "🐾",
-    plant: "🌳",
-    facility: "📍",
-  };
-
-  return {
-    id: item.id,
-    slug: item.code,
-    icon: icons[item.category] ?? "📍",
-    category: item.category,
-
-    lat: item.latitude,
-    lng: item.longitude,
-    radiusMeters: item.radiusMeters,
-    priority: item.priority,
-
-    mapX: item.mapX,
-    mapY: item.mapY,
-    isActive: item.isActive,
-    imageUrl: item.imageUrl,
-
-    name: item.names,
-    desc: item.descriptions,
-
-    audioUrl: {
-      [item.language]: item.audioUrl,
-    },
+function toPlace(item: PlaceDetail): PlaceDetail {
+  return { ...item,
+    imageUrl: item.imageUrl ? mediaUrl(item.imageUrl) : null,
+    audioUrl: Object.fromEntries(Object.entries(item.audioUrl ?? {}).map(([lang, url]) => [lang, url ? mediaUrl(url) : null])),
   };
 }
-
 export const placeApi = {
   async list(lang = "vi"): Promise<PlaceDetail[]> {
-    const result = await api.get<ApiPlace[]>(
-      `/api/places?lang=${encodeURIComponent(lang)}`,
-    );
-
-    return result.map(toPlace);
+    return (await api.get<PlaceDetail[]>(`/api/places?lang=${encodeURIComponent(lang)}`)).map(toPlace);
   },
-
   async get(id: string, lang = "vi"): Promise<PlaceDetail> {
-    const result = await api.get<ApiPlace>(
-      `/api/places/${id}?lang=${encodeURIComponent(lang)}`,
-    );
-
-    return toPlace(result);
+    return toPlace(await api.get<PlaceDetail>(`/api/places/${id}?lang=${encodeURIComponent(lang)}`));
   },
-
-  async adminList(): Promise<Place[]> {
-    const result = await api.get<ApiPlace[]>(
-      "/api/admin/places",
-    );
-
-    return result.map(toPlace);
+  async adminList(): Promise<PlaceDetail[]> {
+    return (await api.get<PlaceDetail[]>("/api/admin/places")).map(toPlace);
   },
-
-  // Các API ghi sẽ triển khai ở bước tiếp theo.
-  create: (body: Partial<Place>) =>
-    api.post<Place>("/api/admin/places", body),
-
-  update: (id: string, body: Partial<Place>) =>
-    api.put<Place>(`/api/admin/places/${id}`, body),
-
-  hide: (id: string) =>
-    api.put<Place>(
-      `/api/admin/places/${id}`,
-      { isActive: false },
-    ),
+  hide: (id: string) => api.patch<void>(`/api/admin/places/${id}/hide`, {}),
 };
 export interface SavePlaceDraftRequest {
   nameVi: string;

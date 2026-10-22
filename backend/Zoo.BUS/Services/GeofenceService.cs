@@ -6,7 +6,7 @@ namespace Zoo.BUS.Services;
 public sealed class GeofenceService : IGeofenceService
 {
     private readonly IPlaceService _placeService;
-    private const double MaxAccuracyMeters = 100; // Nới lỏng sai số GPS cho thiết bị di động/trình duyệt
+    private const double MaxAccuracyMeters = 25; // Nới lỏng sai số GPS cho thiết bị di động/trình duyệt
 
     public GeofenceService(IPlaceService placeService)
     {
@@ -22,7 +22,7 @@ public sealed class GeofenceService : IGeofenceService
         var acc = request.ResolvedAccuracy;
 
         if (lat is null || lng is null || acc is null ||
-            !double.IsFinite(lat.Value) || !double.IsFinite(lng.Value) ||
+            !double.IsFinite(lat.Value) || !double.IsFinite(lng.Value) || !double.IsFinite(acc.Value) || acc < 0 ||
             lat < -90 || lat > 90 || lng < -180 || lng > 180)
         {
             return new EvaluateVisitResponse { Accepted = false, ReasonCode = "INVALID_POSITION" };

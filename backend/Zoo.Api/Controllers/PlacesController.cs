@@ -6,6 +6,7 @@ namespace Zoo.Api.Controllers;
 
 [ApiController]
 [Route("api/places")]
+[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class PlacesController : ControllerBase
 {
     private readonly IPlaceService _placeService;

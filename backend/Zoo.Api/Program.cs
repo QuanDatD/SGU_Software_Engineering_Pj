@@ -70,18 +70,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGeofenceService, GeofenceService>();
 builder.Services.AddScoped<INarrationService, NarrationService>();
 
-// Hiện chưa có PlaceService đọc database.
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddScoped<IPlaceService, PlaceService>();
-
-    builder.Services.AddScoped<IAdminPlaceService, PlaceService>();
-}
-else
-{
-    throw new InvalidOperationException(
-        "Cần triển khai PlaceService đọc database trước khi chạy production.");
-}
+builder.Services.AddScoped<PlaceEditingService>();
+builder.Services.AddScoped<IPlaceService, PlaceService>();
+builder.Services.AddScoped<IAdminPlaceService, PlaceService>();
+builder.Services.AddScoped<Zoo.Api.Filters.ContentWriteFilter>();
 
 builder.Services.AddScoped<
     IPasswordHasher<AdminUser>,
@@ -147,9 +139,7 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = securePolicy;
 });
-builder.Services.AddScoped<
-    IPasswordHasher<AdminUser>,
-    PasswordHasher<AdminUser>>();
+
 // Chỉ Build một lần, sau tất cả đăng ký service.
 var app = builder.Build();
 
@@ -184,11 +174,11 @@ if (!Directory.Exists(resolvedStoragePath))
     Directory.CreateDirectory(resolvedStoragePath);
 }
 
+Directory.CreateDirectory(Path.Combine(resolvedStoragePath, "images"));
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(resolvedStoragePath),
-    RequestPath = "/storage",
-    ServeUnknownFileTypes = true
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.Combine(resolvedStoragePath, "images")),
+    RequestPath = "/storage/images"
 });
 app.UseRouting();
 app.UseCors("LocalFrontend");

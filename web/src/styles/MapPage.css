@@ -328,3 +328,16 @@
   font-size: 16px;
   color: #627568;
 }
+
+/* Live SQL/API map: retain existing site colours and shared audio player. */
+.live-map { position:relative; height:calc(100dvh - 80px); min-height:550px; }
+.live-map__canvas { position:absolute; inset:0; z-index:1; }
+.live-map__gps,.live-map__detail { position:absolute; z-index:500; padding:16px; background:#fffffff2; border:1px solid #168652; border-radius:16px; box-shadow:0 6px 24px #163d2526; color:#173d29; }
+.live-map__gps { top:12px; left:12px; max-width:320px; display:grid; gap:8px; }
+.live-map button { cursor:pointer; border:0; border-radius:8px; padding:8px 12px; background:#168652; color:white; margin:3px; }
+.live-map button:disabled { opacity:.5; cursor:default; }
+.live-map__detail { bottom:110px; left:12px; width:min(420px,calc(100% - 24px)); max-height:50%; overflow:auto; }
+.live-map__detail img { width:100%; max-height:130px; object-fit:cover; border-radius:10px; }
+.live-map__detail p { white-space:pre-wrap; }
+.live-map__close { float:right; }
+.live-map .audio-player { z-index:700; }

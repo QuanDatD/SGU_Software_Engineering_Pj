@@ -5,16 +5,25 @@
      X-CSRF-TOKEN cho mọi mutating request (POST/PUT/DELETE)
    ====================================================== */
 
-const BASE = import.meta.env.VITE_API_BASE ?? "";
+const BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+export function mediaUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
+  // Local UI artwork remains on the frontend; API/storage URLs belong to the backend.
+  return path.startsWith("/api/") || path.startsWith("/storage/") ? `${BASE}${path}` : path;
+}
 
 export class ApiError extends Error {
+  public status: number;
+  public code: string;
   constructor(
-    public status: number,
-    public code: string,
+    status: number,
+    code: string,
     message: string,
   ) {
     super(message);
     this.name = "ApiError";
+    this.status = status;
+    this.code = code;
   }
 }
 
@@ -29,7 +38,7 @@ async function fetchCsrf(): Promise<string> {
 }
 
 async function getCsrf(): Promise<string> {
-  if (!csrfToken) csrfToken = await fetchCsrf();
+  csrfToken = await fetchCsrf();
   return csrfToken;
 }
 
@@ -51,6 +60,7 @@ async function request<T>(
 
   const res = await fetch(`${BASE}${path}`, {
     credentials: "include",
+    cache: "no-store",
     ...init,
     headers,
   });
@@ -77,7 +87,7 @@ async function handleResponse<T>(res: Response): Promise<T> {
     try {
       const body = await res.json();
       code    = body.code    ?? code;
-      message = body.message ?? message;
+      message = body.message ?? (body.errors ? Object.values(body.errors).flat().join(" ") : body.title) ?? message;
     } catch { /* ignore */ }
     throw new ApiError(res.status, code, message);
   }

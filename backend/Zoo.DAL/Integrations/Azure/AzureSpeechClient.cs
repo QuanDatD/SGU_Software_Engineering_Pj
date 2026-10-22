@@ -42,7 +42,7 @@ public class AzureSpeechClient : ISpeechClient
 
         using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
         request.Headers.Add("Ocp-Apim-Subscription-Key", _options.ApiKey);
-        request.Headers.Add("X-MicrosoftSpeak-OutputFormat", "audio-16khz-128kbitrate-mono-mp3");
+        request.Headers.Add("X-Microsoft-OutputFormat", "audio-16khz-128kbitrate-mono-mp3");
         request.Headers.Add("User-Agent", "SaigonZooAudioGuide");
         request.Content = new StringContent(ssml, Encoding.UTF8, "application/ssml+xml");
 

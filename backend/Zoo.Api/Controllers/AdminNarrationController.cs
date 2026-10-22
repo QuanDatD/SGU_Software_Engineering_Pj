@@ -1,4 +1,7 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
+using Zoo.BUS.Services;
+using Zoo.Api.Filters;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +16,9 @@ namespace Zoo.Api.Controllers;
 
 [ApiController]
 [Route("api/admin")]
+[Authorize(Roles = "Admin")]
+[AutoValidateAntiforgeryToken]
+[ServiceFilter(typeof(ContentWriteFilter))]
 public class AdminNarrationController : ControllerBase
 {
     private readonly ZooDbContext _db;
@@ -37,19 +43,11 @@ public class AdminNarrationController : ControllerBase
         _storage = storage;
     }
 
-    // 1. Lấy toàn bộ danh sách khu cho Admin
-    [HttpGet("places")]
-    public async Task<ActionResult<IReadOnlyList<PlaceDto>>> GetAdminPlaces(CancellationToken ct)
-    {
-        var places = await _placeService.GetAllForAdminAsync(ct);
-        return Ok(places);
-    }
-
     // 2. Lấy danh sách phiên bản thuyết minh của 1 khu
     [HttpGet("places/{placeId:guid}/revisions")]
     public async Task<IActionResult> GetRevisions(Guid placeId, CancellationToken ct)
     {
-        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        Response.Headers.CacheControl = "no-store";
 
         var revisions = await _db.NarrationRevisions
             .AsNoTracking()
@@ -71,7 +69,7 @@ public class AdminNarrationController : ControllerBase
             {
                 lang = t.Language,
                 text = t.ScriptText,
-                isApproved = t.AudioStatus == AudioStatus.Ready
+                isApproved = PublicationRules.Ready(t)
             }),
             jobs = r.Jobs.Select(j =>
             {
@@ -83,8 +81,8 @@ public class AdminNarrationController : ControllerBase
                     status = j.Status.ToString().ToLowerInvariant(),
                     stage = j.Stage.ToString().ToLowerInvariant(),
                     errorMessage = j.LastError,
-                    audioUrl = !string.IsNullOrEmpty(tr?.AudioPath)
-                        ? $"{baseUrl}/storage/{tr.AudioPath.TrimStart('/')}"
+                    audioUrl = tr != null && PublicationRules.Ready(tr)
+                        ? $"/api/admin/revisions/{r.Id}/audio/{tr.Language}?hash={tr.AudioContentHash}"
                         : null,
                     createdAt = j.CreatedAt,
                     updatedAt = j.UpdatedAt
@@ -101,6 +99,8 @@ public class AdminNarrationController : ControllerBase
     [HttpPost("places/{placeId:guid}/revisions")]
     public async Task<IActionResult> CreateRevision(Guid placeId, [FromBody] CreateRevisionRequest req, CancellationToken ct)
     {
+        if (string.IsNullOrWhiteSpace(req.SourceText) || req.SourceText.Length > 20000)
+            return BadRequest(new { message = "Bài thuyết minh phải có từ 1 đến 20.000 ký tự." });
         var place = await _db.Places
             .Include(p => p.Revisions)
                 .ThenInclude(r => r.Translations)
@@ -118,7 +118,8 @@ public class AdminNarrationController : ControllerBase
             PlaceId = placeId,
             Version = nextVersion,
             Status = RevisionStatus.Draft,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            CreatedByAdminId = Guid.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var adminId) ? adminId : null
         };
 
         var viTitle = !string.IsNullOrWhiteSpace(prevVi?.Title) ? prevVi.Title : place.Code;
@@ -159,12 +160,16 @@ public class AdminNarrationController : ControllerBase
     public async Task<IActionResult> UpdateTranslation(Guid revisionId, string lang, [FromBody] UpdateTranslationRequest req, CancellationToken ct)
     {
         var targetLang = lang.ToLowerInvariant().Trim();
+        if (!AllLangs.Contains(targetLang) || string.IsNullOrWhiteSpace(req.Text) || req.Text.Length > 20000)
+            return BadRequest(new { message = "Ngôn ngữ hoặc nội dung không hợp lệ (tối đa 20.000 ký tự)." });
         var revision = await _db.NarrationRevisions
             .Include(r => r.Translations)
             .Include(r => r.Place)
             .FirstOrDefaultAsync(r => r.Id == revisionId, ct);
 
         if (revision == null) return NotFound(new { message = "Không tìm thấy phiên bản." });
+        if (revision.Status != RevisionStatus.Draft)
+            return Conflict(new { message = "Chỉ sửa, tạo âm thanh hoặc xuất bản bản nháp. Hãy tạo phiên bản mới." });
 
         var viTrans = revision.Translations.FirstOrDefault(t => t.Language == "vi");
         var translation = revision.Translations.FirstOrDefault(t => t.Language == targetLang);
@@ -175,8 +180,8 @@ public class AdminNarrationController : ControllerBase
             {
                 RevisionId = revisionId,
                 Language = targetLang,
-                Title = viTrans?.Title ?? revision.Place.Code,
-                Description = req.Text,
+                Title = targetLang == "vi" ? viTrans?.Title ?? revision.Place.Code : "",
+                Description = "",
                 UpdatedAt = DateTime.UtcNow
             };
             _db.NarrationTranslations.Add(translation);
@@ -185,7 +190,16 @@ public class AdminNarrationController : ControllerBase
         translation.ScriptText = req.Text.Trim();
         translation.IsEditedByAdmin = true;
         translation.ContentHash = ComputeHash(translation.ScriptText);
-        translation.AudioStatus = AudioStatus.Missing;
+        PublicationRules.Invalidate(translation);
+        if (targetLang == "vi")
+            foreach (var other in revision.Translations.Where(t => t.Language != "vi"))
+            {
+                other.ScriptText = ""; other.IsEditedByAdmin = false;
+                PublicationRules.Invalidate(other);
+            }
+        var staleJobs = await _db.GenerationJobs.Where(j => j.RevisionId == revisionId
+            && (targetLang == "vi" || j.Language == targetLang)).ToListAsync(ct);
+        foreach (var job in staleJobs) { job.Status = JobStatus.Queued; job.LastError = null; }
         translation.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(ct);
@@ -204,6 +218,8 @@ public class AdminNarrationController : ControllerBase
             .FirstOrDefaultAsync(r => r.Id == revisionId, ct);
 
         if (revision == null) return NotFound(new { message = "Không tìm thấy phiên bản." });
+        if (revision.Status != RevisionStatus.Draft)
+            return Conflict(new { message = "Chỉ sửa, tạo âm thanh hoặc xuất bản bản nháp. Hãy tạo phiên bản mới." });
 
         var viTrans = revision.Translations.FirstOrDefault(t => t.Language == "vi");
         if (viTrans == null || string.IsNullOrWhiteSpace(viTrans.ScriptText))
@@ -244,24 +260,34 @@ public class AdminNarrationController : ControllerBase
             try
             {
                 // Bước A: Dịch tự động cho en, zh, ko, ja
-                if (l != "vi" && (!trans.IsEditedByAdmin || string.IsNullOrWhiteSpace(trans.ScriptText)))
+                if (l != "vi" && (string.IsNullOrWhiteSpace(trans.ScriptText) || string.IsNullOrWhiteSpace(trans.Title)))
                 {
                     job.Stage = JobStage.Translate;
                     job.Status = JobStatus.Processing;
 
-                    trans.Title = await _translator.TranslateAsync(viTrans.Title, "vi", l, ct);
-                    trans.ScriptText = await _translator.TranslateAsync(viTrans.ScriptText, "vi", l, ct);
-                    trans.Description = trans.ScriptText;
+                    var title = await _translator.TranslateAsync(viTrans.Title, "vi", l, ct);
+                    var script = trans.IsEditedByAdmin && !string.IsNullOrWhiteSpace(trans.ScriptText)
+                        ? trans.ScriptText : await _translator.TranslateAsync(viTrans.ScriptText, "vi", l, ct);
+                    var description = string.IsNullOrWhiteSpace(viTrans.Description) ? "" : await _translator.TranslateAsync(viTrans.Description, "vi", l, ct);
+                    trans.Title = title; trans.ScriptText = script; trans.Description = description;
                     trans.ContentHash = ComputeHash(trans.ScriptText);
                 }
 
                 // Bước B: Tạo file MP3 bằng Azure Speech
                 var textHash = ComputeHash(trans.ScriptText);
-                if (trans.AudioStatus != AudioStatus.Ready || trans.AudioContentHash != textHash || string.IsNullOrEmpty(trans.AudioPath))
+                bool fileExists = false;
+                if (!string.IsNullOrWhiteSpace(trans.AudioPath))
                 {
+                    await using var existing = await _storage.OpenReadAudioAsync(trans.AudioPath, ct);
+                    fileExists = existing != null && existing.Length > 0;
+                }
+                if (!PublicationRules.Ready(trans) || !fileExists)
+                {
+                    job.Status = JobStatus.Processing;
                     job.Stage = JobStage.Synthesize;
                     var audioBytes = await _speechClient.SynthesizeAsync(trans.ScriptText, l, ct);
 
+                    if (audioBytes.Length == 0) throw new InvalidOperationException("Azure trả về file rỗng.");
                     job.Stage = JobStage.Store;
                     var relativePath = await _storage.SaveAudioAsync(revision.PlaceId, revision.Id, l, audioBytes, ct);
 
@@ -275,17 +301,28 @@ public class AdminNarrationController : ControllerBase
                 job.LastError = null;
                 job.UpdatedAt = DateTime.UtcNow;
             }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
             catch (Exception ex)
             {
                 trans.AudioStatus = AudioStatus.Failed;
                 job.Status = JobStatus.Failed;
-                job.LastError = ex.Message;
+                job.LastError = GenerationError(ex);
+                HttpContext.RequestServices.GetRequiredService<ILogger<AdminNarrationController>>().LogError(ex, "Generation failed for {RevisionId}/{Language}", revisionId, l);
                 job.UpdatedAt = DateTime.UtcNow;
             }
+            await _db.SaveChangesAsync(ct);
         }
 
-        await _db.SaveChangesAsync(ct);
         return await GetRevisions(revision.PlaceId, ct);
+    }
+
+    [HttpGet("revisions/{revisionId:guid}/jobs")]
+    public async Task<IActionResult> Jobs(Guid revisionId, CancellationToken ct)
+    {
+        var jobs = await _db.GenerationJobs.AsNoTracking().Where(j => j.RevisionId == revisionId).ToListAsync(ct);
+        return Ok(jobs.Select(j => new { id = j.Id, lang = j.Language,
+            status = j.Status.ToString().ToLowerInvariant(), stage = j.Stage.ToString().ToLowerInvariant(),
+            errorMessage = j.LastError, audioUrl = (string?)null, createdAt = j.CreatedAt, updatedAt = j.UpdatedAt }));
     }
 
     // 6. Retry 1 job bị lỗi
@@ -306,7 +343,19 @@ public class AdminNarrationController : ControllerBase
             .FirstOrDefaultAsync(r => r.Id == revisionId, ct);
 
         if (revision == null) return NotFound(new { message = "Không tìm thấy phiên bản." });
+        if (revision.Status != RevisionStatus.Draft)
+            return Conflict(new { message = "Chỉ sửa, tạo âm thanh hoặc xuất bản bản nháp. Hãy tạo phiên bản mới." });
 
+        await _db.Entry(revision).Collection(r => r.Translations).LoadAsync(ct);
+        var missing = AllLangs.Where(l => !revision.Translations.Any(t => t.Language == l && PublicationRules.Ready(t))).ToArray();
+        if (missing.Length > 0)
+            return BadRequest(new { message = "Chưa sẵn sàng xuất bản: " + string.Join(", ", missing) });
+        foreach (var tr in revision.Translations)
+        {
+            await using var audio = await _storage.OpenReadAudioAsync(tr.AudioPath!, ct);
+            if (audio == null || audio.Length == 0)
+                return BadRequest(new { message = $"Không tìm thấy file âm thanh {tr.Language}. Hãy tạo lại âm thanh." });
+        }
         // Đưa các bản Published cũ của khu này về Archived
         var oldPublished = await _db.NarrationRevisions
             .Where(r => r.PlaceId == revision.PlaceId && r.Id != revision.Id && r.Status == RevisionStatus.Published)
@@ -326,6 +375,32 @@ public class AdminNarrationController : ControllerBase
 
         await _db.SaveChangesAsync(ct);
         return Ok(new { message = "Đã xuất bản thành công!" });
+    }
+
+    private static string GenerationError(Exception ex)
+    {
+        // Return only known configuration messages/status codes; do not expose provider response bodies.
+        if (ex.Message == "Chưa cấu hình Azure Speech ApiKey." || ex.Message == "Chưa cấu hình Azure Translator ApiKey.")
+            return ex.Message + " Cấu hình key bằng User Secrets rồi khởi động lại backend.";
+        var match = System.Text.RegularExpressions.Regex.Match(ex.Message, @"^Lỗi Azure (Speech|Translator) \((\d{3})\)");
+        if (match.Success)
+        {
+            var service = match.Groups[1].Value;
+            var status = match.Groups[2].Value;
+            var action = status switch
+            {
+                "401" => "Kiểm tra key và region có thuộc đúng tài nguyên Azure đang gọi.",
+                "403" => "Kiểm tra quyền truy cập, trạng thái tài nguyên, mạng và hạn mức Azure.",
+                "429" => "Đang bị giới hạn yêu cầu. Kiểm tra hạn mức Azure và thử lại sau.",
+                "400" => "Azure từ chối nội dung hoặc cấu hình yêu cầu. Xem log backend để biết chi tiết.",
+                _ => "Kiểm tra dịch vụ Azure và log backend rồi thử lại."
+            };
+            return $"Azure {service} HTTP {status}. {action}";
+        }
+        if (ex is OperationCanceledException) return "Dịch vụ Azure phản hồi quá thời gian chờ. Hãy thử lại.";
+        if (ex is HttpRequestException) return "Không kết nối được Azure. Kiểm tra mạng, endpoint và region; xem log backend.";
+        if (ex is IOException || ex is UnauthorizedAccessException) return "Không đọc/ghi được file audio. Kiểm tra thư mục storage và quyền ghi; xem log backend.";
+        return "Không tạo được âm thanh. Xem log backend tại dòng Generation failed để biết nguyên nhân.";
     }
 
     private static string ComputeHash(string text)

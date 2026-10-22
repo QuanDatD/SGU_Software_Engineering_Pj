@@ -19,7 +19,7 @@ const CAT_COLOR: Record<string, string> = {
 
 interface Props {
   places: Place[];
-  activePlaceId: number | null;
+  activePlaceId: string | null;
   lang: Lang;
   onSelect: (place: Place) => void;
 }

@@ -2,6 +2,9 @@ namespace Zoo.BUS.DTOs;
 
 public sealed class PlaceDto
 {
+    public Guid? RevisionId { get; init; }
+    public int? Version { get; init; }
+    public Dictionary<string, string> Script { get; init; } = new();
     public Guid Id { get; init; }
     public string Slug { get; init; } = "";
     public string Code { get; init; } = "";
