@@ -12,6 +12,12 @@ using Zoo.DAL.Repositories;
 using Zoo.DAL.Integrations.Azure;
 using Zoo.DAL.Storage;
 
+
+
+using System.Security.Claims;
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Controller và bộ lọc CSRF.
@@ -183,6 +189,49 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 app.UseCors("LocalFrontend");
 app.UseAuthentication();
+
+// Chỉ bật khi chạy Development và có tham số --demo-admin.
+if (app.Environment.IsDevelopment() && args.Contains("--demo-admin"))
+{
+    // Dùng tài khoản thật để CreatedByAdminId vẫn liên kết đúng database.
+    using var scope = app.Services.CreateScope();
+
+    var db = scope.ServiceProvider.GetRequiredService<ZooDbContext>();
+
+    var demoAdmin = await db.AdminUsers
+        .AsNoTracking()
+        .Where(a => a.IsActive && a.Role == "Admin")
+        .OrderBy(a => a.CreatedAt)
+        .FirstOrDefaultAsync();
+
+    if (demoAdmin is null)
+    {
+        throw new InvalidOperationException(
+            "Chế độ demo cần ít nhất một tài khoản Admin đang hoạt động.");
+    }
+
+    var demoAdminId = demoAdmin.Id.ToString();
+    var demoUsername = demoAdmin.Username;
+
+    app.Logger.LogWarning(
+        "DEMO ADMIN đang bật: truy cập quản trị không cần mật khẩu.");
+
+    app.Use(async (context, next) =>
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, demoAdminId),
+            new Claim(ClaimTypes.Name, demoUsername),
+            new Claim(ClaimTypes.Role, "Admin")
+        };
+
+        context.User = new ClaimsPrincipal(
+            new ClaimsIdentity(claims, "DemoAdmin"));
+
+        await next();
+    });
+}
+
 app.UseAuthorization();
 app.MapControllers();
 

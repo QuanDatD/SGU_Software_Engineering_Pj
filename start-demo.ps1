@@ -50,7 +50,7 @@ $apiQuoted = Quote-PS $apiProject
 
 Open-DemoWindow @"
 Set-Location $rootQuoted
-dotnet run --project $apiQuoted --launch-profile http
+dotnet run --project $apiQuoted --launch-profile http -- --demo-admin
 "@
 
 Write-Host "Dang cho backend khoi dong..."
