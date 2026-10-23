@@ -16,6 +16,9 @@ export interface Place {
 }
 
 export interface PlaceDetail extends Place {
+  revisionId?: string | null;
+  version?: number | null;
+  script?: Record<string, string>;
   /** audioUrl trả về từ API — không lộ đường dẫn vật lý */
   audioUrl: Record<string, string | null>;
 }

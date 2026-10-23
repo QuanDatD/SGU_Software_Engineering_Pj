@@ -1,137 +1,128 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "../../styles/MapPage.css";
-import { placeApi } from "../../services/placeApi";
-import type { Place, PlaceDetail } from "../../types/place";
-import { staticPlaces } from "../../data/staticPlaces";
 import { useLang } from "../../contexts/LanguageContext";
+import { useAudio } from "../../contexts/AudioContext";
+import { placeApi } from "../../services/placeApi";
 import { useGeolocation } from "../../hooks/useGeolocation";
 import { useVisitSession } from "../../hooks/useVisitSession";
-import { useAudio } from "../../contexts/AudioContext";
-import IllustratedMap from "../../maps/IllustratedMap";
-import GpsStatus from "../../components/GpsStatus";
+import type { PlaceDetail } from "../../types/place";
 import AudioPlayer from "../../components/AudioPlayer";
-import SpotPanel from "../../components/SpotPanel";
-
-const LABELS = {
-  title:    { vi: "Bản đồ tham quan",               en: "Visit Map",                  zh: "参观地图",          ko: "방문 지도",            ja: "訪問マップ"        },
-  eyebrow:  { vi: "HÀNH TRÌNH CỦA BẠN",              en: "YOUR JOURNEY",               zh: "您的旅程",          ko: "당신의 여정",          ja: "あなたの旅"        },
-  subtitle: { vi: "Nhấn vào điểm để xem thông tin.", en: "Tap a marker to view info.", zh: "点击标记查看信息。", ko: "마커를 탭하여 정보 보기.", ja: "マーカーをタップして情報を表示。" },
-  animal:   { vi: "Động vật",  en: "Animals",    zh: "动物", ko: "동물", ja: "動物" },
-  plant:    { vi: "Thực vật",  en: "Plants",     zh: "植物", ko: "식물", ja: "植物" },
-  facility: { vi: "Tiện ích",  en: "Facilities", zh: "设施", ko: "시설", ja: "施設" },
-  offlineNote: { vi: "Đang hiển thị dữ liệu mẫu (chưa kết nối server).", en: "Showing sample data (server not connected).", zh: "显示示例数据（未连接服务器）。", ko: "샘플 데이터 표시 중 (서버 미연결).", ja: "サンプルデータを表示中（サーバー未接続）。" },
-};
-const t = (key: keyof typeof LABELS, lang: string): string =>
-  (LABELS[key] as Record<string, string>)?.[lang] ?? (LABELS[key] as Record<string, string>)?.["en"] ?? "";
 
 export default function MapPage() {
   const { lang } = useLang();
-  const { gps, start: startGps, stop: stopGps } = useGeolocation();
-  const { track } = useAudio();
+  const audio = useAudio();
+  const { gps, start, stop } = useGeolocation();
+  const position = gps.status === "active" ? gps.position : null;
+  const container = useRef<HTMLDivElement>(null);
+  const map = useRef<L.Map | null>(null);
+  const [places, setPlaces] = useState<PlaceDetail[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [autoPlay, setAutoPlay] = useState(false);
+  const selected = places.find(p => p.id === selectedId) ?? null;
+  useVisitSession({ position, places, lang, enabled: autoPlay && !error, onEnter: setSelectedId });
 
-  const [places,      setPlaces]      = useState<PlaceDetail[]>(staticPlaces);
-  const [placeDetail, setPlaceDetail] = useState<PlaceDetail | null>(null);
-  const [activeId,    setActiveId]    = useState<number | null>(null);
-  const [isOffline,   setIsOffline]   = useState(false); // true = dùng dữ liệu tĩnh
-
-  // Thử load từ API, fallback sang dữ liệu tĩnh nếu lỗi
+  // One sequential request at a time. Refresh after publication from any other browser.
   useEffect(() => {
-    placeApi.list()
-      .then((data) => {
-        setPlaces(data as PlaceDetail[]);
-        setIsOffline(false);
-      })
-      .catch(() => {
-        // Giữ staticPlaces, chỉ báo đang offline
-        setIsOffline(true);
-      });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    let disposed = false;
+    let pending = false;
+    async function refresh() {
+      if (pending) return;
+      pending = true;
+      try {
+        const result = await placeApi.list(lang);
+        if (!disposed) { setPlaces(result); setError(""); }
+      } catch (e) {
+        if (!disposed) setError(e instanceof Error ? e.message : "Không kết nối được API.");
+      } finally { pending = false; if (!disposed) setLoading(false); }
+    }
+    void refresh();
+    const timer = window.setInterval(refresh, 10000);
+    window.addEventListener("focus", refresh);
+    return () => { disposed = true; clearInterval(timer); window.removeEventListener("focus", refresh); };
+  }, [lang]);
+
+  // Stop stale audio on language changes, hide, or a newly published revision.
+  useEffect(() => {
+    if (!audio.track) return;
+    const current = places.find(p => p.id === audio.track?.placeId);
+    if (audio.track.lang !== lang || !current || current.audioUrl[lang] !== audio.track.url) audio.stop();
+  }, [places, lang, audio.track, audio.stop]);
+
+  useEffect(() => {
+    if (!container.current) return;
+    const instance = L.map(container.current, { center: [10.7882, 106.7055], zoom: 17, zoomControl: false });
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 19,
+    }).addTo(instance);
+    L.control.zoom({ position: "bottomright" }).addTo(instance);
+    map.current = instance;
+    return () => { instance.remove(); map.current = null; };
   }, []);
 
-  // Load chi tiết khi click marker
   useEffect(() => {
-    if (activeId === null) { setPlaceDetail(null); return; }
-
-    // Nếu offline, dùng dữ liệu tĩnh ngay
-    if (isOffline) {
-      const found = staticPlaces.find((p) => p.id === activeId) ?? null;
-      setPlaceDetail(found);
-      return;
+    const instance = map.current;
+    if (!instance) return;
+    const layer = L.layerGroup().addTo(instance);
+    for (const place of places) {
+      if (!Number.isFinite(place.lat) || !Number.isFinite(place.lng)) continue;
+      L.circle([place.lat, place.lng], { radius: place.radiusMeters, color: "#168652", fillOpacity: .15, weight: 1.5 }).addTo(layer);
+      // DOM textContent avoids executing markup in Admin-supplied names.
+      const label = document.createElement("span");
+      label.textContent = `${place.icon} ${place.name[lang] || place.name.vi || place.slug}`;
+      label.style.cssText = "background:#168652;color:white;border:2px solid white;border-radius:14px;padding:5px 9px;white-space:nowrap";
+      L.marker([place.lat, place.lng], { icon: L.divIcon({ html: label, className: "spot-marker", iconSize: [110, 30] }) })
+        .on("click", () => { setSelectedId(place.id); instance.flyTo([place.lat, place.lng], 18); }).addTo(layer);
     }
+    return () => { layer.remove(); };
+  }, [places, lang]);
 
-    placeApi.get(activeId)
-      .then(setPlaceDetail)
-      .catch(() => {
-        // Fallback sang dữ liệu tĩnh nếu API lỗi
-        const found = staticPlaces.find((p) => p.id === activeId) ?? null;
-        setPlaceDetail(found);
-      });
-  }, [activeId, isOffline]);
-
-  // Tự phát audio theo GPS (chỉ khi GPS đang active)
-  const gpsPosition = gps.status === "active" ? gps.position : null;
-  useVisitSession({
-    position: gpsPosition,
-    places,
-    lang,
-    enabled: gps.status === "active",
-  });
-
-  // Highlight khu đang phát
   useEffect(() => {
-    if (track) setActiveId(track.placeId);
-  }, [track]);
+    if (!map.current || !position) return;
+    const layer = L.layerGroup().addTo(map.current);
+    L.circleMarker([position.lat, position.lng], { radius: 8, fillColor: "#2563eb", fillOpacity: 1, color: "white", weight: 3 }).addTo(layer);
+    L.circle([position.lat, position.lng], { radius: position.accuracy, color: "#2563eb", weight: 1, fillOpacity: .08 }).addTo(layer);
+    return () => { layer.remove(); };
+  }, [position]);
 
+  const url = selected?.audioUrl[lang];
+  const sameTrack = !!url && audio.track?.url === url && audio.track.lang === lang;
+  const playing = sameTrack && (audio.state === "playing" || audio.state === "loading");
   return (
-    <>
-      <section className="section map-page">
-        <div className="section__heading">
-          <div>
-            <span className="eyebrow eyebrow--green">{t("eyebrow", lang)}</span>
-            <h1>{t("title", lang)}</h1>
-          </div>
-          <p>{t("subtitle", lang)}</p>
+    <div className="live-map">
+      <div ref={container} className="live-map__canvas" />
+      <section className="live-map__gps">
+        <strong>🛰️ GPS · {places.length} khu đã xuất bản</strong>
+        <div>
+          <button onClick={() => { if (position) map.current?.flyTo([position.lat, position.lng], 18); else start(); }}>📍 Vị trí của tôi</button>
+          <button onClick={() => { stop(); setAutoPlay(false); }}>Tắt GPS</button>
         </div>
-
-        {/* Thông báo offline nhẹ — không chặn bản đồ */}
-        {isOffline && (
-          <div className="map-offline-note">
-            ℹ️ {t("offlineNote", lang)}
-          </div>
-        )}
-
-        {/* GPS — không tự bật, user chủ động bấm */}
-        <GpsStatus gps={gps} onStart={startGps} onStop={stopGps} lang={lang} />
-
-        {/* Bản đồ — luôn hiện */}
-        <div className="zoo-map-frame">
-          <IllustratedMap
-            places={places as Place[]}
-            activePlaceId={activeId}
-            lang={lang}
-            onSelect={(p) => setActiveId(p.id)}
-          />
-        </div>
-
-        {/* Chú thích */}
-        <div className="map-legend">
-          <span style={{ borderLeft: "3px solid #206a45", paddingLeft: 8 }}>🐘 {t("animal", lang)}</span>
-          <span style={{ borderLeft: "3px solid #2d8a2d", paddingLeft: 8 }}>🌳 {t("plant", lang)}</span>
-          <span style={{ borderLeft: "3px solid #5d3d85", paddingLeft: 8 }}>🏛️ {t("facility", lang)}</span>
-        </div>
+        {position ? <small>{position.lat.toFixed(6)}, {position.lng.toFixed(6)} · ±{Math.round(position.accuracy)} m</small>
+          : <small>{gps.status === "denied" ? "Bạn chưa cho phép truy cập vị trí." : gps.status === "unavailable" ? "Không lấy được GPS. Kiểm tra HTTPS và quyền vị trí." : gps.status === "requesting" ? "Đang tìm GPS…" : "Bật GPS để xác định khu đang đứng."}</small>}
+        <label><input type="checkbox" checked={autoPlay} onChange={e => { setAutoPlay(e.target.checked); if (e.target.checked && !position) start(); }} /> Tự phát khi vào vùng</label>
+        {position && position.accuracy > 25 && <small>GPS chưa đủ chính xác để tự phát (cần ≤25 m).</small>}
+        {loading && <small>Đang lấy dữ liệu từ API…</small>}
+        {error && <small role="alert">Không cập nhật được dữ liệu: {error}. Đang thử lại; tự phát tạm dừng.</small>}
+        {!loading && !error && places.length === 0 && <small>Chưa có khu đang bật với thuyết minh đã xuất bản.</small>}
       </section>
-
-      {/* Audio player cố định dưới màn hình */}
-      <div className="audio-player-bar">
-        <AudioPlayer lang={lang} />
-      </div>
-
-      {/* Panel chi tiết */}
-      <SpotPanel
-        place={placeDetail}
-        lang={lang}
-        onClose={() => setActiveId(null)}
-      />
-    </>
+      {selected && <section className="live-map__detail">
+        <button className="live-map__close" onClick={() => setSelectedId(null)} aria-label="Đóng">✕</button>
+        {selected.imageUrl && <img src={selected.imageUrl} alt={selected.name[lang] || selected.name.vi} />}
+        <h3>{selected.name[lang] || selected.name.vi}</h3>
+        <p>{selected.desc[lang] || selected.desc.vi}</p>
+        <small>Vùng GPS: {selected.radiusMeters} m · Phiên bản {selected.version}</small>
+        <details><summary>Nội dung thuyết minh ({lang.toUpperCase()})</summary><p>{selected.script?.[lang] || "Chưa có bản dịch."}</p></details>
+        <button disabled={!url} onClick={() => {
+          if (playing) audio.pause();
+          else if (sameTrack && audio.state === "paused") audio.resume();
+          else if (url) void audio.play({ placeId: selected.id, lang, url, title: selected.name[lang] || selected.name.vi });
+        }}>{playing ? "⏸ Tạm dừng" : url ? "▶ Nghe thuyết minh" : "Chưa có âm thanh ngôn ngữ này"}</button>
+        {sameTrack && audio.state === "error" && <p role="alert">Không phát được âm thanh. Nhấn Nghe để thử lại hoặc cho phép trình duyệt phát âm thanh.</p>}
+      </section>}
+      <AudioPlayer lang={lang} />
+    </div>
   );
 }

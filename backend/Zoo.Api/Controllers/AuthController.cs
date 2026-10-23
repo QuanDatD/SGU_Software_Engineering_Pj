@@ -80,7 +80,10 @@ public sealed class AuthController : ControllerBase
                 IsPersistent = false
             });
 
-        return Ok(admin);
+        return Ok(new
+        {
+            user = admin
+        });
     }
 
     // GET /api/auth/me

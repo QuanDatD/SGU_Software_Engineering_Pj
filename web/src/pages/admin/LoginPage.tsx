@@ -1,13 +1,18 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { ApiError } from "../../services/api";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login,  user, loading: checkingSession } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error,    setError]    = useState<string | null>(null);
   const [loading,  setLoading]  = useState(false);
+  useEffect(() => {
+  if (!checkingSession && user) {
+    window.location.replace("/admin");
+  }
+}, [checkingSession, user]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -26,7 +31,13 @@ export default function LoginPage() {
       setLoading(false);
     }
   }
-
+  if (checkingSession || user) {
+  return (
+    <div className="login-page">
+      <p>Đang mở trang quản trị…</p>
+    </div>
+  );
+}
   return (
     <div className="login-page">
       <form className="login-form" onSubmit={handleSubmit}>

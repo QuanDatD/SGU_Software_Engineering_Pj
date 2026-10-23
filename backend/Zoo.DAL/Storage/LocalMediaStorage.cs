@@ -14,7 +14,7 @@ public class LocalMediaStorage : IMediaStorage
 
     public async Task<string> SaveAudioAsync(Guid placeId, Guid revisionId, string language, byte[] audioBytes, CancellationToken ct = default)
     {
-        var relativePath = Path.Combine("audio", placeId.ToString(), revisionId.ToString(), $"{language.ToLowerInvariant()}.mp3")
+        var relativePath = Path.Combine("audio", placeId.ToString(), revisionId.ToString(), $"{language.ToLowerInvariant()}-{Guid.NewGuid():N}.mp3")
             .Replace('\\', '/');
 
         var fullPath = Path.GetFullPath(Path.Combine(_options.RootPath, relativePath));
@@ -27,6 +27,8 @@ public class LocalMediaStorage : IMediaStorage
     public Task<Stream?> OpenReadAudioAsync(string relativePath, CancellationToken ct = default)
     {
         var fullPath = Path.GetFullPath(Path.Combine(_options.RootPath, relativePath));
+        if (!fullPath.StartsWith(Path.GetFullPath(_options.RootPath).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            return Task.FromResult<Stream?>(null);
         if (!File.Exists(fullPath))
             return Task.FromResult<Stream?>(null);
 
