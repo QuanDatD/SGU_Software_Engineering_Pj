@@ -19,7 +19,7 @@ export const narrationApi = {
 
   /* Tạo công việc generate audio cho tất cả 5 ngôn ngữ */
   generate: (revisionId: string) =>
-    api.post<NarrationRevision>(`/api/admin/revisions/${revisionId}/generate`, {}),
+    api.post<NarrationRevision[]>(`/api/admin/revisions/${revisionId}/generate`, {}),
 
   /* Xem tiến độ các job */
   listJobs: (revisionId: string) =>
@@ -31,5 +31,5 @@ export const narrationApi = {
 
   /* Xuất bản phiên bản */
   publish: (revisionId: string) =>
-    api.post<NarrationRevision>(`/api/admin/revisions/${revisionId}/publish`, {}),
+    api.post<{ message: string }>(`/api/admin/revisions/${revisionId}/publish`, {}),
 };

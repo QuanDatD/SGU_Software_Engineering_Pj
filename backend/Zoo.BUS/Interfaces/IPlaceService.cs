@@ -12,4 +12,7 @@ public interface IPlaceService
         Guid id,
         string language,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<PlaceDto>> GetAllForAdminAsync(
+        CancellationToken cancellationToken = default);
 }

@@ -29,12 +29,18 @@ public class PlaceRepository : IPlaceRepository
             .OrderByDescending(p => p.Priority)
             .ToListAsync(ct);
 
-    public Task<List<Place>> GetAllAsync(CancellationToken ct = default)
-        => _db.Places
-            .Include(p => p.PublishedRevision)
-            .Include(p => p.Revisions)
-            .OrderByDescending(p => p.Priority)
-            .ToListAsync(ct);
+    public Task<List<Place>> GetAllAsync(
+      CancellationToken ct = default)
+      => _db.Places
+          .AsNoTracking()
+          .Include(p => p.PublishedRevision)
+              .ThenInclude(r => r!.Translations)
+          .Include(p => p.Revisions)
+              .ThenInclude(r => r.Translations)
+          .AsSplitQuery()
+          .OrderByDescending(p => p.Priority)
+          .ThenBy(p => p.Code)
+          .ToListAsync(ct);
 
     public async Task AddAsync(Place place, CancellationToken ct = default)
         => await _db.Places.AddAsync(place, ct);

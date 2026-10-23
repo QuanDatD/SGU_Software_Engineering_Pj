@@ -8,7 +8,9 @@ export interface GpsPosition {
 /** Kết quả từ POST /api/visit/evaluate */
 export interface EvaluateResult {
   placeId: string | null;  // Guid hoặc null
-  distance: number | null; // mét tới tâm vùng
+  accepted: boolean;
+  reasonCode: string;
+  distanceMeters: number | null; // mét tới tâm vùng
 }
 
 export type GpsState =

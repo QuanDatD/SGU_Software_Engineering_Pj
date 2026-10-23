@@ -1,6 +1,7 @@
 export interface AdminUser {
-  id: number;
+  id: string;
   username: string;
+  role: string;
 }
 
 export interface LoginRequest {

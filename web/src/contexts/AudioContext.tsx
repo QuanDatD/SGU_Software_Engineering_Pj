@@ -3,12 +3,14 @@
    Đảm bảo không phát chồng, không lặp liên tục.
    ====================================================== */
 import {
-  createContext, useContext, useRef, useState,
+  createContext, useContext, useRef, useState, useEffect,
   useCallback, type ReactNode,
 } from "react";
 
+import { mediaUrl } from "../services/api";
+
 export interface TrackInfo {
-  placeId: number;
+  placeId: string;
   lang: string;
   url: string;
   title: string;
@@ -22,7 +24,7 @@ interface AudioCtx {
   currentTime: number;
   duration: number;
   /** Phát bài mới (dừng bài cũ nếu đang phát) */
-  play: (track: TrackInfo) => void;
+  play: (track: TrackInfo) => Promise<boolean>;
   /** Tiếp tục bài đang tạm dừng */
   resume: () => void;
   pause: () => void;
@@ -46,7 +48,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       el.preload = "auto";
 
       el.addEventListener("loadstart",  () => setState("loading"));
-      el.addEventListener("canplay",    () => setState((s) => s === "loading" ? "playing" : s));
       el.addEventListener("play",       () => setState("playing"));
       el.addEventListener("pause",      () => setState((s) => s !== "ended" ? "paused" : s));
       el.addEventListener("ended",      () => { setState("ended"); });
@@ -59,20 +60,29 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     return audioRef.current;
   }
 
-  const play = useCallback((newTrack: TrackInfo) => {
-    const el = getAudio();
+    const play = useCallback(async (next: TrackInfo): Promise<boolean> => {
+        const el = getAudio();
 
-    // Không phát lại bài đang phát
-    if (track?.url === newTrack.url && (state === "playing" || state === "loading")) return;
+        // Không phát lại bài đang phát
+        if (track?.url === mediaUrl(next.url) && (state === "playing" || state === "loading")) return true;
 
-    el.pause();
-    el.src = newTrack.url;
-    el.currentTime = 0;
-    setTrack(newTrack);
-    setState("loading");
-    el.play().catch(() => setState("error"));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [track, state]);
+        el.pause();
+
+        // Xử lý nối domain Backend nếu là đường dẫn tương đối
+        const fullAudioUrl = mediaUrl(next.url);
+
+        const currentTrack = { ...next, url: fullAudioUrl };
+
+        setTrack(currentTrack);
+        setCurrentTime(0);
+        setDuration(0);
+        setState("loading");
+
+        el.src = fullAudioUrl;
+        el.currentTime = 0;
+        el.load();
+        try { await el.play(); return true; } catch { if (el.src === new URL(fullAudioUrl, location.href).href) setState("error"); return false; }
+    }, [track, state]);
 
   const resume = useCallback(() => {
     audioRef.current?.play().catch(() => setState("error"));
@@ -86,7 +96,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     const el = audioRef.current;
     if (!el) return;
     el.pause();
-    el.src = "";
+    el.removeAttribute("src");
+    el.load();
     setTrack(null);
     setState("idle");
     setCurrentTime(0);
@@ -98,6 +109,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     if (!el) return;
     el.currentTime = Math.max(0, Math.min(seconds, el.duration || 0));
   }, []);
+
+  useEffect(() => () => { audioRef.current?.pause(); }, []);
 
   return (
     <Ctx.Provider value={{ track, state, currentTime, duration, play, resume, pause, stop, seek }}>

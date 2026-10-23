@@ -1,22 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { GpsState, GpsPosition } from "../types/visit";
 
-/* Chỉ cập nhật nếu di chuyển > MIN_DELTA mét hoặc độ chính xác thay đổi đáng kể */
-const MIN_DISTANCE_M = 3;
-const MAX_ACCURACY_M = 30; // bỏ qua nếu accuracy > 30m
-
-function haversineM(a: GpsPosition, b: GpsPosition): number {
-  const R = 6_371_000;
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
-  const s =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((a.lat * Math.PI) / 180) *
-      Math.cos((b.lat * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
-}
-
 export function useGeolocation() {
   const [gps, setGps] = useState<GpsState>({ status: "idle" });
   const watchId  = useRef<number | null>(null);
@@ -27,6 +11,7 @@ export function useGeolocation() {
       setGps({ status: "unavailable" });
       return;
     }
+    if (watchId.current !== null) navigator.geolocation.clearWatch(watchId.current);
     setGps({ status: "requesting" });
 
     watchId.current = navigator.geolocation.watchPosition(
@@ -39,10 +24,10 @@ export function useGeolocation() {
         };
 
         // Bỏ qua nếu quá kém
-        if (next.accuracy > MAX_ACCURACY_M) return;
+
 
         // Bỏ qua nếu ít di chuyển
-        if (lastPos.current && haversineM(lastPos.current, next) < MIN_DISTANCE_M) return;
+
 
         lastPos.current = next;
         setGps({ status: "active", position: next });
