@@ -39,7 +39,7 @@ public class AzureSpeechClient : ISpeechClient
         var endpoint = $"https://{_options.Region}.tts.speech.microsoft.com/cognitiveservices/v1";
         var escapedText = SecurityElement.Escape(text);
         var ssml = $"<speak version='1.0' xml:lang='{voiceInfo.Locale}'><voice name='{voiceInfo.Voice}'>{escapedText}</voice></speak>";
-
+            
         using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
         request.Headers.Add("Ocp-Apim-Subscription-Key", _options.ApiKey);
         request.Headers.Add("X-Microsoft-OutputFormat", "audio-16khz-128kbitrate-mono-mp3");

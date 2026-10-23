@@ -1,11 +1,12 @@
 import { useState } from "react";
 import HomePage from "./pages/user/HomePage";
 import MapPage  from "./pages/user/MapPage";
+import QrPage from "./pages/user/QrPage";
 import { useLang } from "./contexts/LanguageContext";
 import LanguageSelector from "./components/LanguageSelector";
 import "./styles/global.css";
 
-type Page = "home" | "map";
+type Page = "home" | "map" | "qr";
 
 export default function App() {
   const [page,     setPage]     = useState<Page>("home");
@@ -97,12 +98,23 @@ export default function App() {
           </nav>
         </>
       )}
-
+      <button
+     type="button"
+      className={page === "qr" ? "is-active" : ""}
+      aria-current={page === "qr" ? "page" : undefined}
+      onClick={() => changePage("qr")}
+    >
+  <span aria-hidden="true">📱</span> Mã QR truy cập
+</button>
       <main>
-        {page === "home"
-          ? <HomePage onOpenMap={() => changePage("map")} />
-          : <MapPage />}
-      </main>
+         {page === "home" && (
+          <HomePage onOpenMap={() => changePage("map")} />
+          )}
+
+      {page === "map" && <MapPage />}
+
+          {page === "qr" && <QrPage />}
+    </main>
 
       <footer className="footer">
         <strong>🌿 Thảo Cầm Viên</strong>
