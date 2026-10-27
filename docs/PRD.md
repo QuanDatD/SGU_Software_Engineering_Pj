@@ -4,16 +4,13 @@
 | Thuộc tính | Nội dung |
 |---|---|
 | Mã tài liệu | PRD-TCV-001 |
-| Phiên bản | 1.0 — Bản dự thảo để nhóm và giảng viên duyệt |
+| Phiên bản | 1.0 - Bản dự thảo để nhóm và giảng viên duyệt |
 | Ngày cập nhật | 25/10/2026 |
-| Nhóm thực hiện | Nhóm 3 thành viên — bổ sung họ tên và mã sinh viên |
-| Người duyệt | Giảng viên phụ trách — bổ sung họ tên |
+| Nhóm thực hiện |<br>Dương Quan Đạt - 3124411063</br><br>Nguyễn Hồng Khương - 3124411140</br><br>Trần Trung Hậu - 3124411</br>|
+| Người duyệt | Giảng viên phụ trách - bổ sung họ tên |
 | Căn cứ | PRD Markdown mẫu; mẫu Focused Use Cases; PRD tham khảo GPS – Chùa Linh Ứng; hình Use Case tổng của nhóm; ZIP feature-be (2) và các thay đổi đã trao đổi |
 | Phạm vi xác minh | Chưa đối chiếu repository GitHub mới nhất; tài liệu xác định yêu cầu mục tiêu, không thay thế biên bản nghiệm thu |
 
-> **QUY ƯỚC HÌNH:** Dòng in đậm bắt đầu bằng “CHÈN HÌNH” được viết IN HOA TOÀN BỘ. Đây là vị trí cần thay bằng hình và chú thích khi nhóm hoàn thiện báo cáo. Danh mục đầy đủ, tên file và hướng dẫn chèn hình nằm ở Phụ lục C–D.
->
-> **QUY ƯỚC TRẠNG THÁI:** “Đã có nền tảng” chỉ nghĩa là đã thấy cấu trúc hoặc luồng tương ứng trong bản code được cung cấp. Chỉ đánh dấu hoàn thành sau khi thực hiện kiểm thử. Các bảng thống kê QR, chỉ tiêu hiệu năng và một số quy tắc cải tiến dưới đây là yêu cầu mục tiêu, chưa được xác nhận đã triển khai.
 
 ## Mục lục
 
@@ -139,13 +136,8 @@ Azure Translator, Azure Speech, dịch vụ bản đồ và API định vị tr�
 
 ### 4.2. Use Case tổng quan
 
-Giữ nguyên 14 chức năng và thứ tự trong hình Use Case tổng của nhóm. Tài liệu chuẩn hóa mã UC1 thành UC01, …, UC9 thành UC09; đây là đổi cách trình bày, không đổi chức năng.
+![Use Case tổng quan](imgs/usecasetong.drawio.png)
 
-**CHÈN HÌNH 02 — SƠ ĐỒ USE CASE TỔNG QUAN: DÙNG HÌNH CỦA NHÓM, GỒM HAI TÁC NHÂN DU KHÁCH VÀ ADMIN, UC01–UC14, CÙNG BIÊN HỆ THỐNG THUYẾT MINH TỰ ĐỘNG THẢO CẦM VIÊN SÀI GÒN.**
-
-Hình Use Case thể hiện tác nhân được sử dụng chức năng nào, **không biểu diễn thứ tự thời gian bằng vị trí các hình elip**. Thứ tự quét QR → chọn ngôn ngữ → quyền GPS được đặc tả trong mục 7. Không tự thêm `include` hoặc `extend` chỉ vì hai chức năng diễn ra nối tiếp.
-
-UC03 là tương tác cấp quyền do trình duyệt thực hiện; UC05 là chức năng hệ thống tự động phục vụ du khách. Hai mục vẫn được giữ để đồng nhất với hình nhóm cung cấp.
 
 ### 4.3. Danh mục Use Case
 
