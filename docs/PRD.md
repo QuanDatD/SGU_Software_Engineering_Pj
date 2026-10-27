@@ -214,8 +214,6 @@ Mỗi UC gồm mục tiêu, tác nhân, kích hoạt, giả định, tiền đi�
 
 **Luồng chính**
 
-**Luồng chính**
-
 | **Bước** | **Hành động tác nhân** | **Phản hồi hệ thống** |
 | :---: | :--- | :--- |
 | 1 | Quét mã QR bằng điện thoại. | — |
@@ -242,6 +240,7 @@ none
 
 ![UC01-activitydiagram](imgs/UC01-activity-diagram.drawio.png)
 ### 5.4. UC02 — Chọn ngôn ngữ
+![UC02](UC02.drawio.png)
 
 | Thuộc tính | Đặc tả |
 |---|---|
@@ -255,30 +254,30 @@ none
 
 **Luồng chính**
 
-| Bước | Hành động tác nhân | Phản hồi hệ thống |
-|---|---|---|
-| 1 | Chọn một ngôn ngữ. | Đánh dấu lựa chọn và hiển thị hướng dẫn tương ứng. |
-| 2 | Xác nhận/tiếp tục. | Lưu lựa chọn trên trình duyệt khi được phép; ở lượt khởi đầu chuyển tới giải thích quyền vị trí. |
-| 3 | Xem nội dung hoặc đổi ngôn ngữ trong khi tham quan. | Đổi văn bản theo lựa chọn; dừng bài thuộc ngôn ngữ cũ, dùng bài tương ứng cho lần nghe kế tiếp. |
-
+| **Bước** | **Hành động tác nhân** | **Phản hồi hệ thống** |
+| :---: | :--- | :--- |
+| 1 | Vào màn hình chọn ngôn ngữ hoặc mở bộ chọn khi đang tham quan. | Hiển thị 5 ngôn ngữ: Việt, Anh, Trung, Hàn, Nhật. |
+| 2 | Chọn ngôn ngữ mong muốn hoặc giữ lựa chọn có sẵn. | Đánh dấu lựa chọn và hiển thị hướng dẫn tương ứng. |
+| 3 | Nhấn “Xác nhận / Tiếp tục”. | Lưu và áp dụng ngôn ngữ đã chọn. |
+| 4 | — | Dừng audio cũ nếu đang phát.<br>Hiển thị văn bản theo ngôn ngữ đã chọn và sử dụng audio tương ứng cho lần nghe kế tiếp. |
+| 5 | — | Hiển thị giải thích quyền vị trí để tiếp tục UC03. **[A1]** |
+| 6 | — | Kết thúc UC02. |
 
 **Luồng thay thế**
 
-- A1 — Bước 1 đã có ngôn ngữ lưu trước: chọn sẵn và cho phép khách giữ hoặc đổi; quay lại bước 2.
-- A2 — Bước 3 thiếu bản dịch ngôn ngữ đã chọn: hiện thông báo rõ, khách chủ động chọn ngôn ngữ khác; quay lại bước 1.
+**A1 – Đổi ngôn ngữ khi đang tham quan (bước 5)**  
+Nếu du khách không ở lượt khởi đầu, hệ thống cho phép tiếp tục tham quan với ngôn ngữ đã chọn, không chuyển sang phần giải thích quyền vị trí. Tiếp tục bước 6.
 
+**Quy tắc liên quan**
 
-**Luồng ngoại lệ**
-
-- E1 — Bước 2 không lưu được localStorage: giữ lựa chọn trong bộ nhớ phiên, không ngăn sử dụng; tiếp tục bước 3.
-- E2 — Bước 3 tải dữ liệu thất bại: giữ lựa chọn và cho phép thử lại; không phát nhầm audio cũ.
-
+Việc đổi ngôn ngữ không tải lại toàn bộ trang và không làm mất trạng thái GPS, điểm đang chọn, danh sách điểm đã đi qua hoặc lịch sử nghe thuyết minh.
 
 **Hậu điều kiện:** Ngôn ngữ hiện hành được xác định; nội dung và audio dùng cùng lựa chọn.
 
 **Quy tắc nghiệp vụ:** BR-02, BR-03, BR-10, BR-18.
 
 **Điểm liên quan:** UC03, UC06. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
+![UC02-activitydiagram](imgs/UC02-activity-diagram.png)
 
 
 ### 5.5. UC03 — Cho phép truy cập vị trí
