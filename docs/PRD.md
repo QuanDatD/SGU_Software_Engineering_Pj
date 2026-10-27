@@ -198,7 +198,8 @@ Mỗi UC gồm mục tiêu, tác nhân, kích hoạt, giả định, tiền đi�
 
 ### 5.3. UC01 — Truy cập bằng QR
 
-![Usecase 01|imgs/UC01.drawio.png]
+
+![Usecase 01](imgs/UC01.drawio.png)
 
 | Thuộc tính | Đặc tả |
 |---|---|
