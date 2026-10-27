@@ -204,6 +204,7 @@ Mỗi UC gồm mục tiêu, tác nhân, kích hoạt, giả định, tiền đi�
 | Thuộc tính | Đặc tả |
 |---|---|
 | Mã / mức chi tiết | UC01 / Focused |
+|Tên|Truy cập bằng QR|
 | Tác nhân | Du khách |
 | Mục tiêu / tóm tắt | Mở đúng website tham quan từ mã QR. |
 | Kích hoạt | Du khách chọn mở liên kết do camera/ứng dụng quét nhận diện. |
@@ -213,23 +214,24 @@ Mỗi UC gồm mục tiêu, tác nhân, kích hoạt, giả định, tiền đi�
 
 **Luồng chính**
 
-| Bước | Hành động tác nhân | Phản hồi hệ thống |
-|---|---|---|
-| 1 | Quét QR và chọn mở liên kết. | Tiếp nhận URL và nhận diện mã nguồn QR nếu có. |
-| 2 | Chờ trang khởi động. | Hiển thị màn hình chọn ngôn ngữ, chưa yêu cầu GPS. |
-| 3 | Tiếp tục sử dụng website. | Tạo/khôi phục phiên truy cập và gửi sự kiện QR với khóa chống trùng; chuyển sang UC02. |
+**Luồng chính**
+
+| **Bước** | **Hành động tác nhân** | **Phản hồi hệ thống** |
+| :---: | :--- | :--- |
+| 1 | Quét mã QR bằng điện thoại. | — |
+| 2 | Chọn mở liên kết từ mã QR. | Tiếp nhận yêu cầu truy cập và tải website.[E1] |
+| 3 | — | Tạo hoặc khôi phục phiên truy cập.<br>Gửi sự kiện truy cập qua QR với khóa chống trùng. |
+| 4 | — | Hiển thị màn hình chọn ngôn ngữ, chưa yêu cầu quyền GPS.<br>Kết thúc UC01 và sẵn sàng cho UC02. |
 
 
 **Luồng thay thế**
 
-- A1 — Tại bước 1, khách mở link trực tiếp không có nguồn QR: vẫn sử dụng website, không ghi nhận là lượt QR; tiếp tục bước 2.
-- A2 — Tại bước 3, tải lại cùng phiên QR: tái sử dụng khóa phiên, không tăng số lượt; tiếp tục UC02 hoặc màn hình đang dùng.
-
+none
 
 **Luồng ngoại lệ**
 
-- E1 — Tại bước 1, link hết hiệu lực hoặc tunnel tắt: trình duyệt không mở được; khách dùng QR hiện hành, UC kết thúc chưa thành công.
-- E2 — Tại bước 3, API thống kê lỗi: báo cáo chưa được cộng lượt; cho phép trải nghiệm tiếp tục và gửi lại cùng khóa chống trùng khi kết nối phục hồi.
+- E1 - Nếu truy cập website không thành công, trình duyệt hiển thị thông báo lỗi. Du khách kiểm tra kết nối Internet hoặc sử dụng mã QR mới nếu liên kết cũ không còn hoạt động. UC01 kết thúc mà chưa hiển thị màn hình chọn ngôn ngữ.
+
 
 
 **Hậu điều kiện:** Website được mở; sự kiện chỉ được coi là đã ghi nhận sau phản hồi lưu thành công.
@@ -238,7 +240,7 @@ Mỗi UC gồm mục tiêu, tác nhân, kích hoạt, giả định, tiền đi�
 
 **Điểm liên quan:** UC02; sự kiện đầu vào UC14. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
 
-
+![UC01-activitydiagram](imgs/UC01-activity-diagram.drawio.png)
 ### 5.4. UC02 — Chọn ngôn ngữ
 
 | Thuộc tính | Đặc tả |
