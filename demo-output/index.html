@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quét QR — Thảo Cầm Viên</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      font-family: Arial, sans-serif;
+      color: #163e2c;
+      background:
+        radial-gradient(circle at top left, #d4edda, transparent 55%),
+        radial-gradient(circle at bottom right, #e6dcf5, transparent 55%),
+        #f5faf6;
+    }
+
+    main {
+      width: min(100%, 1000px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 48px;
+      padding: 56px;
+      border: 1px solid #dce9df;
+      border-radius: 32px;
+      background: white;
+      box-shadow: 0 24px 80px #163e2c14;
+    }
+
+    .brand {
+      margin-bottom: 24px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #168652;
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1.15;
+    }
+
+    p {
+      color: #617268;
+      font-size: 19px;
+      line-height: 1.7;
+    }
+
+    .languages {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      background: #eee7f7;
+      color: #67458b;
+      font-weight: bold;
+    }
+
+    .qr-panel { text-align: center; }
+
+    .qr-frame {
+      padding: 20px;
+      border: 2px solid #168652;
+      border-radius: 24px;
+      background: white;
+    }
+
+    #qr {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .caption {
+      margin: 20px 0 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #168652;
+    }
+
+    .hint { font-size: 14px; }
+
+    #error {
+      padding: 32px 12px;
+      color: #9b3535;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 720px) {
+      main {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 28px;
+        text-align: center;
+      }
+
+      .qr-panel {
+        width: min(100%, 360px);
+        margin: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <section>
+      <div class="brand">🌿 THẢO CẦM VIÊN</div>
+
+      <h1>Chạm vào thiên nhiên.<br />Lắng nghe câu chuyện.</h1>
+
+      <p>
+        Quét mã QR bằng camera điện thoại để mở bản đồ,
+        khám phá các khu tham quan và nghe thuyết minh.
+      </p>
+
+      <div class="languages">
+        Việt · Anh · Trung · Hàn · Nhật
+      </div>
+    </section>
+
+    <section class="qr-panel">
+      <div class="qr-frame">
+        <img id="qr" alt="Mã QR truy cập website Thảo Cầm Viên" />
+        <div id="error" hidden>
+          Chưa có ảnh QR.<br />
+          Hãy chạy start-demo.ps1 trước rồi tải lại trang.
+        </div>
+      </div>
+
+      <p class="caption">Quét mã để bắt đầu khám phá</p>
+      <p class="hint">
+        Mở bằng Safari hoặc Chrome và cho phép truy cập vị trí.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const qr = document.getElementById("qr");
+    const error = document.getElementById("error");
+
+    qr.onerror = () => {
+      qr.hidden = true;
+      qr.style.display = "none";
+      error.hidden = false;
+    };
+
+    // Dùng ảnh mới nhất sau mỗi lần mở hoặc tải lại trang.
+    qr.src = "./qr.png?v=" + Date.now();
+  </script>
+</body>
+</html>
