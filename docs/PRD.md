@@ -7,8 +7,8 @@
 | Mã tài liệu | PRD-TCV-001 |
 | Phiên bản | 1.1 — Bản cập nhật để nhóm rà soát |
 | Ngày cập nhật | 29/10/2026 |
-| Nhóm thực hiện | Dương Quan Đạt — 3124411063<br>Nguyễn Hồng Khương — 3124411140<br>Trần Trung Hậu — bổ sung đầy đủ mã sinh viên |
-| Người duyệt | Giảng viên phụ trách — bổ sung họ tên |
+| Nhóm thực hiện | Dương Quan Đạt — 3124411063<br>Nguyễn Hồng Khương — 3124411140<br>Trần Trung Hậu — 3124411088|
+| Người duyệt | Nguyễn Quốc Huy |
 | Phạm vi | Website thuyết minh đa ngôn ngữ, GPS, quản trị nội dung và thống kê truy cập qua QR |
 | Trạng thái | Tài liệu yêu cầu và thiết kế mục tiêu; kết quả triển khai được xác nhận qua kiểm thử |
 
@@ -190,7 +190,7 @@ Sơ đồ thể hiện hai tác nhân Du khách và Admin cùng các chức năn
 
 Không đưa UC “Kiểm tra quyền truy cập” thành chức năng riêng. Điều kiện đăng nhập được mô tả trong tiền điều kiện của các UC quản trị.
 
-**[CHÈN HÌNH USE CASE TỔNG QUAN — THỐNG NHẤT VỚI 7 NHÓM, 26 UC CHI TIẾT VÀ HAI TÁC NHÂN DU KHÁCH, ADMIN.]**
+![uctong](imgs/uctong_cnpm.drawio.png)
 
 ## 4.3. Danh mục Use Case
 
@@ -277,7 +277,7 @@ Không đưa UC “Kiểm tra quyền truy cập” thành chức năng riêng. 
 
 Nhóm này hỗ trợ mở website qua QR, ghi nhận truy cập, chọn ngôn ngữ và thiết lập quyền vị trí.
 
-**[CHÈN HÌNH USE CASE NHÓM 01 — BẮT ĐẦU THAM QUAN.]**
+![HÌNH USE CASE NHÓM 01 — BẮT ĐẦU THAM QUAN.](imgs/uc01_cnpm.drawio.png)
 
 ### UC01.1 — Chọn ngôn ngữ ban đầu
 
@@ -300,7 +300,8 @@ Nhóm này hỗ trợ mở website qua QR, ghi nhận truy cập, chọn ngôn n
 
 **Luồng thay thế / ngoại lệ:** Không có luồng riêng. Giao diện chỉ cho tiếp tục khi có lựa chọn hợp lệ.
 
-**[CHÈN HÌNH ACTIVITY UC01.1 — CHỌN NGÔN NGỮ → XÁC NHẬN → LƯU VÀ ÁP DỤNG.]**
+![HÌNH ACTIVITY UC01.1 — CHỌN NGÔN NGỮ → XÁC NHẬN → LƯU VÀ ÁP DỤNG.](imgs/uc01.1_act_cnpm.drawio.png
+)
 
 ### UC01.2 — Thiết lập quyền vị trí
 
@@ -326,7 +327,7 @@ Nhóm này hỗ trợ mở website qua QR, ghi nhận truy cập, chọn ngôn n
 
 Hệ thống vẫn mở bản đồ, cho phép chọn điểm và nghe thủ công. Không hiển thị vị trí giả hoặc tự phát theo GPS. Kết thúc chức năng.
 
-**[CHÈN HÌNH ACTIVITY UC01.2 — PHÂN NHÁNH CẤP QUYỀN VÀ KHÔNG CẤP QUYỀN GPS.]**
+![HÌNH ACTIVITY UC01.2 — PHÂN NHÁNH CẤP QUYỀN VÀ KHÔNG CẤP QUYỀN GPS.](imgs/uc01.2_act_cnpm.drawio.png)
 
 ### UC01.3 — Ghi nhận truy cập qua QR
 
@@ -353,7 +354,7 @@ Không tạo lượt mới. Hệ thống trả kết quả đã ghi nhận và c
 
 Việc ghi nhận thống kê không chặn luồng chọn ngôn ngữ.
 
-**[CHÈN HÌNH ACTIVITY UC01.3 — MỞ LINK QR → KIỂM TRA PHIÊN → KIỂM TRA TRÙNG → GHI NHẬN HOẶC BỎ QUA.]**
+![HÌNH ACTIVITY UC01.3 — MỞ LINK QR → KIỂM TRA PHIÊN → KIỂM TRA TRÙNG → GHI NHẬN HOẶC BỎ QUA.](imgs/uc01.3_act_cnpm.drawio.png)
 
 ---
 
@@ -361,7 +362,7 @@ Việc ghi nhận thống kê không chặn luồng chọn ngôn ngữ.
 
 Nhóm này hỗ trợ xem các điểm công khai, thông tin chi tiết và vị trí hiện tại.
 
-**[CHÈN HÌNH USE CASE NHÓM 02 — XEM BẢN ĐỒ THAM QUAN.]**
+![HÌNH USE CASE NHÓM 02 — XEM BẢN ĐỒ THAM QUAN.](imgs/uc02_cnpm.drawio.png)
 
 ### UC02.1 — Xem thông tin điểm tham quan
 
@@ -386,7 +387,7 @@ Nhóm này hỗ trợ xem các điểm công khai, thông tin chi tiết và v�
 
 Chọn xem một điểm không đồng nghĩa với đã đi đến hoặc đã nghe điểm đó.
 
-**[CHÈN HÌNH ACTIVITY UC02.1 — CHỌN ĐIỂM → HIỂN THỊ VÙNG VÀ THÔNG TIN.]**
+![HÌNH ACTIVITY UC02.1 — CHỌN ĐIỂM → HIỂN THỊ VÙNG VÀ THÔNG TIN.](imgs/uc02.1_act_cnpm.drawio.png)
 
 ### UC02.2 — Xem vị trí của tôi
 
@@ -415,7 +416,7 @@ Hướng dẫn bật quyền vị trí. Nếu được cấp quyền, tiếp t�
 
 Hiển thị trạng thái đang xác định vị trí. Tiếp tục bước 3 khi có dữ liệu hợp lệ; không dùng tọa độ không hợp lệ để kích hoạt vùng.
 
-**[CHÈN HÌNH ACTIVITY UC02.2 — KIỂM TRA QUYỀN → LẤY TỌA ĐỘ → HIỂN THỊ VỊ TRÍ.]**
+![HÌNH ACTIVITY UC02.2 — KIỂM TRA QUYỀN → LẤY TỌA ĐỘ → HIỂN THỊ VỊ TRÍ.](imgs/uc02.2_act_cnpm.drawio.png)
 
 ---
 
@@ -423,7 +424,7 @@ Hiển thị trạng thái đang xác định vị trí. Tiếp tục bước 3 
 
 Nhóm này hỗ trợ chọn điểm cần nghe, lấy nội dung/audio phù hợp và điều khiển phát.
 
-**[CHÈN HÌNH USE CASE NHÓM 03 — NGHE THUYẾT MINH.]**
+![HÌNH USE CASE NHÓM 03 — NGHE THUYẾT MINH.](imgs/uc03_cnpm.drawio.png)
 
 ### UC03.1 — Xác định điểm cần nghe
 
@@ -457,7 +458,7 @@ Chưa tạo yêu cầu tự phát. Tiếp tục theo dõi vị trí và quay l�
 
 Nếu đang có bài phát hoặc yêu cầu bị xác định là phát lặp, chưa tự phát bài mới. Tiếp tục theo dõi vị trí và trạng thái phát.
 
-**[CHÈN HÌNH ACTIVITY UC03.1 — CÓ CÁC NHÁNH A1 NGHE THỦ CÔNG, A2 NGOÀI VÙNG VÀ A3 CHƯA ĐỦ ĐIỀU KIỆN TỰ PHÁT.]**
+![HÌNH ACTIVITY UC03.1 — CÓ CÁC NHÁNH A1 NGHE THỦ CÔNG, A2 NGOÀI VÙNG VÀ A3 CHƯA ĐỦ ĐIỀU KIỆN TỰ PHÁT.](imgs/uc03.1_act_cnpm.drawio.png)
 
 ### UC03.2 — Lấy thuyết minh theo ngôn ngữ
 
@@ -482,7 +483,7 @@ Nếu đang có bài phát hoặc yêu cầu bị xác định là phát lặp, 
 
 Thông báo chưa có thuyết minh phù hợp. Không tự phát audio của ngôn ngữ khác. Du khách có thể đổi ngôn ngữ hoặc chọn điểm khác.
 
-**[CHÈN HÌNH ACTIVITY UC03.2 — KIỂM TRA NỘI DUNG/AUDIO HỢP LỆ; NHÁNH KHÔNG HỢP LỆ DẪN ĐẾN E1.]**
+![ HÌNH ACTIVITY UC03.2 — KIỂM TRA NỘI DUNG/AUDIO HỢP LỆ; NHÁNH KHÔNG HỢP LỆ DẪN ĐẾN E1.](imgs/uc03.2_act_cnpm.drawio.png)
 
 ### UC03.3 — Tạm dừng thuyết minh
 
@@ -504,7 +505,7 @@ Thông báo chưa có thuyết minh phù hợp. Không tự phát audio của ng
 
 **Luồng thay thế / ngoại lệ:** Không có luồng riêng.
 
-**[CHÈN HÌNH ACTIVITY UC03.3 — NHẤN TẠM DỪNG → GIỮ THỜI ĐIỂM → HIỂN THỊ TRẠNG THÁI.]**
+![ HÌNH ACTIVITY UC03.3 — NHẤN TẠM DỪNG → GIỮ THỜI ĐIỂM → HIỂN THỊ TRẠNG THÁI.](imgs/uc03.3_act_cnpm.drawio.png)
 
 ### UC03.4 — Tiếp tục thuyết minh
 
@@ -526,7 +527,7 @@ Thông báo chưa có thuyết minh phù hợp. Không tự phát audio của ng
 
 **Luồng thay thế / ngoại lệ:** Không có luồng riêng.
 
-**[CHÈN HÌNH ACTIVITY UC03.4 — NHẤN TIẾP TỤC → LẤY THỜI ĐIỂM → PHÁT TIẾP.]**
+![HÌNH ACTIVITY UC03.4 — NHẤN TIẾP TỤC → LẤY THỜI ĐIỂM → PHÁT TIẾP.](imgs/uc03.4_act_cnpm.drawio.png)
 
 ### UC03.5 — Nghe lại thuyết minh
 
@@ -550,7 +551,7 @@ Thông báo chưa có thuyết minh phù hợp. Không tự phát audio của ng
 
 Nghe lại không xóa lịch sử tham quan.
 
-**[CHÈN HÌNH ACTIVITY UC03.5 — NHẤN NGHE LẠI → ĐƯA VỀ ĐẦU → PHÁT AUDIO.]**
+![ HÌNH ACTIVITY UC03.5 — NHẤN NGHE LẠI → ĐƯA VỀ ĐẦU → PHÁT AUDIO.](imgs/uc03.5_act_cnpm.drawio.png)
 
 ### UC03.6 — Đổi ngôn ngữ thuyết minh
 
@@ -576,7 +577,7 @@ Nghe lại không xóa lịch sử tham quan.
 
 Không tự phát lại chỉ vì đổi ngôn ngữ. Việc dừng audio cũ là xử lý thông thường, không phải ngoại lệ.
 
-**[CHÈN HÌNH ACTIVITY UC03.6 — CHỌN NGÔN NGỮ → LƯU → DỪNG AUDIO CŨ NẾU CÓ → CẬP NHẬT NỘI DUNG VÀ GIỮ TRẠNG THÁI.]**
+![HÌNH ACTIVITY UC03.6 — CHỌN NGÔN NGỮ → LƯU → DỪNG AUDIO CŨ NẾU CÓ → CẬP NHẬT NỘI DUNG VÀ GIỮ TRẠNG THÁI.](imgs/uc03.6_act_cnpm.drawio.png)
 
 ---
 
@@ -584,7 +585,7 @@ Không tự phát lại chỉ vì đổi ngôn ngữ. Việc dừng audio cũ l�
 
 Nhóm này xác thực tài khoản để truy cập khu vực Admin.
 
-**[CHÈN HÌNH USE CASE NHÓM 04 — ĐĂNG NHẬP QUẢN TRỊ.]**
+![ HÌNH USE CASE NHÓM 04 — ĐĂNG NHẬP QUẢN TRỊ.](imgs/uc04_cnpm.drawio.png)
 
 ### UC04.1 — Xác thực tài khoản Admin
 
@@ -611,7 +612,7 @@ Từ chối đăng nhập, hiển thị thông báo phù hợp. Admin nhập l�
 
 Không thêm UC kiểm tra quyền riêng. Các API quản trị vẫn phải xác thực phiên.
 
-**[CHÈN HÌNH ACTIVITY UC04.1 — NHẬP THÔNG TIN → KIỂM TRA → TẠO PHIÊN HOẶC THÔNG BÁO KHÔNG HỢP LỆ.]**
+![ HÌNH ACTIVITY UC04.1 — NHẬP THÔNG TIN → KIỂM TRA → TẠO PHIÊN HOẶC THÔNG BÁO KHÔNG HỢP LỆ.](imgs/uc04.1_act_cnpm.drawio.png)
 
 ---
 
@@ -619,7 +620,7 @@ Không thêm UC kiểm tra quyền riêng. Các API quản trị vẫn phải x�
 
 Admin quản lý thông tin, ảnh, tọa độ, bán kính và trạng thái của điểm.
 
-**[CHÈN HÌNH USE CASE NHÓM 05 — ADMIN NỐI TRỰC TIẾP VỚI THÊM, SỬA, XÓA, ẨN/HIỆN; KHÔNG CÓ UC-S01.]**
+![ HÌNH USE CASE NHÓM 05 — ADMIN NỐI TRỰC TIẾP VỚI THÊM, SỬA, XÓA, ẨN/HIỆN; KHÔNG CÓ UC-S01.](imgs/uc05_cnpm.drawio.png)
 
 ### UC05.1 — Thêm điểm tham quan
 
@@ -647,7 +648,7 @@ Thông báo đúng trường cần sửa, giữ dữ liệu form. Admin sửa v�
 
 Nội dung giới thiệu đa ngôn ngữ được quản lý theo quy trình bản nháp của điểm, tránh tạo hai nguồn dữ liệu công khai không đồng nhất.
 
-**[CHÈN HÌNH ACTIVITY UC05.1 — NHẬP THÔNG TIN → KIỂM TRA → SINH MÃ → LƯU ĐIỂM.]**
+![CHÈN HÌNH ACTIVITY UC05.1 — NHẬP THÔNG TIN → KIỂM TRA → SINH MÃ → LƯU ĐIỂM.](imgs/uc05.1_act_cnpm.drawio.jpg)
 
 ### UC05.2 — Sửa điểm tham quan
 
@@ -675,7 +676,7 @@ Chưa ghi thay đổi; thông báo trường cần sửa và cho lưu lại.
 
 Sửa nội dung thuyết minh đã công khai phải qua bản nháp, không ghi đè trực tiếp phiên bản đang phát cho khách.
 
-**[CHÈN HÌNH ACTIVITY UC05.2 — CHỌN ĐIỂM → SỬA → KIỂM TRA → LƯU.]**
+![CHÈN HÌNH ACTIVITY UC05.2 — CHỌN ĐIỂM → SỬA → KIỂM TRA → LƯU.](imgs/uc05.2_act_cnpm.drawio.jpg)
 
 ### UC05.3 — Xóa điểm tham quan
 
@@ -704,7 +705,7 @@ Giữ nguyên điểm, đóng hộp xác nhận.
 
 Từ chối xóa, thông báo lý do và hướng dẫn sử dụng chức năng ẩn.
 
-**[CHÈN HÌNH ACTIVITY UC05.3 — KIỂM TRA RÀNG BUỘC → XÁC NHẬN → XÓA; CÓ NHÁNH HỦY VÀ KHÔNG ĐƯỢC XÓA.]**
+![CHÈN HÌNH ACTIVITY UC05.3 — KIỂM TRA RÀNG BUỘC → XÁC NHẬN → XÓA; CÓ NHÁNH HỦY VÀ KHÔNG ĐƯỢC XÓA.](imgs/uc05.3_act_cnpm.drawio.jpg)
 
 ### UC05.4 — Ẩn / hiện điểm tham quan
 
@@ -729,7 +730,7 @@ Từ chối xóa, thông báo lý do và hướng dẫn sử dụng chức năng
 
 Chuyển điểm sang hoạt động. Chỉ đưa ra web User nếu có phiên bản công khai hợp lệ; bật hoạt động không tự xuất bản bản nháp.
 
-**[CHÈN HÌNH ACTIVITY UC05.4 — CHỌN ẨN/HIỆN → CẬP NHẬT TRẠNG THÁI → ÁP DỤNG ĐIỀU KIỆN CÔNG KHAI.]**
+![ HÌNH ACTIVITY UC05.4 — CHỌN ẨN/HIỆN → CẬP NHẬT TRẠNG THÁI → ÁP DỤNG ĐIỀU KIỆN CÔNG KHAI.](imgs/uc05.4_act_cnpm.drawio.png)
 
 ---
 
@@ -737,7 +738,7 @@ Chuyển điểm sang hoạt động. Chỉ đưa ra web User nếu có phiên b
 
 Nhóm này quản lý nội dung từ bản nháp tiếng Việt đến bản dịch, audio và xuất bản.
 
-**[CHÈN HÌNH USE CASE NHÓM 06 — ADMIN NỐI VỚI UC06.1–UC06.7; AZURE HỖ TRỢ TẠO BẢN DỊCH/AUDIO; KHÔNG CÓ UC-S01.]**
+![HÌNH USE CASE NHÓM 06 ](imgs/uc06_cnpm.drawio.png)
 
 ### UC06.1 — Thêm bản nháp thuyết minh
 
@@ -762,7 +763,7 @@ Nhóm này quản lý nội dung từ bản nháp tiếng Việt đến bản d�
 
 Thông báo phần cần bổ sung; Admin sửa và lưu lại.
 
-**[CHÈN HÌNH ACTIVITY UC06.1 — CHỌN ĐIỂM → NHẬP TIẾNG VIỆT → KIỂM TRA → LƯU DRAFT.]**
+![HÌNH ACTIVITY UC06.1 — CHỌN ĐIỂM → NHẬP TIẾNG VIỆT → KIỂM TRA → LƯU DRAFT.](imgs/uc06.1_act_cnpm.drawio.png)
 
 ### UC06.2 — Sửa bản nháp thuyết minh
 
@@ -791,7 +792,7 @@ Không ghi đè bản đã xuất bản. Hướng dẫn tạo bản nháp mới.
 
 Giữ bản đã lưu, thông báo trường cần sửa.
 
-**[CHÈN HÌNH ACTIVITY UC06.2 — KIỂM TRA TRẠNG THÁI → SỬA → LƯU → CẬP NHẬT HIỆU LỰC BẢN DỊCH/AUDIO.]**
+![ HÌNH ACTIVITY UC06.2 — KIỂM TRA TRẠNG THÁI → SỬA → LƯU → CẬP NHẬT HIỆU LỰC BẢN DỊCH/AUDIO.](imgs/uc06.2_act_cnpm.drawio.png)
 
 ### UC06.3 — Xóa bản nháp thuyết minh
 
@@ -820,7 +821,7 @@ Giữ nguyên bản nháp.
 
 Từ chối nếu không phải Draft hoặc còn tác vụ đang xử lý. Không xóa phiên bản đang công khai.
 
-**[CHÈN HÌNH ACTIVITY UC06.3 — KIỂM TRA ĐIỀU KIỆN → XÁC NHẬN → XÓA BẢN NHÁP.]**
+![ HÌNH ACTIVITY UC06.3 — KIỂM TRA ĐIỀU KIỆN → XÁC NHẬN → XÓA BẢN NHÁP.](imgs/uc06.3_act_cnpm.drawio.png)
 
 ### UC06.4 — Tạo bản dịch và audio
 
@@ -857,7 +858,7 @@ Giữ kết quả đã hoàn thành, ghi phần lỗi và cho phép tạo lại.
 
 GenerationJobs là dữ liệu theo dõi xử lý, không tự tạo thêm UC quản lý tác vụ riêng.
 
-**[CHÈN HÌNH ACTIVITY UC06.4 — TẠO JOB → DỊCH → TẠO AUDIO → LƯU KẾT QUẢ VÀ TRẠNG THÁI; CÓ NHÁNH TẠO LẠI PHẦN LỖI.]**
+![ HÌNH ACTIVITY UC06.4 — TẠO JOB → DỊCH → TẠO AUDIO → LƯU KẾT QUẢ VÀ TRẠNG THÁI; CÓ NHÁNH TẠO LẠI PHẦN LỖI.](imgs/uc06.4_act_cnpm.drawio.png)
 
 ### UC06.5 — Hiệu chỉnh bản dịch
 
@@ -883,7 +884,7 @@ GenerationJobs là dữ liệu theo dõi xử lý, không tự tạo thêm UC qu
 
 Thông báo và cho sửa lại, không ghi đè dữ liệu hợp lệ trước đó.
 
-**[CHÈN HÌNH ACTIVITY UC06.5 — CHỌN NGÔN NGỮ → HIỆU CHỈNH → LƯU → ĐÁNH DẤU AUDIO CẦN TẠO LẠI.]**
+![ HÌNH ACTIVITY UC06.5 — CHỌN NGÔN NGỮ → HIỆU CHỈNH → LƯU → ĐÁNH DẤU AUDIO CẦN TẠO LẠI.](imgs/uc06.5_act_cnpm.drawio.png)
 
 ### UC06.6 — Nghe thử thuyết minh
 
@@ -908,7 +909,7 @@ Thông báo và cho sửa lại, không ghi đè dữ liệu hợp lệ trước
 
 Thông báo cần tạo hoặc tạo lại. Không trình bày audio cũ như kết quả hợp lệ.
 
-**[CHÈN HÌNH ACTIVITY UC06.6 — CHỌN NGÔN NGỮ → KIỂM TRA AUDIO → PHÁT NGHE THỬ.]**
+![HÌNH ACTIVITY UC06.6 — CHỌN NGÔN NGỮ → KIỂM TRA AUDIO → PHÁT NGHE THỬ.](imgs/uc06.6_act_cnpm.drawio.png)
 
 ### UC06.7 — Xuất bản thuyết minh
 
@@ -942,7 +943,7 @@ Phiên bản vẫn được xuất bản nhưng điểm chưa xuất hiện trê
 
 Liệt kê ngôn ngữ hoặc audio cần hoàn thiện; không thay đổi phiên bản công khai.
 
-**[CHÈN HÌNH ACTIVITY UC06.7 — KIỂM TRA ĐIỀU KIỆN → XÁC NHẬN → XUẤT BẢN → CẬP NHẬT DỮ LIỆU PUBLIC.]**
+![ HÌNH ACTIVITY UC06.7 — KIỂM TRA ĐIỀU KIỆN → XÁC NHẬN → XUẤT BẢN → CẬP NHẬT DỮ LIỆU PUBLIC.](imgs/uc06.7_act_cnpm.drawio.png)
 
 ---
 
@@ -950,7 +951,7 @@ Liệt kê ngôn ngữ hoặc audio cần hoàn thiện; không thay đổi phi�
 
 Báo cáo phản ánh lượt truy cập đã ghi nhận, không phải số người thực tế.
 
-**[CHÈN HÌNH USE CASE NHÓM 07 — LỌC THỜI GIAN, PHÂN BỐ THEO GIỜ VÀ GIỜ CAO ĐIỂM; KHÔNG CÓ BỘ LỌC MÃ QR.]**
+![ HÌNH USE CASE NHÓM 07 — LỌC THỜI GIAN, PHÂN BỐ THEO GIỜ VÀ GIỜ CAO ĐIỂM; KHÔNG CÓ BỘ LỌC MÃ QR.](imgs/uc07_cnpm.drawio.png)
 
 ### UC07.1 — Lọc theo khoảng thời gian
 
@@ -979,7 +980,7 @@ Hiển thị 0 lượt và thông báo chưa có dữ liệu; không tạo số 
 
 Thông báo và yêu cầu sửa; chưa áp dụng bộ lọc.
 
-**[CHÈN HÌNH ACTIVITY UC07.1 — CHỌN THỜI GIAN → KIỂM TRA → TỔNG HỢP → HIỂN THỊ.]**
+![HÌNH ACTIVITY UC07.1 — CHỌN THỜI GIAN → KIỂM TRA → TỔNG HỢP → HIỂN THỊ.](imgs/uc07.1_act_cnpm.drawio.png)
 
 ### UC07.2 — Xem phân bố truy cập theo giờ
 
@@ -1006,7 +1007,7 @@ Hiển thị trạng thái chưa có dữ liệu hoặc các khung bằng 0.
 
 Nếu lọc nhiều ngày, lượt ở cùng giờ của các ngày được cộng vào cùng khung. Giao diện phải ghi rõ cách tổng hợp này.
 
-**[CHÈN HÌNH ACTIVITY UC07.2 — LẤY DỮ LIỆU → QUY ĐỔI GIỜ → NHÓM THEO 24 KHUNG → HIỂN THỊ.]**
+![ HÌNH ACTIVITY UC07.2 — LẤY DỮ LIỆU → QUY ĐỔI GIỜ → NHÓM THEO 24 KHUNG → HIỂN THỊ.](imgs/uc07.2_act_cnpm.drawio.png)
 
 ### UC07.3 — Xem khung giờ cao điểm
 
@@ -1035,7 +1036,7 @@ Thông báo chưa đủ dữ liệu để xác định cao điểm. Kết thúc.
 
 Hiển thị tất cả khung giờ có cùng số lượt lớn nhất.
 
-**[CHÈN HÌNH ACTIVITY UC07.3 — KIỂM TRA DỮ LIỆU → TÌM CỰC ĐẠI → HIỂN THỊ CÁC GIỜ CAO ĐIỂM.]**
+![ HÌNH ACTIVITY UC07.3 — KIỂM TRA DỮ LIỆU → TÌM CỰC ĐẠI → HIỂN THỊ CÁC GIỜ CAO ĐIỂM.](imgs/uc07.3_act_cnpm.drawio.png)
 
 ## 5.10. Giả lập vị trí phục vụ demo
 
@@ -1221,7 +1222,7 @@ Các thành phần chính:
 - Azure Translator/Speech adapters.
 - Media Storage.
 
-**[CHÈN HÌNH COMPONENT DIAGRAM — THÀNH PHẦN PHẦN MỀM, INTERFACE VÀ QUAN HỆ PHỤ THUỘC.]**
+![ HÌNH COMPONENT DIAGRAM — THÀNH PHẦN PHẦN MỀM, INTERFACE VÀ QUAN HỆ PHỤ THUỘC.](imgs/component_cnpm.drawio.png)
 
 ## 9.4. Deployment Diagram
 
@@ -1236,7 +1237,7 @@ Môi trường demo gồm:
 
 Cổng thực tế được lấy từ cấu hình khởi động. Không coi cổng ví dụ là giá trị cố định của mọi môi trường.
 
-**[CHÈN HÌNH DEPLOYMENT DIAGRAM — THIẾT BỊ, MÁY CHỦ/ TIẾN TRÌNH DEMO, SQL SERVER, KHO MEDIA, AZURE VÀ GIAO THỨC KẾT NỐI.]**
+![HÌNH DEPLOYMENT DIAGRAM — THIẾT BỊ, MÁY CHỦ/ TIẾN TRÌNH DEMO, SQL SERVER, KHO MEDIA, AZURE VÀ GIAO THỨC KẾT NỐI.](imgs/deployment_cnpm.drawio.png)
 
 Quick Tunnel dùng cho demo, không phải cam kết hosting lâu dài.
 
@@ -1277,7 +1278,6 @@ Các quan hệ và ràng buộc nêu trên phải được kiểm tra trong migr
 
 Dấu nguồn như `source=qr` chỉ xác định loại liên kết truy cập, không chứng minh hành động camera quét.
 
-**[CHÈN HÌNH ERD LOGIC — 7 BẢNG, KHÔNG CÓ QRCODES; GIỮ GENERATIONJOBS, SITETEXTS VÀ QRVISITS.]**
 
 **[CHÈN HÌNH LƯỢC ĐỒ VẬT LÝ — TÊN CỘT, KIỂU DỮ LIỆU, PK, FK, UNIQUE VÀ INDEX THEO MIGRATION ĐÃ CHỐT.]**
 
