@@ -149,20 +149,32 @@ builder.Services.AddAntiforgery(options =>
 // Chỉ Build một lần, sau tất cả đăng ký service.
 var app = builder.Build();
 
-if (args.Contains("--seed-admin"))
+var seedAdmin = args.Contains("--seed-admin");
+var resetAdminPassword = args.Contains("--reset-admin-password");
+
+if (seedAdmin && resetAdminPassword)
+{
+    throw new InvalidOperationException(
+        "Chỉ dùng một lệnh: --seed-admin hoặc --reset-admin-password.");
+}
+
+if (seedAdmin || resetAdminPassword)
 {
     if (!app.Environment.IsDevelopment())
     {
         throw new InvalidOperationException(
-            "Chỉ chạy khởi tạo admin trong môi trường Development.");
+            "Chỉ tạo hoặc đặt lại mật khẩu Admin trong môi trường Development.");
     }
 
     await AdminAccountSetup.RunAsync(
         app.Services,
-        app.Configuration);
+        app.Configuration,
+        resetPassword: resetAdminPassword);
 
     return;
 }
+
+
 
 // Tự động migrate và seed dữ liệu mẫu khi khởi động
 using (var seedScope = app.Services.CreateScope())

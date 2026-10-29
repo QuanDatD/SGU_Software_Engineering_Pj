@@ -357,7 +357,7 @@ public class AdminNarrationController : ControllerBase
         return NoContent();
     }
 
-    // 7. Xuất bản phiên bản -> Cập nhật thẳng vào Place.PublishedRevisionId cho Web User
+    // 7. Xuất bản phiên bản và cập nhật phiên bản công khai của điểm.
     [HttpPost("revisions/{revisionId:guid}/publish")]
     public async Task<IActionResult> Publish(Guid revisionId, CancellationToken ct)
     {

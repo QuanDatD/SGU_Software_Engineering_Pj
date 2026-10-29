@@ -1,12 +1,37 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{7FA64589-69EF-4FF8-A508-7C16A1A07249}|Zoo.Api\\Zoo.Api.csproj|d:\\learning pj\\sgu_software_engineering_pj\\backend\\zoo.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7FA64589-69EF-4FF8-A508-7C16A1A07249}|Zoo.Api\\Zoo.Api.csproj|solutionrelative:zoo.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.Api\\Program.cs",
+              "RelativeDocumentMoniker": "Zoo.Api\\Program.cs",
+              "ToolTip": "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\backend\\Zoo.Api\\Program.cs",
+              "RelativeToolTip": "Zoo.Api\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-21T20:59:42.681Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

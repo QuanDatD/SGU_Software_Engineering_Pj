@@ -2,7 +2,10 @@ import { QRCodeSVG } from "qrcode.react";
 
 export default function QrPage() {
   // Thêm ?source=qr để backend ghi nhận lượt truy cập (UC01.3, BR-20)
-  const websiteUrl = `${window.location.origin}/?source=qr`;
+  const entryUrl = new URL("/", window.location.origin);
+  entryUrl.searchParams.set("source", "qr");
+
+  const websiteUrl = entryUrl.toString();
 
   const isLocal =
     window.location.hostname === "localhost" ||

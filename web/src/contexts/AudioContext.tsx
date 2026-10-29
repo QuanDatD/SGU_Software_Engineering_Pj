@@ -24,7 +24,10 @@ interface AudioCtx {
   currentTime: number;
   duration: number;
   /** Phát bài mới (dừng bài cũ nếu đang phát) */
-  play: (track: TrackInfo) => Promise<boolean>;
+  play: (
+    track: TrackInfo,
+    canStart?: () => boolean,
+) => Promise<boolean>;
   /** Tiếp tục bài đang tạm dừng */
   resume: () => void;
   pause: () => void;
@@ -36,6 +39,9 @@ const Ctx = createContext<AudioCtx | null>(null);
 
 export function AudioProvider({ children }: { children: ReactNode }) {
   const audioRef  = useRef<HTMLAudioElement | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
+  const downloadRef = useRef<AbortController | null>(null);
+  const requestIdRef = useRef(0);
   const [track,   setTrack]   = useState<TrackInfo | null>(null);
   const [state,   setState]   = useState<PlayerState>("idle");
   const [currentTime, setCurrentTime] = useState(0);
@@ -47,8 +53,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       const el = new Audio();
       el.preload = "auto";
 
-      el.addEventListener("loadstart",  () => setState("loading"));
-      el.addEventListener("play",       () => setState("playing"));
+      
+      el.addEventListener("playing",       () => setState("playing"));
       el.addEventListener("pause",      () => setState((s) => s !== "ended" ? "paused" : s));
       el.addEventListener("ended",      () => { setState("ended"); });
       el.addEventListener("error",      () => setState("error"));
@@ -60,29 +66,98 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     return audioRef.current;
   }
 
-    const play = useCallback(async (next: TrackInfo): Promise<boolean> => {
-        const el = getAudio();
+    const play = useCallback(async (
+    next: TrackInfo,
+    canStart?: () => boolean,
+): Promise<boolean> => {
+	if (canStart && !canStart()) {
+    return false;
+}
+    const el = getAudio();
+    const fullAudioUrl = mediaUrl(next.url);
 
-        // Không phát lại bài đang phát
-        if (track?.url === mediaUrl(next.url) && (state === "playing" || state === "loading")) return true;
+    if (
+        track?.url === fullAudioUrl &&
+        (state === "playing" || state === "loading")
+    ) {
+        return true;
+    }
 
-        el.pause();
+    const requestId = ++requestIdRef.current;
 
-        // Xử lý nối domain Backend nếu là đường dẫn tương đối
-        const fullAudioUrl = mediaUrl(next.url);
+    downloadRef.current?.abort();
 
-        const currentTrack = { ...next, url: fullAudioUrl };
+    const controller = new AbortController();
+    downloadRef.current = controller;
 
-        setTrack(currentTrack);
-        setCurrentTime(0);
-        setDuration(0);
-        setState("loading");
+    el.pause();
+    el.removeAttribute("src");
+    el.load();
 
-        el.src = fullAudioUrl;
-        el.currentTime = 0;
+    if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+    }
+
+    // Track vẫn giữ URL API để nhận diện bài và phiên bản.
+    setTrack({
+        ...next,
+        url: fullAudioUrl,
+    });
+
+    setCurrentTime(0);
+    setDuration(0);
+    setState("loading");
+
+    try {
+        const response = await fetch(fullAudioUrl, {
+            credentials: "include",
+            cache: "no-store",
+            signal: controller.signal,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Không tải được audio: HTTP ${response.status}`);
+        }
+
+        const blob = await response.blob();
+
+        if (blob.size === 0) {
+            throw new Error("File audio rỗng.");
+        }
+
+        if (requestId !== requestIdRef.current) {
+            return false;
+        }
+
+        // File đã tải trọn; trình phát sử dụng bản trong bộ nhớ.
+        const blobUrl = URL.createObjectURL(blob);
+        blobUrlRef.current = blobUrl;
+
+        el.src = blobUrl;
         el.load();
-        try { await el.play(); return true; } catch { if (el.src === new URL(fullAudioUrl, location.href).href) setState("error"); return false; }
-    }, [track, state]);
+
+        await el.play();
+
+        if (requestId !== requestIdRef.current) {
+            return false;
+        }
+
+        setState("playing");
+        return true;
+    } catch {
+        // Không để lỗi của yêu cầu cũ làm đổi trạng thái bài mới.
+        if (requestId === requestIdRef.current) {
+            setState("error");
+        }
+
+        return false;
+    } finally {
+        if (requestId === requestIdRef.current) {
+            downloadRef.current = null;
+        }
+    }
+}, [track, state]);
 
   const resume = useCallback(() => {
     audioRef.current?.play().catch(() => setState("error"));
@@ -92,17 +167,31 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     audioRef.current?.pause();
   }, []);
 
-  const stop = useCallback(() => {
-    const el = audioRef.current;
-    if (!el) return;
-    el.pause();
-    el.removeAttribute("src");
-    el.load();
-    setTrack(null);
-    setState("idle");
-    setCurrentTime(0);
-    setDuration(0);
-  }, []);
+    const stop = useCallback(() => {
+        // Làm mất hiệu lực kết quả tải đang chờ.
+        requestIdRef.current++;
+
+        downloadRef.current?.abort();
+        downloadRef.current = null;
+
+        const el = audioRef.current;
+
+        if (el) {
+            el.pause();
+            el.removeAttribute("src");
+            el.load();
+        }
+
+        if (blobUrlRef.current) {
+            URL.revokeObjectURL(blobUrlRef.current);
+            blobUrlRef.current = null;
+        }
+
+        setTrack(null);
+        setState("idle");
+        setCurrentTime(0);
+        setDuration(0);
+    }, []);
 
   const seek = useCallback((seconds: number) => {
     const el = audioRef.current;
@@ -110,7 +199,26 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     el.currentTime = Math.max(0, Math.min(seconds, el.duration || 0));
   }, []);
 
-  useEffect(() => () => { audioRef.current?.pause(); }, []);
+ useEffect(() => {
+    return () => {
+        requestIdRef.current++;
+
+        downloadRef.current?.abort();
+
+        const el = audioRef.current;
+
+        if (el) {
+            el.pause();
+            el.removeAttribute("src");
+            el.load();
+        }
+
+        if (blobUrlRef.current) {
+            URL.revokeObjectURL(blobUrlRef.current);
+            blobUrlRef.current = null;
+        }
+    };
+}, []);
 
   return (
     <Ctx.Provider value={{ track, state, currentTime, duration, play, resume, pause, stop, seek }}>

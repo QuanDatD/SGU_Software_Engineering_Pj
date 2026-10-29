@@ -5,25 +5,57 @@ import "../../styles/MapPage.css";
 import { useLang } from "../../contexts/LanguageContext";
 import { useAudio } from "../../contexts/AudioContext";
 import { placeApi } from "../../services/placeApi";
-import { useGeolocation } from "../../hooks/useGeolocation";
+import type { useGeolocation } from "../../hooks/useGeolocation";
 import { useVisitSession } from "../../hooks/useVisitSession";
 import type { PlaceDetail } from "../../types/place";
 import AudioPlayer from "../../components/AudioPlayer";
+import type { useVisitHistory } from "../../hooks/useVisitHistory";
+import GpsSimulationPanel from "../../components/GpsSimulationPanel";
+import type { useGpsSimulator } from "../../hooks/useGpsSimulator";
+interface MapPageProps {
+    geolocation: ReturnType<typeof useGeolocation>;
+    selectedId: string | null;
+    onSelectPlace: (id: string | null) => void;
+    autoPlay: boolean;
+    onAutoPlayChange: (enabled: boolean) => void;
+    visitHistory: ReturnType<typeof useVisitHistory>;
+    simulator: ReturnType<typeof useGpsSimulator>;
 
-export default function MapPage() {
+    onStartSimulation: (
+        from: { lat: number; lng: number },
+        to: { lat: number; lng: number },
+        speed: number,
+    ) => void;
+}
+
+export default function MapPage({
+    geolocation,
+    selectedId,
+    onSelectPlace: setSelectedId,
+    autoPlay,
+    onAutoPlayChange: setAutoPlay,
+    visitHistory,
+    simulator,
+    onStartSimulation,
+}: MapPageProps) {
   const { lang } = useLang();
   const audio = useAudio();
-  const { gps, start, stop } = useGeolocation();
+  const { gps, start, stop } = geolocation;
   const position = gps.status === "active" ? gps.position : null;
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const [places, setPlaces] = useState<PlaceDetail[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [autoPlay, setAutoPlay] = useState(false);
   const selected = places.find(p => p.id === selectedId) ?? null;
-  useVisitSession({ position, places, lang, enabled: autoPlay && !error, onEnter: setSelectedId });
+  useVisitSession({
+    position,
+    places,
+    lang,
+    enabled: autoPlay && !error,
+    onEnter: setSelectedId,
+    history: visitHistory,
+});
 
   // One sequential request at a time. Refresh after publication from any other browser.
   useEffect(() => {
@@ -46,11 +78,37 @@ export default function MapPage() {
   }, [lang]);
 
   // Stop stale audio on language changes, hide, or a newly published revision.
-  useEffect(() => {
-    if (!audio.track) return;
-    const current = places.find(p => p.id === audio.track?.placeId);
-    if (audio.track.lang !== lang || !current || current.audioUrl[lang] !== audio.track.url) audio.stop();
-  }, [places, lang, audio.track, audio.stop]);
+  // Đổi ngôn ngữ hoặc điểm không còn công khai thì dừng.
+// Xuất bản phiên bản mới không tự ngắt bài đang nghe.
+useEffect(() => {
+    const track = audio.track;
+
+    if (!track) return;
+
+    if (track.lang !== lang) {
+        audio.stop();
+        return;
+    }
+
+    // Chưa tải xong hoặc đang lỗi API thì chưa đủ căn cứ
+    // kết luận điểm đang nghe đã bị ẩn.
+    if (loading || error) return;
+
+    const current = places.find(
+        (place) => place.id === track.placeId,
+    );
+
+    if (!current) {
+        audio.stop();
+    }
+}, [
+    places,
+    lang,
+    loading,
+    error,
+    audio.track,
+    audio.stop,
+]);
 
   useEffect(() => {
     if (!container.current) return;
@@ -94,8 +152,22 @@ export default function MapPage() {
   return (
     <div className="live-map">
       <div ref={container} className="live-map__canvas" />
+      <GpsSimulationPanel
+            places={places}
+            simulator={simulator}
+            onStart={onStartSimulation}
+            onStop={stop}
+        />
       <section className="live-map__gps">
-        <strong>🛰️ GPS · {places.length} khu đã xuất bản</strong>
+        <strong>
+            {simulator.enabled ? "🧪 GPS giả lập" : "🛰️ GPS"}
+            {" · "}{places.length} khu đã xuất bản
+        </strong>
+        <small>
+            Đã tới: {visitHistory.visitedPlaceIds.length} điểm
+            {" · "}
+            Đã nghe: {visitHistory.heardPlaceIds.length} điểm
+        </small>
         <div>
           <button onClick={() => { if (position) map.current?.flyTo([position.lat, position.lng], 18); else start(); }}>📍 Vị trí của tôi</button>
           <button onClick={() => { stop(); setAutoPlay(false); }}>Tắt GPS</button>

@@ -130,7 +130,7 @@ export default function NarrationAdmin() {
     if (error) return (
         <div className= "admin-section" >
         <div className="admin-notice admin-notice--warning" >
-            <span>⚠️</span><div><strong>Chưa kết nối backend</strong > <p>{ error } < /p></div >
+            <span>⚠️</span><div><strong>Chưa kết nối backend</strong > <p>{ error } </p></div >
                 </div>
                 </div>
   );
@@ -139,7 +139,7 @@ export default function NarrationAdmin() {
 
     return (
         <div className= "admin-section" >
-        <div className="admin-section__header" > <h2>Thuyết minh < /h2></div >
+        <div className="admin-section__header" > <h2>Thuyết minh </h2></div >
 
         {/* Chọn khu */ }
             < label className = "admin-form__field" style = {{ maxWidth: 340, marginBottom: 24 }
