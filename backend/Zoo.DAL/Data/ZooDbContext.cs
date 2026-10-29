@@ -55,6 +55,13 @@ public class ZooDbContext : DbContext
                 .WithMany(p => p.Revisions)
                 .HasForeignKey(x => x.PlaceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // PRD 9.5: AdminUsers 1 — 0..N NarrationRevisions qua CreatedByAdminId
+            e.HasOne<AdminUser>()
+                .WithMany()
+                .HasForeignKey(x => x.CreatedByAdminId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .IsRequired(false);
         });
 
         modelBuilder.Entity<NarrationTranslation>(e =>

@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Zoo.Api.Setup;
-using Zoo.BUS.Interfaces;
+using Zoo.Api.Setup;using Zoo.BUS.Interfaces;
 using Zoo.BUS.Services;
-
 using Zoo.DAL.Data;
 using Zoo.DAL.Entities;
 using Zoo.DAL.Interfaces;
@@ -75,6 +73,8 @@ builder.Services.AddHttpClient<
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGeofenceService, GeofenceService>();
 builder.Services.AddScoped<INarrationService, NarrationService>();
+builder.Services.AddScoped<IQrVisitService, QrVisitService>();
+builder.Services.AddScoped<IReportingService, ReportingService>();
 
 builder.Services.AddScoped<PlaceEditingService>();
 builder.Services.AddScoped<IPlaceService, PlaceService>();
@@ -170,6 +170,27 @@ using (var seedScope = app.Services.CreateScope())
     var seedDb = seedScope.ServiceProvider.GetRequiredService<ZooDbContext>();
     var hasher = seedScope.ServiceProvider.GetRequiredService<IPasswordHasher<AdminUser>>();
     await Zoo.DAL.Data.DbSeeder.SeedAsync(seedDb, (user, pwd) => hasher.HashPassword(user, pwd));
+
+    // BR-27: phục hồi job bị kẹt Processing sau khi backend restart
+    // Job nào Processing mà LockedUntilUtc đã qua hoặc null → reset về Queued
+    var now = DateTime.UtcNow;
+    var stuckJobs = await seedDb.GenerationJobs
+        .Where(j => j.Status == Zoo.DAL.Enums.JobStatus.Processing
+                    && (j.LockedUntilUtc == null || j.LockedUntilUtc < now))
+        .ToListAsync();
+
+    foreach (var j in stuckJobs)
+    {
+        j.Status = Zoo.DAL.Enums.JobStatus.Queued;
+        j.LastError = "Job bị gián đoạn khi backend khởi động lại. Tạo lại audio để tiếp tục.";
+        j.UpdatedAt = now;
+    }
+
+    if (stuckJobs.Count > 0)
+    {
+        await seedDb.SaveChangesAsync();
+        app.Logger.LogWarning("Đã reset {Count} job bị kẹt sang Queued.", stuckJobs.Count);
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -179,7 +200,9 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseHttpsRedirection();
-}var storageOptions = builder.Configuration.GetSection("MediaStorageOptions").Get<MediaStorageOptions>() ?? new MediaStorageOptions();
+}
+
+var storageOptions = builder.Configuration.GetSection("MediaStorageOptions").Get<MediaStorageOptions>() ?? new MediaStorageOptions();
 var resolvedStoragePath = Path.GetFullPath(storageOptions.RootPath, builder.Environment.ContentRootPath);
 
 if (!Directory.Exists(resolvedStoragePath))

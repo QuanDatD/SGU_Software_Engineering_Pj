@@ -125,6 +125,8 @@ namespace Zoo.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedByAdminId");
+
                     b.HasIndex("PlaceId", "Version")
                         .IsUnique();
 
@@ -299,6 +301,11 @@ namespace Zoo.DAL.Migrations
                         .HasForeignKey("PlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Zoo.DAL.Entities.AdminUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByAdminId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Place");
                 });

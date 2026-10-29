@@ -251,10 +251,18 @@ public class AdminNarrationController : ControllerBase
                 {
                     RevisionId = revision.Id,
                     Language = l,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 };
                 revision.Jobs.Add(job);
                 _db.GenerationJobs.Add(job);
+            }
+
+            // BR-27: reset job bị kẹt từ lần chạy trước (Processing → Queued)
+            if (job.Status == JobStatus.Processing)
+            {
+                job.Status = JobStatus.Queued;
+                job.LastError = null;
             }
 
             try

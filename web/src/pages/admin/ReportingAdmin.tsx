@@ -2,13 +2,21 @@ import { useState } from "react";
 import { reportingApi, type ReportingData } from "../../services/reportingApi";
 
 function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
+  // Dùng locale VN để tránh lệch ngày do UTC offset — BR-23
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 function sevenDaysAgoStr(): string {
-  const d = new Date();
-  d.setDate(d.getDate() - 6);
-  return d.toISOString().slice(0, 10);
+  const now = new Date();
+  now.setDate(now.getDate() - 6);
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 function fmtHour(h: number): string {
