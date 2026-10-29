@@ -340,4 +340,61 @@
 .live-map__detail img { width:100%; max-height:130px; object-fit:cover; border-radius:10px; }
 .live-map__detail p { white-space:pre-wrap; }
 .live-map__close { float:right; }
-.live-map .audio-player { z-index:700; }
+.live-map .audio-player {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 700;
+    box-sizing: border-box;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+.live-map .audio-player__controls {
+    flex-wrap: wrap;
+}
+.live-map__simulation {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 600;
+    width: min(300px, calc(100% - 24px));
+    box-sizing: border-box;
+    max-height: 45vh;
+    overflow: auto;
+    padding: 14px;
+    border: 1px solid #8060a5;
+    border-radius: 14px;
+    background: #faf6ff;
+    color: #3f2b58;
+    box-shadow: 0 6px 24px #163d2526;
+}
+
+    .live-map__simulation summary {
+        cursor: pointer;
+        font-weight: 700;
+    }
+
+    .live-map__simulation label {
+        display: grid;
+        gap: 6px;
+        margin: 12px 0;
+    }
+
+    .live-map__simulation select {
+        width: 100%;
+        min-width: 0;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    .live-map__simulation progress {
+        width: 100%;
+    }
+
+@media (max-width: 600px) {
+    .live-map__simulation {
+        top: auto;
+        bottom: 180px;
+    }
+}

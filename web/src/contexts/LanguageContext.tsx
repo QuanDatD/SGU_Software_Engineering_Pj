@@ -9,13 +9,35 @@ interface LanguageCtx {
 const Ctx = createContext<LanguageCtx | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const stored = (localStorage.getItem("lang") ?? "vi") as Lang;
-  const [lang, setLangState] = useState<Lang>(stored);
+  const [lang, setLangState] = useState<Lang>(() => {
+    try {
+        const stored = localStorage.getItem("lang");
+
+        if (
+            stored === "vi" ||
+            stored === "en" ||
+            stored === "zh" ||
+            stored === "ko" ||
+            stored === "ja"
+        ) {
+            return stored;
+        }
+    } catch {
+        // Không đọc được storage thì dùng tiếng Việt.
+    }
+
+    return "vi";
+});
 
   function setLang(l: Lang) {
     setLangState(l);
-    localStorage.setItem("lang", l);
-  }
+
+    try {
+        localStorage.setItem("lang", l);
+    } catch {
+        // Vẫn sử dụng ngôn ngữ trong bộ nhớ nếu trình duyệt chặn lưu.
+    }
+}
 
   return <Ctx.Provider value={{ lang, setLang }}>{children}</Ctx.Provider>;
 }

@@ -6,6 +6,9 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+	allowedHosts: [
+        "positive-zealand-fish-pour.trycloudflare.com",
+		],
     proxy: {
       "/api": {
         target: "http://localhost:5230",

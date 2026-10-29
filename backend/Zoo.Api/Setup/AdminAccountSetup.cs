@@ -9,7 +9,8 @@ public static class AdminAccountSetup
 {
     public static async Task RunAsync(
         IServiceProvider services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        bool resetPassword = false)
     {
         var username =
             configuration["BootstrapAdmin:Username"]?.Trim();
@@ -38,13 +39,41 @@ public static class AdminAccountSetup
         var passwordHasher = scope.ServiceProvider
             .GetRequiredService<IPasswordHasher<AdminUser>>();
 
-        var exists = await db.AdminUsers
-            .AnyAsync(x => x.Username == username);
+        var existingAdmin = await db.AdminUsers
+    .SingleOrDefaultAsync(x => x.Username == username);
 
-        if (exists)
+        if (resetPassword)
+        {
+            if (existingAdmin is null)
+            {
+                throw new InvalidOperationException(
+                    "Không tìm thấy tài khoản. Dùng --seed-admin để tạo trước.");
+            }
+
+            if (!existingAdmin.IsActive ||
+                existingAdmin.Role != "Admin")
+            {
+                throw new InvalidOperationException(
+                    "Tài khoản bị khóa hoặc không có vai trò Admin.");
+            }
+
+            existingAdmin.PasswordHash =
+                passwordHasher.HashPassword(existingAdmin, password);
+
+            await db.SaveChangesAsync();
+
+            Console.WriteLine(
+                "Đã đặt lại mật khẩu Admin. Giữ nguyên ID tài khoản.");
+
+            return;
+        }
+
+        if (existingAdmin is not null)
         {
             Console.WriteLine(
-                "Tài khoản đã tồn tại. Không thay đổi dữ liệu.");
+                "Tài khoản đã tồn tại. Không thay đổi dữ liệu. " +
+                "Dùng --reset-admin-password nếu muốn đặt lại mật khẩu.");
+
             return;
         }
 

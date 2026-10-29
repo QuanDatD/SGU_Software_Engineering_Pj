@@ -1,20 +1,52 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import HomePage from "./pages/user/HomePage";
 import MapPage  from "./pages/user/MapPage";
 import QrPage from "./pages/user/QrPage";
 import { useLang } from "./contexts/LanguageContext";
 import LanguageSelector from "./components/LanguageSelector";
 import { useQrVisit } from "./hooks/useQrVisit";
+import { useGeolocation } from "./hooks/useGeolocation";
+import VisitSetup from "./components/VisitSetup";
+import { useVisitHistory } from "./hooks/useVisitHistory";
+import { useAudio } from "./contexts/AudioContext";
+import { useGpsSimulator } from "./hooks/useGpsSimulator";
 import "./styles/global.css";
 
 type Page = "home" | "map" | "qr";
 
 export default function App() {
+    
   // UC01.3 — ghi nhận lượt truy cập qua QR ngay khi app mount
   useQrVisit();
-  const [page,     setPage]     = useState<Page>("home");
+
+  const geolocation = useGeolocation();
+  const simulator = useGpsSimulator();
+  const visitHistory = useVisitHistory();
+  const [visitStarted, setVisitStarted] = useState(false);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const [autoPlay, setAutoPlay] = useState(false);
+
+  const [page, setPage] = useState<Page>(() => {
+    const path = window.location.pathname.replace(/\/+$/, "");
+
+    return path === "/qr" ? "qr" : "home";
+});
   const [menuOpen, setMenuOpen] = useState(false);
   const { lang } = useLang();
+  const { stop: stopAudio } = useAudio();
+    const previousLang = useRef(lang);
+
+    useEffect(() => {
+        if (previousLang.current === lang) return;
+
+        previousLang.current = lang;
+
+        // Ngôn ngữ thay đổi: chờ khách chủ động yêu cầu nghe.
+        setAutoPlay(false);
+
+        // Không tiếp tục phát bài thuộc ngôn ngữ cũ.
+        stopAudio();
+    }, [lang, stopAudio]);
 
   function changePage(next: Page) {
     setPage(next);
@@ -31,7 +63,49 @@ export default function App() {
     footer:  { vi: "Khám phá · Lắng nghe · Yêu thiên nhiên", en: "Explore · Listen · Love Nature", zh: "探索 · 倾听 · 热爱自然", ko: "탐험 · 듣기 · 자연 사랑", ja: "探検 · 聞く · 自然愛" },
   };
   const t = (k: keyof typeof NAV) => NAV[k]?.[lang] ?? NAV[k]?.["en"] ?? "";
+  
 
+    const activeGeolocation = {
+        gps: simulator.enabled ? simulator.gps : geolocation.gps,
+
+        start: () => {
+            simulator.stop();
+            setAutoPlay(false);
+            geolocation.start();
+        },
+
+        stop: () => {
+            simulator.stop();
+            geolocation.stop();
+            setAutoPlay(false);
+        },
+    };
+
+    function startSimulation(
+        from: { lat: number; lng: number },
+        to: { lat: number; lng: number },
+        speed: number,
+    ) {
+        simulator.start(from, to, speed);
+
+        geolocation.stop();
+        setAutoPlay(false);
+    }
+
+
+
+// Return giao diện chính phía dưới giữ nguyên.
+  if (page !== "qr" && !visitStarted) {
+    return (
+        <VisitSetup
+            geolocation={activeGeolocation}
+            onComplete={() => {
+                setVisitStarted(true);
+                setPage("map");
+            }}
+        />
+    );
+}
   return (
     <div className="app">
       <header className="header">
@@ -114,7 +188,18 @@ export default function App() {
           <HomePage onOpenMap={() => changePage("map")} />
           )}
 
-      {page === "map" && <MapPage />}
+      {page === "map" && (
+    <MapPage
+        geolocation={activeGeolocation}
+        selectedId={selectedPlaceId}
+        onSelectPlace={setSelectedPlaceId}
+        autoPlay={autoPlay}
+        onAutoPlayChange={setAutoPlay}
+        visitHistory={visitHistory}
+        simulator={simulator}
+        onStartSimulation={startSimulation}
+    />
+    )}
 
           {page === "qr" && <QrPage />}
     </main>

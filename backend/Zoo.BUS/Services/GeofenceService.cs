@@ -40,15 +40,47 @@ public sealed class GeofenceService : IGeofenceService
 
         foreach (var place in places)
         {
-            var dist = CalculateHaversineMeters(lat.Value, lng.Value, place.Lat, place.Lng);
-            if (dist <= place.RadiusMeters)
+            var dist = CalculateHaversineMeters(
+                lat.Value,
+                lng.Value,
+                place.Lat,
+                place.Lng);
+
+            if (dist > place.RadiusMeters)
             {
-                if (matchedPlace == null || place.Priority > matchedPlace.Priority ||
-                   (place.Priority == matchedPlace.Priority && dist < minDistance))
-                {
-                    matchedPlace = place;
-                    minDistance = dist;
-                }
+                continue;
+            }
+
+            if (matchedPlace == null)
+            {
+                matchedPlace = place;
+                minDistance = dist;
+                continue;
+            }
+
+            bool higherPriority =
+                place.Priority > matchedPlace.Priority;
+
+            bool samePriority =
+                place.Priority == matchedPlace.Priority;
+
+            bool closer =
+                dist < minDistance;
+
+            bool sameDistance =
+                dist == minDistance;
+
+            bool smallerId =
+                place.Id.CompareTo(matchedPlace.Id) < 0;
+
+            if (
+                higherPriority ||
+                (samePriority && closer) ||
+                (samePriority && sameDistance && smallerId)
+            )
+            {
+                matchedPlace = place;
+                minDistance = dist;
             }
         }
 
