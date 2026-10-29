@@ -1,1251 +1,1658 @@
-# TÀI LIỆU YÊU CẦU SẢN PHẨM (PRD)
+# TÀI LIỆU YÊU CẦU SẢN PHẨM — PRD
+
 ## Hệ thống thuyết minh tự động Thảo Cầm Viên Sài Gòn
 
 | Thuộc tính | Nội dung |
 |---|---|
 | Mã tài liệu | PRD-TCV-001 |
-| Phiên bản | 1.0 — Bản dự thảo để nhóm và giảng viên duyệt |
-| Ngày cập nhật | 25/10/2026 |
-| Nhóm thực hiện | Nhóm 3 thành viên — bổ sung họ tên và mã sinh viên |
+| Phiên bản | 1.1 — Bản cập nhật để nhóm rà soát |
+| Ngày cập nhật | 29/10/2026 |
+| Nhóm thực hiện | Dương Quan Đạt — 3124411063<br>Nguyễn Hồng Khương — 3124411140<br>Trần Trung Hậu — bổ sung đầy đủ mã sinh viên |
 | Người duyệt | Giảng viên phụ trách — bổ sung họ tên |
-| Căn cứ | PRD Markdown mẫu; mẫu Focused Use Cases; PRD tham khảo GPS – Chùa Linh Ứng; hình Use Case tổng của nhóm; ZIP feature-be (2) và các thay đổi đã trao đổi |
-| Phạm vi xác minh | Chưa đối chiếu repository GitHub mới nhất; tài liệu xác định yêu cầu mục tiêu, không thay thế biên bản nghiệm thu |
-
-> **QUY ƯỚC HÌNH:** Dòng in đậm bắt đầu bằng “CHÈN HÌNH” được viết IN HOA TOÀN BỘ. Đây là vị trí cần thay bằng hình và chú thích khi nhóm hoàn thiện báo cáo. Danh mục đầy đủ, tên file và hướng dẫn chèn hình nằm ở Phụ lục C–D.
->
-> **QUY ƯỚC TRẠNG THÁI:** “Đã có nền tảng” chỉ nghĩa là đã thấy cấu trúc hoặc luồng tương ứng trong bản code được cung cấp. Chỉ đánh dấu hoàn thành sau khi thực hiện kiểm thử. Các bảng thống kê QR, chỉ tiêu hiệu năng và một số quy tắc cải tiến dưới đây là yêu cầu mục tiêu, chưa được xác nhận đã triển khai.
+| Phạm vi | Website thuyết minh đa ngôn ngữ, GPS, quản trị nội dung và thống kê truy cập qua QR |
+| Trạng thái | Tài liệu yêu cầu và thiết kế mục tiêu; kết quả triển khai được xác nhận qua kiểm thử |
 
 ## Mục lục
 
-1. [Tổng quan sản phẩm](#1-tổng-quan-sản-phẩm)
-2. [Mục tiêu sản phẩm](#2-mục-tiêu-sản-phẩm)
-3. [Đối tượng người dùng](#3-đối-tượng-người-dùng)
-4. [Kiến trúc chức năng](#4-kiến-trúc-chức-năng)
-5. [Đặc tả chi tiết chức năng](#5-đặc-tả-chi-tiết-chức-năng)
-6. [User Stories](#6-user-stories)
-7. [Luồng người dùng](#7-luồng-người-dùng)
-8. [Yêu cầu phi chức năng](#8-yêu-cầu-phi-chức-năng)
-9. [Công nghệ sử dụng và thiết kế hệ thống](#9-công-nghệ-sử-dụng-và-thiết-kế-hệ-thống)
-10. [Phương pháp phát triển](#10-phương-pháp-phát-triển)
-11. [Kế hoạch kiểm thử](#11-kế-hoạch-kiểm-thử)
-12. [Lộ trình và mức độ ưu tiên](#12-lộ-trình-và-mức-độ-ưu-tiên)
-13. [Định nghĩa hoàn thành](#13-định-nghĩa-hoàn-thành)
-14. [Phụ lục](#phụ-lục)
+1. Tổng quan sản phẩm.
+2. Mục tiêu sản phẩm.
+3. Đối tượng người dùng.
+4. Kiến trúc chức năng.
+5. Đặc tả chi tiết chức năng.
+6. User Stories.
+7. Luồng người dùng.
+8. Yêu cầu phi chức năng.
+9. Công nghệ và thiết kế hệ thống.
+10. Phương pháp phát triển và phân công.
+11. Kế hoạch kiểm thử.
+12. Lộ trình và mức độ ưu tiên.
+13. Định nghĩa hoàn thành.
+14. Phụ lục.
 
-## 1. Tổng quan sản phẩm
+---
 
-### 1.1. Tên sản phẩm
+# 1. Tổng quan sản phẩm
+
+## 1.1. Tên sản phẩm
 
 **Hệ thống thuyết minh tự động Thảo Cầm Viên Sài Gòn**, gọi tắt là **TCV Audio Guide**.
 
-### 1.2. Mô tả ngắn gọn
+## 1.2. Mô tả sản phẩm
 
-Ứng dụng web giúp du khách tiếp cận thông tin về các khu động vật, thực vật và tiện ích trong Thảo Cầm Viên bằng văn bản và âm thanh. Du khách quét mã QR, chọn một trong năm ngôn ngữ, được hỏi quyền truy cập vị trí, sau đó theo dõi vị trí trên bản đồ. Khi đi vào vùng thuyết minh của một điểm tham quan, hệ thống xác định điểm phù hợp và phát nội dung đã xuất bản theo ngôn ngữ đã chọn.
+TCV Audio Guide là ứng dụng web giúp du khách tìm hiểu các khu động vật, thực vật và tiện ích bằng văn bản và âm thanh.
 
-Admin quản lý điểm tham quan, tọa độ và bán kính; nhập nội dung gốc tiếng Việt; yêu cầu Azure dịch và tạo audio; kiểm tra, hiệu chỉnh và xuất bản. Nội dung bản nháp không xuất hiện trên giao diện du khách. Chức năng báo cáo nhằm phản ánh lượt truy cập từ QR và khung giờ có nhiều lượt truy cập nhất.
+Du khách quét mã QR để mở website, chọn ngôn ngữ, thiết lập quyền vị trí và sử dụng bản đồ tham quan. Khi bật tự phát và di chuyển vào vùng kích hoạt hợp lệ, hệ thống chọn điểm phù hợp để phát thuyết minh theo ngôn ngữ hiện hành.
 
-### 1.3. Vấn đề cần giải quyết — Problem Alignment
+Du khách không cấp quyền vị trí vẫn có thể xem thông tin và chọn nghe thủ công.
 
-- Du khách tự tham quan khó tiếp cận đầy đủ thông tin tại từng khu, đặc biệt khi không có hướng dẫn viên.
-- Nội dung chỉ bằng tiếng Việt hạn chế trải nghiệm của khách quốc tế.
-- Việc tìm và chọn bài thuyết minh thủ công ở mỗi điểm làm gián đoạn hành trình.
-- Nội dung, bản dịch và audio dễ lệch phiên bản khi quản lý rời rạc.
-- Nhân viên chưa có số liệu đáng tin cậy về lượt mở website từ QR và thời gian truy cập cao điểm.
+Admin quản lý điểm tham quan, nhập nội dung tiếng Việt, tạo bản dịch và audio bằng Azure, hiệu chỉnh, nghe thử và xuất bản. Chỉ nội dung đã xuất bản mới được cung cấp cho du khách.
 
-### 1.4. Giải pháp đề xuất — High Level Approach
+Hệ thống ghi nhận lượt mở website từ liên kết QR để thống kê số lượt truy cập và khung giờ cao điểm.
 
-Xây dựng một website ưu tiên thiết bị di động, sử dụng định vị trình duyệt, bản đồ số và vùng kích hoạt dạng hình tròn. Thông tin được quản lý tập trung qua backend và SQL Server. Azure xử lý dịch văn bản và tổng hợp giọng nói trước khi xuất bản; khi khách nghe, hệ thống phục vụ file đã tạo thay vì gọi Azure để sinh mới ở từng lượt nghe.
+## 1.3. Vấn đề cần giải quyết
 
-### 1.5. Tình huống sử dụng — Narrative
+- Du khách tự tham quan khó tiếp cận đầy đủ thông tin tại từng khu.
+- Nội dung chỉ bằng tiếng Việt hạn chế khả năng phục vụ khách quốc tế.
+- Tìm và chọn bài thủ công tại từng điểm có thể làm gián đoạn hành trình.
+- Nội dung, bản dịch và audio dễ không đồng nhất khi quản lý riêng lẻ.
+- Đơn vị quản lý thiếu dữ liệu về lượt truy cập hệ thống và thời điểm sử dụng cao nhất.
 
-Một du khách tới cổng Thảo Cầm Viên và quét QR. Website hiển thị lựa chọn ngôn ngữ trước. Sau khi chọn tiếng Anh, khách được giải thích mục đích sử dụng vị trí và đồng ý cấp quyền. Bản đồ hiển thị các khu đang phục vụ cùng vị trí của khách. Khi khách đi vào vùng của khu voi, hệ thống xác nhận vị trí và phát thuyết minh tiếng Anh. Khách có thể tạm dừng, nghe tiếp hoặc chọn một điểm khác. Sau đó, Admin xem báo cáo để biết trong ngày có bao nhiêu lượt mở web từ QR và khung giờ nào có lượng truy cập cao nhất.
+## 1.4. Giải pháp
 
-### 1.6. Phạm vi sản phẩm
+Xây dựng website ưu tiên thiết bị di động, kết hợp:
+
+- Bản đồ số và vị trí do trình duyệt cung cấp.
+- Vùng kích hoạt hình tròn cho từng điểm tham quan.
+- Nội dung đa ngôn ngữ được quản lý theo phiên bản.
+- Azure Translator để dịch văn bản.
+- Azure Speech để tạo file âm thanh trước khi xuất bản.
+- SQL Server để lưu dữ liệu nghiệp vụ.
+- Kho media để lưu ảnh và audio.
+- Báo cáo dựa trên sự kiện truy cập qua QR.
+
+Khi khách nghe, hệ thống sử dụng audio đã tạo; không gọi Azure để sinh audio mới cho mỗi lượt nghe.
+
+## 1.5. Tình huống sử dụng
+
+Một du khách quét QR tại Thảo Cầm Viên, mở website và chọn tiếng Anh. Website giải thích việc sử dụng vị trí; khách đồng ý cấp quyền và bật tự phát.
+
+Khi khách đi vào vùng của khu voi, hệ thống kiểm tra vị trí và điều kiện phát, sau đó phát đúng bài tiếng Anh đã xuất bản. Khách có thể tạm dừng, nghe tiếp, nghe lại hoặc đổi ngôn ngữ.
+
+Admin có thể cập nhật nội dung trong bản nháp mà không làm thay đổi bài đang công khai. Sau khi hoàn thiện bản dịch và audio, Admin xuất bản phiên bản mới.
+
+## 1.6. Phạm vi
 
 | Trong phạm vi | Ngoài phạm vi phiên bản này |
 |---|---|
-| Website cho du khách và Admin; tối đa 5 ngôn ngữ VI/EN/ZH/KO/JA | Ứng dụng native Android/iOS |
-| Quản lý điểm, GPS, bán kính, hình ảnh và mức ưu tiên | Định vị chính xác trong nhà bằng beacon/UWB |
-| Nháp, dịch, tạo audio, hiệu chỉnh, xuất bản | Thanh toán, bán vé, đặt tour |
-| Bản đồ, nghe tự động và nghe thủ công | Chatbot/RAG, đề xuất lộ trình tối ưu |
-| QR truy cập; báo cáo lượt truy cập và giờ cao điểm | Đếm số người thực tế hoặc mọi lần camera nhận diện QR |
-| Giả lập vị trí để kiểm thử và demo | Cam kết chạy nền khi khóa màn hình hoặc nghe offline toàn bộ |
+| Website Du khách và Admin | Ứng dụng native Android/iOS |
+| Năm ngôn ngữ: vi, en, zh, ko, ja | Hỗ trợ thêm ngôn ngữ ngoài danh sách |
+| Bản đồ, vị trí GPS và vùng kích hoạt | Định vị trong nhà bằng beacon/UWB |
+| Nghe tự động và nghe thủ công | Cam kết hoạt động liên tục khi khóa màn hình |
+| Quản lý điểm, ảnh, tọa độ và bán kính | Bán vé, thanh toán, đặt tour |
+| Bản nháp, dịch, audio và xuất bản | Chatbot, đề xuất lộ trình tối ưu |
+| QR truy cập và báo cáo lượt truy cập | Đếm chính xác số người thực tế |
+| Giả lập vị trí phục vụ kiểm thử/demo | Cam kết hoạt động offline toàn bộ |
 
-Dữ liệu ban đầu dự kiến gồm **7 khu** do nhóm chuẩn bị; số khu hiển thị phụ thuộc trạng thái hoạt động và phiên bản đã xuất bản. Không hard-code giao diện chỉ có đúng 7 khu.
+Dữ liệu ban đầu dự kiến có 7 khu. Hệ thống không giới hạn cứng số điểm tham quan ở con số này.
 
-### 1.7. Giả định và phụ thuộc
+## 1.7. Giả định và phụ thuộc
 
-- Du khách có trình duyệt hỗ trợ định vị và kết nối Internet; quyền vị trí do người dùng quyết định.
-- Có ít nhất một tài khoản Admin hoạt động và có nội dung được người phụ trách duyệt về tính chính xác.
-- Máy chủ truy cập được SQL Server, Azure và kho media; dịch vụ nền bản đồ sẵn sàng.
-- Quyền phát âm thanh phụ thuộc trình duyệt; giao diện có thao tác chủ động để bắt đầu và có cách nghe thủ công khi tự phát bị chặn.
-- QR public phải chứa địa chỉ HTTPS truy cập được từ thiết bị khác, không dùng localhost.
+- Theo bối cảnh sử dụng của dự án, du khách tiếp cận website qua QR.
+- Thiết bị khách có trình duyệt và kết nối Internet.
+- GPS phụ thuộc quyền truy cập và khả năng định vị của thiết bị.
+- Audio phụ thuộc chính sách phát của trình duyệt.
+- Có tài khoản Admin và nội dung được kiểm tra trước khi xuất bản.
+- Backend kết nối được SQL Server, Azure và kho media.
+- URL trong QR phải truy cập được từ thiết bị khác; không sử dụng localhost.
+- URL demo có thể thay đổi; QR cần được tạo lại theo URL đang hoạt động.
 
-## 2. Mục tiêu sản phẩm
+---
 
-Các ngưỡng dưới đây là **mục tiêu nghiệm thu đề xuất**, chưa phải số đo thực tế.
+# 2. Mục tiêu sản phẩm
 
-| Mã | Mục tiêu | Tiêu chí thành công |
+Các tiêu chí dưới đây là mục tiêu nghiệm thu, không phải kết quả đã được đo.
+
+| Mã | Mục tiêu | Tiêu chí chấp nhận |
 |---|---|---|
-| OBJ-01 | Truy cập nhanh bằng QR | Điện thoại mở đúng website công khai; không yêu cầu tài khoản khách |
-| OBJ-02 | Thống nhất luồng tiếp cận | Lượt truy cập mới chọn ngôn ngữ trước khi hệ thống yêu cầu quyền vị trí |
-| OBJ-03 | Phát đúng điểm tham quan | Vị trí ngoài vùng không tự phát; vị trí hợp lệ trong vùng chọn đúng khu theo quy tắc ưu tiên |
-| OBJ-04 | Đồng nhất nội dung đa ngôn ngữ | Một phiên bản xuất bản có nội dung và audio hợp lệ cho 5 ngôn ngữ; không dùng audio của văn bản cũ |
-| OBJ-05 | Kiểm soát xuất bản | User không truy cập bản nháp qua danh sách, chi tiết hoặc URL audio công khai |
-| OBJ-06 | Có báo cáo sử dụng | Tổng lượt và biểu đồ theo giờ khớp bộ dữ liệu kiểm thử QR; không đếm trùng khi tải lại cùng phiên |
-| OBJ-07 | Demo được trên thiết bị khác | Kiểm thử quét QR, tải bản đồ, nghe audio trên ít nhất một iPhone và một Android được ghi rõ phiên bản |
-| OBJ-08 | Dễ sử dụng | Ít nhất 4/5 người thử hoàn thành quét QR → chọn ngôn ngữ → mở bản đồ → nghe nội dung mà không cần hướng dẫn trực tiếp |
+| OBJ-01 | Truy cập thuận tiện | Quét QR mở đúng website HTTPS, không yêu cầu tài khoản khách |
+| OBJ-02 | Đúng thứ tự thiết lập | Chọn ngôn ngữ trước khi đề nghị cấp quyền GPS |
+| OBJ-03 | Phát đúng vùng | Ngoài vùng không tự phát; trong vùng hợp lệ chọn đúng điểm |
+| OBJ-04 | Đồng nhất đa ngôn ngữ | Văn bản và audio cùng ngôn ngữ, cùng phiên bản |
+| OBJ-05 | Kiểm soát công khai | Bản nháp không được cung cấp qua API hoặc audio công khai |
+| OBJ-06 | Bảo toàn trải nghiệm | Đổi ngôn ngữ không tải lại trang hoặc xóa trạng thái tham quan |
+| OBJ-07 | Có thống kê | Tổng lượt và giờ cao điểm khớp dữ liệu kiểm thử |
+| OBJ-08 | Demo trên thiết bị khác | Điện thoại mở bản đồ và nghe được audio qua URL public |
 
-## 3. Đối tượng người dùng
+---
 
-### 3.1. Du khách nội địa
+# 3. Đối tượng người dùng
 
-- **Mục tiêu:** Tìm hiểu thông tin khu tham quan bằng tiếng Việt, không phải đọc văn bản dài khi di chuyển.
-- **Khó khăn:** Không biết khu nào có nội dung, không rõ cách cấp quyền GPS.
-- **Nhu cầu:** Quét QR dễ dàng, hướng dẫn ngắn, chữ dễ đọc, bản đồ và nút nghe rõ ràng.
-- **Bối cảnh:** Điện thoại, ngoài trời, mạng và GPS có thể không ổn định.
+## 3.1. Du khách
 
-### 3.2. Du khách quốc tế
+Bao gồm khách nội địa và khách quốc tế.
 
-- **Mục tiêu:** Nghe và đọc đúng ngôn ngữ đã chọn trong suốt hành trình.
-- **Khó khăn:** Không hiểu tiếng Việt; tên khu hoặc bản dịch có thể khó hiểu.
-- **Nhu cầu:** Chọn ngôn ngữ ngay khi vào, thay đổi ngôn ngữ dễ dàng, nội dung đã được kiểm tra.
+Nhu cầu:
 
-Hai persona trên cùng sử dụng tác nhân **Du khách** trong sơ đồ Use Case, không tạo hai vai trò phân quyền riêng.
+- Mở website nhanh qua QR.
+- Chọn ngôn ngữ phù hợp.
+- Xem thông tin, vị trí và vùng tham quan.
+- Nghe tự động khi vào vùng hoặc nghe thủ công.
+- Điều khiển audio và đổi ngôn ngữ trong hành trình.
 
-### 3.3. Admin / nhân viên quản trị nội dung
+Du khách không cần đăng nhập.
 
-- **Mục tiêu:** Cập nhật khu, tạo thuyết minh đa ngôn ngữ và kiểm soát nội dung public.
-- **Khó khăn:** Dịch và thu âm thủ công tốn thời gian; không biết bản nào đã được công bố.
-- **Nhu cầu:** Nhập tiếng Việt, tạo bản dịch/audio, nghe thử, sửa, xuất bản có kiểm tra; xem báo cáo QR theo thời gian.
+## 3.2. Admin
 
-### 3.4. Hệ thống và dịch vụ hỗ trợ
+Hệ thống chỉ có một vai trò quản trị là Admin. Các tài khoản Admin có cùng phạm vi chức năng.
 
-Azure Translator, Azure Speech, dịch vụ bản đồ và API định vị trình duyệt là các thành phần hỗ trợ. SQL Server và kho file thuộc hạ tầng hệ thống, không phải tác nhân người dùng. Khi bổ sung tác nhân hệ thống vào Use Case Diagram, chỉ nối tới UC thực sự tương tác với dịch vụ đó.
+Nhu cầu:
 
-## 4. Kiến trúc chức năng
+- Quản lý điểm tham quan.
+- Soạn nội dung tiếng Việt.
+- Tạo, kiểm tra và hiệu chỉnh bản dịch/audio.
+- Xuất bản nội dung.
+- Xem báo cáo truy cập.
 
-### 4.1. Nhóm chức năng
+Admin phải đăng nhập trước khi sử dụng chức năng quản trị.
 
-| Phân hệ | Nội dung | Use Case |
-|---|---|---|
-| Tiếp cận và thiết lập | QR, ngôn ngữ, quyền vị trí | UC01–UC03 |
-| Trải nghiệm tham quan | Bản đồ, nhận diện vùng, nghe và điều khiển audio | UC04–UC07 |
-| Quản trị nội dung | Đăng nhập, khu tham quan, bản thuyết minh, bản dịch, audio, xuất bản | UC08–UC13 |
-| Báo cáo | Lượt truy cập QR, khách ước tính và khung giờ cao điểm | UC14 |
-| Hỗ trợ demo và vận hành | Giả lập vị trí, script khởi động, tunnel và QR trong website | Tính năng hỗ trợ; không tự thêm UC nghiệp vụ mới |
+## 3.3. Dịch vụ hỗ trợ
 
-**CHÈN HÌNH 01 — SƠ ĐỒ PHÂN RÃ CHỨC NĂNG (BFD): THỂ HIỆN CÁC PHÂN HỆ TIẾP CẬN, THAM QUAN, QUẢN TRỊ VÀ BÁO CÁO; TÁCH CHỨC NĂNG DEMO KHỎI NGHIỆP VỤ CHÍNH.**
+- Azure Translator: dịch văn bản.
+- Azure Speech: tạo audio.
+- Dịch vụ bản đồ: cung cấp nền bản đồ.
+- API định vị trình duyệt: cung cấp vị trí thiết bị.
 
-### 4.2. Use Case tổng quan
+SQL Server và kho media là thành phần hạ tầng của hệ thống.
 
-Giữ nguyên 14 chức năng và thứ tự trong hình Use Case tổng của nhóm. Tài liệu chuẩn hóa mã UC1 thành UC01, …, UC9 thành UC09; đây là đổi cách trình bày, không đổi chức năng.
+---
 
-**CHÈN HÌNH 02 — SƠ ĐỒ USE CASE TỔNG QUAN: DÙNG HÌNH CỦA NHÓM, GỒM HAI TÁC NHÂN DU KHÁCH VÀ ADMIN, UC01–UC14, CÙNG BIÊN HỆ THỐNG THUYẾT MINH TỰ ĐỘNG THẢO CẦM VIÊN SÀI GÒN.**
+# 4. Kiến trúc chức năng
 
-Hình Use Case thể hiện tác nhân được sử dụng chức năng nào, **không biểu diễn thứ tự thời gian bằng vị trí các hình elip**. Thứ tự quét QR → chọn ngôn ngữ → quyền GPS được đặc tả trong mục 7. Không tự thêm `include` hoặc `extend` chỉ vì hai chức năng diễn ra nối tiếp.
+## 4.1. Các nhóm chức năng
 
-UC03 là tương tác cấp quyền do trình duyệt thực hiện; UC05 là chức năng hệ thống tự động phục vụ du khách. Hai mục vẫn được giữ để đồng nhất với hình nhóm cung cấp.
-
-### 4.3. Danh mục Use Case
-
-| Mã | Tên theo hình tổng | Tác nhân chính | Ưu tiên |
+| Nhóm | Tên nhóm | Tác nhân | UC chi tiết |
 |---|---|---|---|
-| UC01 | Truy cập bằng QR | Du khách | P0 |
-| UC02 | Chọn ngôn ngữ | Du khách | P0 |
-| UC03 | Cho phép truy cập vị trí | Du khách | P0 |
-| UC04 | Xem bản đồ | Du khách | P0 |
-| UC05 | Nhận diện điểm tham quan | Du khách; hệ thống thực hiện tự động | P0 |
-| UC06 | Nghe thuyết minh | Du khách | P0 |
-| UC07 | Điều khiển âm thanh | Du khách | P0 |
-| UC08 | Đăng nhập | Admin | P0 |
-| UC09 | Quản lý điểm tham quan | Admin | P0 |
-| UC10 | Tạo bản thuyết minh | Admin | P0 |
-| UC11 | Tạo bản dịch và âm thanh | Admin; Azure hỗ trợ | P0 |
-| UC12 | Hiệu chỉnh bản dịch | Admin | P0 |
-| UC13 | Xuất bản thuyết minh | Admin | P0 |
-| UC14 | Báo cáo thống kê | Admin | P1 — bắt buộc trước nghiệm thu phiên bản có báo cáo |
+| 01 | Bắt đầu tham quan | Du khách | UC01.1–UC01.3 |
+| 02 | Xem bản đồ tham quan | Du khách | UC02.1–UC02.2 |
+| 03 | Nghe thuyết minh | Du khách | UC03.1–UC03.6 |
+| 04 | Đăng nhập quản trị | Admin | UC04.1 |
+| 05 | Quản lý điểm tham quan | Admin | UC05.1–UC05.4 |
+| 06 | Quản lý bản thuyết minh | Admin | UC06.1–UC06.7 |
+| 07 | Xem báo cáo thống kê | Admin | UC07.1–UC07.3 |
 
-P0: luồng cốt lõi cần hoàn thiện trước; P1: hoàn thiện sau khi P0 ổn định; P2: cải tiến tùy chọn.
+Các nhóm dùng để tổ chức chức năng. Không dùng quan hệ `include` hoặc `extend` chỉ để thể hiện một chức năng thuộc nhóm.
 
-## 5. Đặc tả chi tiết chức năng
+**[CHÈN HÌNH BFD — PHÂN RÃ HỆ THỐNG THÀNH 7 NHÓM CHỨC NĂNG VÀ CÁC CHỨC NĂNG CON TƯƠNG ỨNG.]**
 
-### 5.1. Quy tắc nghiệp vụ chung
+## 4.2. Sơ đồ Use Case tổng quan
+
+Sơ đồ thể hiện hai tác nhân Du khách và Admin cùng các chức năng liên quan. Nhóm chức năng được thể hiện bằng khung/package khi cần tổ chức sơ đồ.
+
+Không đưa UC “Kiểm tra quyền truy cập” thành chức năng riêng. Điều kiện đăng nhập được mô tả trong tiền điều kiện của các UC quản trị.
+
+**[CHÈN HÌNH USE CASE TỔNG QUAN — THỐNG NHẤT VỚI 7 NHÓM, 26 UC CHI TIẾT VÀ HAI TÁC NHÂN DU KHÁCH, ADMIN.]**
+
+## 4.3. Danh mục Use Case
+
+| Mã | Tên chức năng |
+|---|---|
+| UC01.1 | Chọn ngôn ngữ ban đầu |
+| UC01.2 | Thiết lập quyền vị trí |
+| UC01.3 | Ghi nhận truy cập qua QR |
+| UC02.1 | Xem thông tin điểm tham quan |
+| UC02.2 | Xem vị trí của tôi |
+| UC03.1 | Xác định điểm cần nghe |
+| UC03.2 | Lấy thuyết minh theo ngôn ngữ |
+| UC03.3 | Tạm dừng thuyết minh |
+| UC03.4 | Tiếp tục thuyết minh |
+| UC03.5 | Nghe lại thuyết minh |
+| UC03.6 | Đổi ngôn ngữ thuyết minh |
+| UC04.1 | Xác thực tài khoản Admin |
+| UC05.1 | Thêm điểm tham quan |
+| UC05.2 | Sửa điểm tham quan |
+| UC05.3 | Xóa điểm tham quan |
+| UC05.4 | Ẩn / hiện điểm tham quan |
+| UC06.1 | Thêm bản nháp thuyết minh |
+| UC06.2 | Sửa bản nháp thuyết minh |
+| UC06.3 | Xóa bản nháp thuyết minh |
+| UC06.4 | Tạo bản dịch và audio |
+| UC06.5 | Hiệu chỉnh bản dịch |
+| UC06.6 | Nghe thử thuyết minh |
+| UC06.7 | Xuất bản thuyết minh |
+| UC07.1 | Lọc theo khoảng thời gian |
+| UC07.2 | Xem phân bố truy cập theo giờ |
+| UC07.3 | Xem khung giờ cao điểm |
+
+---
+
+# 5. Đặc tả chi tiết chức năng
+
+## 5.1. Quy tắc nghiệp vụ chung
 
 | Mã | Quy tắc |
 |---|---|
-| BR-01 | Du khách không cần đăng nhập. Admin phải được backend xác thực và kiểm tra vai trò với mọi thao tác quản trị. |
-| BR-02 | Lượt truy cập mới phải chọn ngôn ngữ trước bước đề nghị cấp quyền vị trí. Ngôn ngữ đã lưu có thể được chọn sẵn nhưng phải có bước xác nhận/tiếp tục trước khi bắt đầu định vị. |
-| BR-03 | Hỗ trợ vi, en, zh, ko, ja. Không âm thầm phát audio ngôn ngữ khác khi bản được chọn thiếu hoặc lỗi. |
-| BR-04 | Chỉ khu đang hoạt động có PublishedRevisionId hợp lệ, thuộc chính khu đó và trỏ tới bản Published được xuất hiện trong danh sách công khai. |
-| BR-05 | Vĩ độ trong [-90,90], kinh độ trong [-180,180], bán kính >0 và ≤500 m. Giao diện/API/database cần thống nhất giới hạn; không mặc định mọi khu cùng bán kính. |
-| BR-06 | Mã khu được sinh duy nhất khi tạo; người quản trị không phải tự nhập mã. Ảnh được chọn từ thiết bị, file lưu tại kho media và database lưu đường dẫn/thông tin liên quan. |
-| BR-07 | Vị trí dùng tự phát phải còn mới (mục tiêu ≤15 giây), sai số ≤25 m và các giá trị hữu hạn/hợp lệ. Từ chối quyền GPS không ngăn nghe thủ công. |
-| BR-08 | Trong vùng khi khoảng cách Haversine tới tâm ≤ bán kính. Vùng chồng nhau: Priority cao hơn được chọn; cùng Priority chọn khoảng cách nhỏ hơn; nếu vẫn bằng nhau dùng mã/ID ổn định để tránh dao động (quy tắc cuối cần bổ sung nếu code chưa có). |
-| BR-09 | GPS thật kiểm tra tuần tự khoảng 5 giây/lần, cần 2 kết quả liên tiếp cùng khu. Thời gian thực tế còn gồm độ trễ API. Giả lập có thể dùng 0,5 giây/lần và 1 xác nhận, phải hiển thị rõ chế độ. |
-| BR-10 | Một bộ phát audio dùng chung; không phát chồng hai bài. Không tự ngắt bài đang phát để chen bài của khu khác; sau khi bài kết thúc đánh giá lại vị trí mới nhất. |
-| BR-11 | Không tự phát lại cùng tổ hợp khu + ngôn ngữ + phiên bản/audio trong một phiên tham quan phía trình duyệt. Nghe lại thủ công được phép. Tải lại trang có thể bắt đầu phiên nghe mới nếu chưa triển khai lưu lịch sử nghe. |
-| BR-12 | Mỗi khu có nhiều revision với cặp (PlaceId, Version) duy nhất; một thời điểm chỉ có tối đa một revision được chọn công khai. |
-| BR-13 | Chỉ chỉnh sửa bản Draft. Muốn thay nội dung đã công bố phải tạo bản nháp mới. |
-| BR-14 | Sửa văn bản làm audio tương ứng hết hiệu lực; sửa tiếng Việt làm các kết quả dịch/audio phụ thuộc cần được tạo hoặc duyệt lại. Không coi audio cũ là Ready cho script mới. |
-| BR-15 | Không ghi đè bản dịch được Admin đánh dấu hiệu chỉnh thủ công trong lần sinh lại mặc định; thao tác ghi đè phải được Admin chủ động xác nhận. |
-| BR-16 | Chỉ xuất bản khi 5 ngôn ngữ có tiêu đề, nội dung và audio hợp lệ, hash audio khớp script, file tồn tại và không rỗng. |
-| BR-17 | Xuất bản cập nhật trạng thái revision và con trỏ PublishedRevisionId nhất quán; bản public cũ chuyển Archived. Lỗi không được để trạng thái cập nhật dở dang. |
-| BR-18 | User lấy nội dung và audio từ cùng phiên bản; public API không trả audio nháp. Cập nhật public được frontend nhận trong lần làm mới dữ liệu kế tiếp. |
-| BR-19 | Chỉ ghi “lượt truy cập từ QR” khi website mở bằng nguồn QR hợp lệ và sự kiện được backend lưu thành công. Không tính lần camera nhìn thấy mã nhưng khách chưa mở web. |
-| BR-20 | Cặp (QrCodeId, SessionId) là khóa chống trùng lượt trong phiên. Một phiên QR hết hạn sau 30 phút không hoạt động; refresh và gửi lại yêu cầu trong phiên không tăng lượt. Đây là yêu cầu cần triển khai. |
-| BR-21 | VisitorId là mã ngẫu nhiên ẩn danh lưu trên trình duyệt; số ID phân biệt là khách ước tính, không phải số người thật. Không bắt buộc thu tên, số điện thoại hoặc lịch sử GPS cho báo cáo QR. |
-| BR-22 | Thời gian sự kiện do server ghi UTC; báo cáo quy đổi Asia/Ho_Chi_Minh. Khoảng lọc theo dạng [bắt đầu, kết thúc). |
-| BR-23 | Giờ cao điểm là khung một giờ có số lượt QR cao nhất trong khoảng lọc; nếu bằng nhau liệt kê các khung đồng hạng; không có dữ liệu thì không kết luận giờ cao điểm. |
-| BR-24 | Chế độ demo/giả lập và lượt từ QR đánh dấu demo không được lẫn vào báo cáo vận hành mặc định. Bỏ qua đăng nhập chỉ là cấu hình trình diễn, phải tắt khi vận hành. |
+| BR-01 | Du khách không đăng nhập. Chức năng quản trị yêu cầu phiên Admin hợp lệ; backend phải xác thực yêu cầu quản trị. |
+| BR-02 | Trong luồng bắt đầu tham quan, chọn ngôn ngữ trước khi đề nghị quyền GPS. |
+| BR-03 | Hỗ trợ vi, en, zh, ko, ja; không tự phát audio ngôn ngữ khác thay thế khi thiếu bản phù hợp. |
+| BR-04 | Chỉ điểm đang hoạt động, có phiên bản công khai hợp lệ thuộc chính điểm đó mới xuất hiện trong danh sách public. |
+| BR-05 | Vĩ độ trong [-90,90], kinh độ trong [-180,180]; bán kính lớn hơn 0 và không quá 500 m. |
+| BR-06 | Mã điểm được sinh tự động, duy nhất. Ảnh tải lên kho media; database lưu đường dẫn và thông tin liên quan. |
+| BR-07 | Vị trí dùng tự phát phải hợp lệ, còn mới và đủ độ chính xác theo cấu hình. Mục tiêu ban đầu: tuổi vị trí không quá 15 giây, sai số không quá 25 m. |
+| BR-08 | Trong vùng khi khoảng cách tới tâm không lớn hơn bán kính. Nếu nhiều vùng phù hợp: ưu tiên cao hơn, sau đó khoảng cách nhỏ hơn, sau cùng dùng ID ổn định để phân định. |
+| BR-09 | GPS thật cần xác nhận ổn định trước tự phát. Cấu hình mục tiêu: đánh giá khoảng 5 giây/lần, 2 kết quả liên tiếp cùng điểm. Giả lập có cấu hình riêng và nhãn nhận biết. |
+| BR-10 | Chỉ một bài phát tại một thời điểm; tự phát không chen ngang bài đang phát. |
+| BR-11 | Không tự phát lặp cùng điểm, ngôn ngữ và phiên bản trong một phiên tham quan; nghe lại thủ công được phép. |
+| BR-12 | Đổi ngôn ngữ không tải lại trang; giữ vị trí, điểm đang chọn, điểm đã đi qua và lịch sử nghe. Trạng thái đã đi qua khác với đã nghe. |
+| BR-13 | Mỗi điểm có nhiều phiên bản; cặp PlaceId và Version là duy nhất. Mỗi điểm có tối đa một phiên bản công khai hiện hành. |
+| BR-14 | Chỉ sửa bản Draft; thay đổi nội dung đã xuất bản phải thực hiện qua bản nháp mới. |
+| BR-15 | Sửa script làm audio tương ứng hết hiệu lực; sửa tiếng Việt làm các kết quả dịch phụ thuộc cần được cập nhật hoặc duyệt lại. |
+| BR-16 | Không tự ghi đè bản dịch đã hiệu chỉnh thủ công trong lần tạo lại mặc định. |
+| BR-17 | Xuất bản yêu cầu đủ nội dung và audio hợp lệ của 5 ngôn ngữ; audio phải khớp script hiện tại. |
+| BR-18 | Cập nhật trạng thái xuất bản và PublishedRevisionId phải nhất quán; bản public trước được giữ trong lịch sử. |
+| BR-19 | Văn bản và audio public phải thuộc cùng phiên bản; bản nháp chỉ được xem/nghe thử qua chức năng Admin. |
+| BR-20 | Chỉ ghi nhận lượt truy cập QR khi website mở từ liên kết có dấu nguồn QR và backend lưu sự kiện thành công. |
+| BR-21 | Mỗi SessionId chỉ được ghi một lượt QR. Tải lại trang hoặc gửi lại cùng sự kiện trong phiên không cộng thêm lượt. |
+| BR-22 | SessionId được duy trì trong phiên trình duyệt; mở lại sau ít nhất 30 phút không hoạt động tạo phiên mới. Quy tắc này không bảo đảm nhận diện một người duy nhất giữa các tab hoặc trình duyệt. |
+| BR-23 | Thời điểm sự kiện do server ghi UTC; báo cáo hiển thị giờ Việt Nam. Khoảng lọc sử dụng [bắt đầu, kết thúc). |
+| BR-24 | Báo cáo cộng lượt theo 24 khung giờ trong ngày của khoảng lọc; khung có tổng lớn nhất là cao điểm. Đồng hạng phải hiển thị đủ; không có lượt thì không kết luận cao điểm. |
+| BR-25 | Không xóa điểm đang có phiên bản thuyết minh tham chiếu; sử dụng chức năng ẩn. Chỉ xóa bản nháp đủ điều kiện, không xóa phiên bản đã xuất bản qua chức năng xóa nháp. |
+| BR-26 | Dữ liệu được đánh dấu demo được loại khỏi báo cáo vận hành mặc định. Không mặc định mọi lượt qua URL tunnel đều là demo. |
+| BR-27 | GenerationJobs lưu trạng thái tác vụ tạo nội dung; trạng thái job không thay thế trạng thái phiên bản hoặc hiệu lực audio. |
+| BR-28 | SiteTexts lưu văn bản giao diện theo khóa và ngôn ngữ; không lưu thuyết minh của từng điểm. |
 
-### 5.2. Cách đọc đặc tả
+## 5.2. Quy ước đặc tả và hình vẽ
 
-Mỗi UC gồm mục tiêu, tác nhân, kích hoạt, giả định, tiền điều kiện, luồng chính theo hai phía, luồng thay thế A, ngoại lệ E, hậu điều kiện và tham chiếu nghiệp vụ. Bước trong A/E chỉ rõ vị trí quay lại hoặc điều kiện kết thúc. Các điểm liên quan không mặc nhiên là quan hệ UML `extend`.
+- Luồng chính trình bày theo hành động tác nhân và phản hồi hệ thống.
+- [A1], [A2] đánh dấu luồng thay thế.
+- [E1], [E2] đánh dấu ngoại lệ nghiệp vụ.
+- Hình chữ nhật bo góc biểu diễn hành động.
+- Hình thoi biểu diễn quyết định rẽ nhánh hoặc hợp nhất luồng.
+- Hành động trong nhánh thay thế/ngoại lệ vẫn là hình chữ nhật bo góc.
+- Không thêm hình thoi khi không có điều kiện cần phân nhánh.
+- Lỗi hạ tầng được quy định ở phần phi chức năng và kiểm thử, không lặp thành ngoại lệ trong mọi UC.
 
+---
 
-### 5.3. UC01 — Truy cập bằng QR
+## 5.3. Nhóm 01 — Bắt đầu tham quan
 
-| Thuộc tính | Đặc tả |
+Nhóm này hỗ trợ mở website qua QR, ghi nhận truy cập, chọn ngôn ngữ và thiết lập quyền vị trí.
+
+**[CHÈN HÌNH USE CASE NHÓM 01 — BẮT ĐẦU THAM QUAN.]**
+
+### UC01.1 — Chọn ngôn ngữ ban đầu
+
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC01 / Focused |
 | Tác nhân | Du khách |
-| Mục tiêu / tóm tắt | Mở đúng website tham quan từ mã QR. |
-| Kích hoạt | Du khách chọn mở liên kết do camera/ứng dụng quét nhận diện. |
-| Giả định | QR hợp lệ trỏ tới website HTTPS; thiết bị có Internet. |
-| Tiền điều kiện | Không cần tài khoản; hệ thống cung cấp endpoint công khai. |
-
+| Mục tiêu | Chọn ngôn ngữ sử dụng trong hành trình |
+| Kích hoạt | Mở website qua QR |
+| Tiền điều kiện | Giao diện chọn ngôn ngữ đã được tải |
+| Hậu điều kiện | Ngôn ngữ được lưu, áp dụng và chuyển tới thiết lập vị trí |
+| Quy tắc | BR-02, BR-03 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Quét QR và chọn mở liên kết. | Tiếp nhận URL và nhận diện mã nguồn QR nếu có. |
-| 2 | Chờ trang khởi động. | Hiển thị màn hình chọn ngôn ngữ, chưa yêu cầu GPS. |
-| 3 | Tiếp tục sử dụng website. | Tạo/khôi phục phiên truy cập và gửi sự kiện QR với khóa chống trùng; chuyển sang UC02. |
+| 1 | Xem lựa chọn ngôn ngữ. | Hiển thị Việt, Anh, Trung, Hàn và Nhật. |
+| 2 | Chọn một ngôn ngữ. | Đánh dấu lựa chọn. |
+| 3 | Nhấn tiếp tục. | Lưu, áp dụng ngôn ngữ và chuyển sang UC01.2. |
 
+**Luồng thay thế / ngoại lệ:** Không có luồng riêng. Giao diện chỉ cho tiếp tục khi có lựa chọn hợp lệ.
 
-**Luồng thay thế**
+**[CHÈN HÌNH ACTIVITY UC01.1 — CHỌN NGÔN NGỮ → XÁC NHẬN → LƯU VÀ ÁP DỤNG.]**
 
-- A1 — Tại bước 1, khách mở link trực tiếp không có nguồn QR: vẫn sử dụng website, không ghi nhận là lượt QR; tiếp tục bước 2.
-- A2 — Tại bước 3, tải lại cùng phiên QR: tái sử dụng khóa phiên, không tăng số lượt; tiếp tục UC02 hoặc màn hình đang dùng.
+### UC01.2 — Thiết lập quyền vị trí
 
-
-**Luồng ngoại lệ**
-
-- E1 — Tại bước 1, link hết hiệu lực hoặc tunnel tắt: trình duyệt không mở được; khách dùng QR hiện hành, UC kết thúc chưa thành công.
-- E2 — Tại bước 3, API thống kê lỗi: báo cáo chưa được cộng lượt; cho phép trải nghiệm tiếp tục và gửi lại cùng khóa chống trùng khi kết nối phục hồi.
-
-
-**Hậu điều kiện:** Website được mở; sự kiện chỉ được coi là đã ghi nhận sau phản hồi lưu thành công.
-
-**Quy tắc nghiệp vụ:** BR-02, BR-19–BR-22.
-
-**Điểm liên quan:** UC02; sự kiện đầu vào UC14. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.4. UC02 — Chọn ngôn ngữ
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC02 / Focused |
 | Tác nhân | Du khách |
-| Mục tiêu / tóm tắt | Sử dụng văn bản và audio theo ngôn ngữ mong muốn. |
-| Kích hoạt | Khách vào lần đầu hoặc mở bộ chọn ngôn ngữ. |
-| Giả định | Có 5 lựa chọn vi/en/zh/ko/ja. |
-| Tiền điều kiện | Website tải được giao diện lựa chọn. |
-
-
-**Luồng chính**
-
-| Bước | Hành động tác nhân | Phản hồi hệ thống |
-|---|---|---|
-| 1 | Chọn một ngôn ngữ. | Đánh dấu lựa chọn và hiển thị hướng dẫn tương ứng. |
-| 2 | Xác nhận/tiếp tục. | Lưu lựa chọn trên trình duyệt khi được phép; ở lượt khởi đầu chuyển tới giải thích quyền vị trí. |
-| 3 | Xem nội dung hoặc đổi ngôn ngữ trong khi tham quan. | Đổi văn bản theo lựa chọn; dừng bài thuộc ngôn ngữ cũ, dùng bài tương ứng cho lần nghe kế tiếp. |
-
-
-**Luồng thay thế**
-
-- A1 — Bước 1 đã có ngôn ngữ lưu trước: chọn sẵn và cho phép khách giữ hoặc đổi; quay lại bước 2.
-- A2 — Bước 3 thiếu bản dịch ngôn ngữ đã chọn: hiện thông báo rõ, khách chủ động chọn ngôn ngữ khác; quay lại bước 1.
-
-
-**Luồng ngoại lệ**
-
-- E1 — Bước 2 không lưu được localStorage: giữ lựa chọn trong bộ nhớ phiên, không ngăn sử dụng; tiếp tục bước 3.
-- E2 — Bước 3 tải dữ liệu thất bại: giữ lựa chọn và cho phép thử lại; không phát nhầm audio cũ.
-
-
-**Hậu điều kiện:** Ngôn ngữ hiện hành được xác định; nội dung và audio dùng cùng lựa chọn.
-
-**Quy tắc nghiệp vụ:** BR-02, BR-03, BR-10, BR-18.
-
-**Điểm liên quan:** UC03, UC06. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.5. UC03 — Cho phép truy cập vị trí
-
-| Thuộc tính | Đặc tả |
-|---|---|
-| Mã / mức chi tiết | UC03 / Focused |
-| Tác nhân | Du khách; trình duyệt hỗ trợ |
-| Mục tiêu / tóm tắt | Quyết định cho phép định vị để sử dụng thuyết minh tự động. |
-| Kích hoạt | Khách hoàn tất chọn ngôn ngữ và chọn bắt đầu định vị. |
-| Giả định | Thiết bị hỗ trợ Geolocation; website truy cập qua secure context phù hợp. |
-| Tiền điều kiện | Đã chọn/xác nhận ngôn ngữ theo UC02. |
-
+| Mục tiêu | Quyết định việc sử dụng vị trí để hỗ trợ tham quan |
+| Kích hoạt | Hoàn thành chọn ngôn ngữ |
+| Tiền điều kiện | Website đã áp dụng ngôn ngữ |
+| Hậu điều kiện | Mở bản đồ với khả năng sử dụng GPS tương ứng |
+| Quy tắc | BR-02, BR-07 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Đọc giải thích và bấm bật vị trí. | Gọi API định vị; trình duyệt hỏi quyền nếu chưa có quyết định trước. |
-| 2 | Chọn Cho phép. | Bắt đầu theo dõi vị trí, hiển thị trạng thái đang xác định. |
-| 3 | Chờ kết quả. | Nhận tọa độ, sai số, thời điểm; hiển thị vị trí trên bản đồ và chuyển UC04. |
+| 1 | Xem hướng dẫn GPS. | Giải thích mục đích sử dụng vị trí. |
+| 2 | Chọn bật GPS. | Yêu cầu quyền vị trí qua trình duyệt khi cần. |
+| 3 | Cho phép truy cập vị trí. | Ghi nhận quyền và bắt đầu lấy tọa độ. [A1] |
+| 4 | Tiếp tục tham quan. | Mở bản đồ, hiển thị vị trí khi có tọa độ hợp lệ. |
 
+**A1 — Không cấp quyền tại bước 3**
 
-**Luồng thay thế**
+Hệ thống vẫn mở bản đồ, cho phép chọn điểm và nghe thủ công. Không hiển thị vị trí giả hoặc tự phát theo GPS. Kết thúc chức năng.
 
-- A1 — Bước 2 khách từ chối: hiển thị hướng dẫn bật lại trong cài đặt; vẫn vào UC04 và nghe thủ công UC06.
-- A2 — Quyền đã được cấp trước: không ép hiện lại hộp hỏi của trình duyệt; sau thao tác bắt đầu của khách tiếp tục bước 3.
-- A3 — Khách tắt GPS trong quá trình dùng: dừng watch, dừng đánh giá tự động và xóa vị trí đang theo dõi; bản đồ vẫn sử dụng được.
+**[CHÈN HÌNH ACTIVITY UC01.2 — PHÂN NHÁNH CẤP QUYỀN VÀ KHÔNG CẤP QUYỀN GPS.]**
 
+### UC01.3 — Ghi nhận truy cập qua QR
 
-**Luồng ngoại lệ**
-
-- E1 — Bước 1 trình duyệt không hỗ trợ hoặc môi trường không hợp lệ: thông báo và chuyển chế độ thủ công.
-- E2 — Bước 3 hết thời gian hoặc sai số quá lớn: hiển thị trạng thái, không tự phát; cho phép thử lại bước 1 hoặc nghe thủ công.
-
-
-**Hậu điều kiện:** Có vị trí hợp lệ để dùng tự động hoặc đã chuyển rõ sang trải nghiệm không GPS.
-
-**Quy tắc nghiệp vụ:** BR-02, BR-07, BR-09.
-
-**Điểm liên quan:** UC04, UC05. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.6. UC04 — Xem bản đồ
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC04 / Focused |
 | Tác nhân | Du khách |
-| Mục tiêu / tóm tắt | Xem vị trí các khu và thông tin tham quan đã công bố. |
-| Kích hoạt | Khách mở mục Bản đồ. |
-| Giả định | Có dịch vụ nền bản đồ; dữ liệu khu được lấy từ public API. |
-| Tiền điều kiện | Đã chọn ngôn ngữ; GPS không phải tiền điều kiện bắt buộc. |
-
-
-**Luồng chính**
-
-| Bước | Hành động tác nhân | Phản hồi hệ thống |
-|---|---|---|
-| 1 | Mở Bản đồ. | Tải các khu đang hoạt động có bản xuất bản hợp lệ. |
-| 2 | Quan sát bản đồ. | Vẽ marker, vùng bán kính; chỉ vẽ vị trí khách nếu có vị trí thực hoặc giả lập được ghi nhãn rõ. |
-| 3 | Chạm một khu. | Hiển thị tên, mô tả, ảnh và nút nghe theo ngôn ngữ hiện hành. |
-| 4 | Tiếp tục xem hoặc quay lại trang. | Làm mới dữ liệu khi đến chu kỳ hoặc trở lại tab; phản ánh nội dung public mới. |
-
-
-**Luồng thay thế**
-
-- A1 — Bước 2 không có GPS: hiển thị bản đồ các khu, không giả mạo vị trí thật.
-- A2 — Bước 1 danh sách trả [] thành công: hiện “Chưa có khu đã xuất bản”, không dựng khu mẫu thay thế.
-
-
-**Luồng ngoại lệ**
-
-- E1 — Bước 1 API lỗi: hiển thị lỗi kết nối và thử lại; không diễn giải thành database không có khu.
-- E2 — Bước 2 nền bản đồ lỗi: thông báo nền bản đồ chưa tải, giữ nội dung khu đã lấy được để nghe thủ công nếu có.
-
-
-**Hậu điều kiện:** Khách xem được dữ liệu public hoặc thông báo đúng nguyên nhân không tải được.
-
-**Quy tắc nghiệp vụ:** BR-04, BR-05, BR-18.
-
-**Điểm liên quan:** UC05, UC06. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.7. UC05 — Nhận diện điểm tham quan
-
-| Thuộc tính | Đặc tả |
-|---|---|
-| Mã / mức chi tiết | UC05 / Focused |
-| Tác nhân | Du khách hưởng lợi; hệ thống tự động thực hiện |
-| Mục tiêu / tóm tắt | Xác định khu phù hợp khi khách đi vào vùng kích hoạt. |
-| Kích hoạt | Có vị trí mới hoặc đến chu kỳ đánh giá khi tự phát đang bật. |
-| Giả định | Dữ liệu tọa độ khu đã được kiểm tra; backend và public API hoạt động. |
-| Tiền điều kiện | Có vị trí đạt điều kiện, chế độ tự phát bật và có khu đã xuất bản. |
-
+| Mục tiêu | Ghi nhận lượt mở website từ liên kết QR |
+| Kích hoạt | Du khách mở liên kết từ QR |
+| Tiền điều kiện | Liên kết truy cập được website và có dấu nguồn QR |
+| Hậu điều kiện | Một lượt hợp lệ được ghi nhận hoặc bản ghi trùng được bỏ qua |
+| Quy tắc | BR-20–BR-23, BR-26 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Di chuyển trong khuôn viên; không cần chọn khu mỗi lần. | Kiểm tra timestamp, sai số và tính hợp lệ của vị trí. |
-| 2 | Tiếp tục hành trình. | Gửi tọa độ tới API; tính khoảng cách với các khu public đang hoạt động. |
-| 3 | Đi vào một hoặc nhiều vùng. | Lọc theo bán kính, chọn khu ưu tiên và xác nhận ổn định theo chế độ. |
-| 4 | Ở trong vùng đã nhận diện. | Nếu bài chưa nghe và bộ phát rảnh, chọn khu và chuyển yêu cầu phát sang UC06. |
+| 1 | Quét QR và mở liên kết. | Nhận diện nguồn QR; tạo hoặc khôi phục SessionId. |
+| 2 | Chờ website hiển thị. | Kiểm tra sự kiện của SessionId đã tồn tại hay chưa. [A1] |
+| 3 | Tiếp tục sử dụng website. | Lưu SessionId, thời điểm UTC và cờ demo phù hợp. |
 
+**A1 — Đã có bản ghi tại bước 2**
 
-**Luồng thay thế**
+Không tạo lượt mới. Hệ thống trả kết quả đã ghi nhận và cho du khách tiếp tục sử dụng.
 
-- A1 — Bước 2 ngoài mọi vùng: không phát; chờ chu kỳ tiếp theo quay lại bước 1.
-- A2 — Bước 3 vùng chồng nhau: áp dụng BR-08; tiếp tục bước 4 với một khu duy nhất.
-- A3 — Bước 4 đang phát bài khác hoặc đã nghe trong phiên: không phát chồng/lặp; tiếp tục đánh giá vị trí mới.
+Việc ghi nhận thống kê không chặn luồng chọn ngôn ngữ.
 
+**[CHÈN HÌNH ACTIVITY UC01.3 — MỞ LINK QR → KIỂM TRA PHIÊN → KIỂM TRA TRÙNG → GHI NHẬN HOẶC BỎ QUA.]**
 
-**Luồng ngoại lệ**
+---
 
-- E1 — Bước 1 vị trí cũ hoặc sai số >25 m: bỏ kết quả, xóa chuỗi xác nhận ổn định, chờ vị trí hợp lệ.
-- E2 — Bước 2 API lỗi: tạm dừng tự phát, không dùng kết quả cũ để kích hoạt; thử lại chu kỳ sau.
-- E3 — Bước 3 nguồn vị trí/ngôn ngữ thay đổi hoặc khách tắt tự phát khi request đang chờ: bỏ kết quả cũ, đánh giá lại theo trạng thái mới.
+## 5.4. Nhóm 02 — Xem bản đồ tham quan
 
+Nhóm này hỗ trợ xem các điểm công khai, thông tin chi tiết và vị trí hiện tại.
 
-**Hậu điều kiện:** Có tối đa một khu được chọn để phát hoặc tiếp tục chờ vị trí; chưa đánh dấu đã nghe trước khi audio phát thành công.
+**[CHÈN HÌNH USE CASE NHÓM 02 — XEM BẢN ĐỒ THAM QUAN.]**
 
-**Quy tắc nghiệp vụ:** BR-04, BR-07–BR-11.
+### UC02.1 — Xem thông tin điểm tham quan
 
-**Điểm liên quan:** UC06; chế độ giả lập tại 7.4. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.8. UC06 — Nghe thuyết minh
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC06 / Focused |
 | Tác nhân | Du khách |
-| Mục tiêu / tóm tắt | Nghe đúng nội dung, ngôn ngữ và phiên bản của khu. |
-| Kích hoạt | UC05 nhận diện khu hoặc khách bấm Nghe thuyết minh. |
-| Giả định | Khu có audio public hợp lệ; kết nối tải được file. |
-| Tiền điều kiện | Đã có ngôn ngữ và khu được chọn; nghe thủ công không bắt buộc GPS. |
-
+| Mục tiêu | Xem thông tin của điểm được chọn |
+| Kích hoạt | Chọn điểm trên bản đồ hoặc danh sách |
+| Tiền điều kiện | Điểm đủ điều kiện công khai |
+| Hậu điều kiện | Hiển thị thông tin theo ngôn ngữ hiện hành |
+| Quy tắc | BR-03, BR-04, BR-19 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Bấm nghe hoặc đi vào vùng với tự phát bật. | Xác định URL audio của revision đang public và ngôn ngữ hiện hành. |
-| 2 | Chờ tải bài. | Dừng/thay bài theo lựa chọn thủ công, dùng bộ phát duy nhất và tải file tương ứng. |
-| 3 | Nghe nội dung. | Phát audio, cập nhật trạng thái và tiến độ; chỉ đánh dấu đã nghe sau khi phát thành công. |
-| 4 | Nghe hết hoặc điều khiển. | Kết thúc bài hoặc chuyển UC07; không tự lặp bài đã nghe trong phiên. |
+| 1 | Xem bản đồ hoặc danh sách. | Hiển thị các điểm công khai. |
+| 2 | Chọn một điểm. | Đánh dấu điểm và vùng kích hoạt tương ứng. |
+| 3 | Xem thông tin. | Hiển thị tên, ảnh, mô tả và lựa chọn nghe. |
 
+**Luồng thay thế / ngoại lệ:** Không có luồng riêng.
 
-**Luồng thay thế**
+Chọn xem một điểm không đồng nghĩa với đã đi đến hoặc đã nghe điểm đó.
 
-- A1 — Bước 1 khách chọn nghe lại: cho phép phát thủ công dù bài đã được đánh dấu đã nghe.
-- A2 — Bước 1 có bài khác đang phát và yêu cầu là tự động: giữ bài hiện tại, chờ đánh giá lại sau; không chen ngang.
+**[CHÈN HÌNH ACTIVITY UC02.1 — CHỌN ĐIỂM → HIỂN THỊ VÙNG VÀ THÔNG TIN.]**
 
+### UC02.2 — Xem vị trí của tôi
 
-**Luồng ngoại lệ**
-
-- E1 — Bước 2 trình duyệt chặn autoplay: hiện nút Chạm để nghe; khi khách bấm thử lại bước 2, chưa đánh dấu đã nghe.
-- E2 — Bước 2 file mất, URL hết hợp lệ hoặc mạng lỗi: hiện lỗi/thử lại; không gọi Azure sinh mới trên thiết bị khách.
-- E3 — Bản public bị ẩn/thay đổi trong khi phát: khi nhận dữ liệu cập nhật, dừng track không còn phù hợp; tải lại thông tin trước lần nghe mới.
-
-
-**Hậu điều kiện:** Bài được phát đúng hoặc lỗi được thể hiện rõ, không phát thay bằng ngôn ngữ khác.
-
-**Quy tắc nghiệp vụ:** BR-03, BR-10, BR-11, BR-18.
-
-**Điểm liên quan:** UC07, UC13. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.9. UC07 — Điều khiển âm thanh
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC07 / Focused |
 | Tác nhân | Du khách |
-| Mục tiêu / tóm tắt | Chủ động tạm dừng, tiếp tục, tua và dừng bài đang nghe. |
-| Kích hoạt | Khách thao tác trên thanh phát. |
-| Giả định | Chỉ có một bộ phát toàn ứng dụng. |
-| Tiền điều kiện | Có bài đã được chọn hoặc đang tải/phát. |
-
+| Mục tiêu | Xác định vị trí hiện tại trên bản đồ |
+| Kích hoạt | Nhấn “Vị trí của tôi” |
+| Tiền điều kiện | Bản đồ đang mở |
+| Hậu điều kiện | Hiển thị vị trí khi có tọa độ hợp lệ |
+| Quy tắc | BR-07 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Bấm Tạm dừng. | Dừng phát và giữ thời điểm hiện tại. |
-| 2 | Bấm Tiếp tục. | Phát tiếp từ thời điểm đã giữ. |
-| 3 | Kéo thanh tiến độ tới vị trí hợp lệ. | Giới hạn thời điểm trong [0, duration] và tua khi media sẵn sàng. |
-| 4 | Bấm Dừng. | Dừng bài, đưa trạng thái bộ phát về nghỉ và dọn tài nguyên cần thiết. |
+| 1 | Nhấn “Vị trí của tôi”. | Kiểm tra quyền vị trí. [A1] |
+| 2 | Chờ xác định vị trí. | Lấy và kiểm tra tọa độ. [A2] |
+| 3 | Xem vị trí. | Hiển thị dấu vị trí và đưa vào vùng nhìn thấy của bản đồ. |
 
+**A1 — Chưa có quyền tại bước 1**
 
-**Luồng thay thế**
+Hướng dẫn bật quyền vị trí. Nếu được cấp quyền, tiếp tục bước 2; nếu không, giữ nguyên bản đồ và kết thúc.
 
-- A1 — Khách chọn nghe lại từ đầu: đặt tiến độ 0 rồi phát; không tạo thêm một player.
-- A2 — Khách đổi ngôn ngữ: dừng bài cũ và dùng ngôn ngữ mới cho lần nghe tiếp theo.
+**A2 — Chưa có tọa độ hợp lệ tại bước 2**
 
+Hiển thị trạng thái đang xác định vị trí. Tiếp tục bước 3 khi có dữ liệu hợp lệ; không dùng tọa độ không hợp lệ để kích hoạt vùng.
 
-**Luồng ngoại lệ**
+**[CHÈN HÌNH ACTIVITY UC02.2 — KIỂM TRA QUYỀN → LẤY TỌA ĐỘ → HIỂN THỊ VỊ TRÍ.]**
 
-- E1 — Bước 3 duration chưa xác định hoặc file không hỗ trợ tua: vô hiệu hóa thanh tua, giữ nút phát/dừng phù hợp.
-- E2 — Bước 2 phát tiếp bị chặn hoặc mất kết nối: hiện lỗi và cho phép khách thử lại.
+---
 
+## 5.5. Nhóm 03 — Nghe thuyết minh
 
-**Hậu điều kiện:** Trạng thái giao diện khớp bộ phát; không có audio chạy chồng.
+Nhóm này hỗ trợ chọn điểm cần nghe, lấy nội dung/audio phù hợp và điều khiển phát.
 
-**Quy tắc nghiệp vụ:** BR-03, BR-10, BR-11.
+**[CHÈN HÌNH USE CASE NHÓM 03 — NGHE THUYẾT MINH.]**
 
-**Điểm liên quan:** UC06. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
+### UC03.1 — Xác định điểm cần nghe
 
-
-### 5.10. UC08 — Đăng nhập
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC08 / Focused |
+| Tác nhân | Du khách |
+| Mục tiêu | Xác định điểm cho yêu cầu nghe |
+| Kích hoạt | Nghe thủ công hoặc cập nhật vị trí khi bật tự phát |
+| Tiền điều kiện | Có điểm công khai; tự phát cần GPS hợp lệ |
+| Hậu điều kiện | Có điểm để chuyển sang UC03.2 hoặc tiếp tục theo dõi |
+| Quy tắc | BR-07–BR-11 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Bật tự phát và di chuyển. | Tiếp nhận vị trí hợp lệ. [A1] |
+| 2 | Tiếp tục di chuyển. | Đối chiếu vị trí với các vùng kích hoạt. [A2] |
+| 3 | Đi vào vùng đủ điều kiện. | Chọn điểm phù hợp; kiểm tra chống phát lặp và phát chồng. [A3] |
+| 4 | Tiếp tục tham quan. | Chuyển điểm đã xác định sang UC03.2. |
+
+**A1 — Nghe thủ công tại bước 1**
+
+Du khách chọn điểm và nhấn nghe. Hệ thống dùng điểm được chọn, không yêu cầu đang ở trong vùng GPS; chuyển sang bước 4.
+
+**A2 — Chưa nằm trong vùng tại bước 2**
+
+Chưa tạo yêu cầu tự phát. Tiếp tục theo dõi vị trí và quay lại bước 2 khi có dữ liệu mới.
+
+**A3 — Chưa đủ điều kiện tự phát tại bước 3**
+
+Nếu đang có bài phát hoặc yêu cầu bị xác định là phát lặp, chưa tự phát bài mới. Tiếp tục theo dõi vị trí và trạng thái phát.
+
+**[CHÈN HÌNH ACTIVITY UC03.1 — CÓ CÁC NHÁNH A1 NGHE THỦ CÔNG, A2 NGOÀI VÙNG VÀ A3 CHƯA ĐỦ ĐIỀU KIỆN TỰ PHÁT.]**
+
+### UC03.2 — Lấy thuyết minh theo ngôn ngữ
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Du khách |
+| Mục tiêu | Sử dụng đúng văn bản và audio theo ngôn ngữ hiện hành |
+| Kích hoạt | Điểm cần nghe đã được xác định |
+| Tiền điều kiện | Điểm có phiên bản thuyết minh công khai |
+| Hậu điều kiện | Nội dung và audio tương ứng được đưa vào trình phát |
+| Quy tắc | BR-03, BR-19 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Yêu cầu nghe hoặc tiếp tục ở chế độ tự phát. | Xác định phiên bản đã xuất bản của điểm. |
+| 2 | — | Chọn nội dung và audio theo ngôn ngữ hiện hành. [E1] |
+| 3 | Nghe thuyết minh. | Hiển thị nội dung và phát audio theo yêu cầu hợp lệ. |
+
+**E1 — Không có nội dung hoặc audio hợp lệ tại bước 2**
+
+Thông báo chưa có thuyết minh phù hợp. Không tự phát audio của ngôn ngữ khác. Du khách có thể đổi ngôn ngữ hoặc chọn điểm khác.
+
+**[CHÈN HÌNH ACTIVITY UC03.2 — KIỂM TRA NỘI DUNG/AUDIO HỢP LỆ; NHÁNH KHÔNG HỢP LỆ DẪN ĐẾN E1.]**
+
+### UC03.3 — Tạm dừng thuyết minh
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Du khách |
+| Mục tiêu | Tạm ngừng bài và giữ vị trí nghe |
+| Kích hoạt | Nhấn tạm dừng |
+| Tiền điều kiện | Có bài đang phát |
+| Hậu điều kiện | Bài tạm dừng và có thể tiếp tục |
+| Quy tắc | BR-10 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Nhấn tạm dừng. | Tạm dừng audio và giữ thời điểm đang nghe. |
+| 2 | Xem trình phát. | Hiển thị trạng thái tạm dừng và nút tiếp tục. |
+
+**Luồng thay thế / ngoại lệ:** Không có luồng riêng.
+
+**[CHÈN HÌNH ACTIVITY UC03.3 — NHẤN TẠM DỪNG → GIỮ THỜI ĐIỂM → HIỂN THỊ TRẠNG THÁI.]**
+
+### UC03.4 — Tiếp tục thuyết minh
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Du khách |
+| Mục tiêu | Nghe tiếp từ thời điểm tạm dừng |
+| Kích hoạt | Nhấn tiếp tục |
+| Tiền điều kiện | Có bài đang tạm dừng, vẫn phù hợp ngôn ngữ hiện hành |
+| Hậu điều kiện | Bài tiếp tục phát từ thời điểm đã lưu |
+| Quy tắc | BR-10 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Nhấn tiếp tục. | Lấy thời điểm tạm dừng. |
+| 2 | Tiếp tục nghe. | Phát tiếp và cập nhật trạng thái đang phát. |
+
+**Luồng thay thế / ngoại lệ:** Không có luồng riêng.
+
+**[CHÈN HÌNH ACTIVITY UC03.4 — NHẤN TIẾP TỤC → LẤY THỜI ĐIỂM → PHÁT TIẾP.]**
+
+### UC03.5 — Nghe lại thuyết minh
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Du khách |
+| Mục tiêu | Nghe lại bài từ đầu |
+| Kích hoạt | Nhấn nghe lại |
+| Tiền điều kiện | Có bài phù hợp ngôn ngữ hiện hành |
+| Hậu điều kiện | Bài được phát từ đầu |
+| Quy tắc | BR-10, BR-11 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Nhấn nghe lại. | Đưa thời điểm phát về đầu bài. |
+| 2 | Nghe lại nội dung. | Phát từ đầu và cập nhật tiến trình. |
+
+**Luồng thay thế / ngoại lệ:** Không có luồng riêng.
+
+Nghe lại không xóa lịch sử tham quan.
+
+**[CHÈN HÌNH ACTIVITY UC03.5 — NHẤN NGHE LẠI → ĐƯA VỀ ĐẦU → PHÁT AUDIO.]**
+
+### UC03.6 — Đổi ngôn ngữ thuyết minh
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Du khách |
+| Mục tiêu | Đổi ngôn ngữ trong quá trình tham quan |
+| Kích hoạt | Chọn ngôn ngữ mới |
+| Tiền điều kiện | Du khách đang sử dụng website |
+| Hậu điều kiện | Áp dụng ngôn ngữ mới, giữ trạng thái tham quan |
+| Quy tắc | BR-03, BR-12 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Mở bộ chọn ngôn ngữ. | Hiển thị 5 ngôn ngữ. |
+| 2 | Chọn ngôn ngữ mới. | Lưu lựa chọn; dừng audio cũ nếu đang phát. |
+| 3 | Tiếp tục sử dụng website. | Cập nhật giao diện và nội dung, giữ vị trí và lịch sử tham quan. |
+| 4 | Yêu cầu nghe. | Sử dụng UC03.2 để lấy bài theo ngôn ngữ mới. |
+
+**Luồng thay thế / ngoại lệ:** Không có luồng riêng.
+
+Không tự phát lại chỉ vì đổi ngôn ngữ. Việc dừng audio cũ là xử lý thông thường, không phải ngoại lệ.
+
+**[CHÈN HÌNH ACTIVITY UC03.6 — CHỌN NGÔN NGỮ → LƯU → DỪNG AUDIO CŨ NẾU CÓ → CẬP NHẬT NỘI DUNG VÀ GIỮ TRẠNG THÁI.]**
+
+---
+
+## 5.6. Nhóm 04 — Đăng nhập quản trị
+
+Nhóm này xác thực tài khoản để truy cập khu vực Admin.
+
+**[CHÈN HÌNH USE CASE NHÓM 04 — ĐĂNG NHẬP QUẢN TRỊ.]**
+
+### UC04.1 — Xác thực tài khoản Admin
+
+| Thuộc tính | Nội dung |
+|---|---|
 | Tác nhân | Admin |
-| Mục tiêu / tóm tắt | Truy cập các chức năng quản trị theo quyền. |
-| Kích hoạt | Admin mở trang quản trị khi chưa có phiên hợp lệ. |
-| Giả định | Tài khoản đã được tạo, hoạt động; mật khẩu lưu bằng PasswordHasher. |
-| Tiền điều kiện | Backend và SQL Server sẵn sàng. |
-
+| Mục tiêu | Xác thực tài khoản và mở phiên quản trị |
+| Kích hoạt | Gửi biểu mẫu đăng nhập |
+| Tiền điều kiện | Có tài khoản được cấp |
+| Hậu điều kiện | Tạo phiên hợp lệ hoặc từ chối đăng nhập |
+| Quy tắc | BR-01 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Nhập username và mật khẩu. | Nhận yêu cầu có mã CSRF hợp lệ; kiểm tra dữ liệu đầu vào. |
-| 2 | Bấm Đăng nhập. | Tìm tài khoản, xác minh hash mật khẩu và trạng thái hoạt động. |
-| 3 | Chờ xác thực. | Tạo phiên cookie với danh tính và vai trò Admin; chuyển giao diện quản trị. |
+| 1 | Nhập tên đăng nhập và mật khẩu. | Tiếp nhận thông tin. |
+| 2 | Nhấn đăng nhập. | Kiểm tra tài khoản, mật khẩu và trạng thái hoạt động. [E1] |
+| 3 | Truy cập quản trị. | Thiết lập phiên và mở giao diện Admin. |
 
+**E1 — Thông tin không hợp lệ tại bước 2**
 
-**Luồng thay thế**
+Từ chối đăng nhập, hiển thị thông báo phù hợp. Admin nhập lại và thực hiện bước 2.
 
-- A1 — Đã có phiên hợp lệ: bỏ qua nhập lại và vào trang quản trị.
-- A2 — Admin chọn Đăng xuất sau khi dùng: hủy phiên; lần mở Admin kế tiếp cần đăng nhập.
+Không thêm UC kiểm tra quyền riêng. Các API quản trị vẫn phải xác thực phiên.
 
+**[CHÈN HÌNH ACTIVITY UC04.1 — NHẬP THÔNG TIN → KIỂM TRA → TẠO PHIÊN HOẶC THÔNG BÁO KHÔNG HỢP LỆ.]**
 
-**Luồng ngoại lệ**
+---
 
-- E1 — Bước 2 username/mật khẩu sai hoặc tài khoản vô hiệu: thông báo chung không tiết lộ tài khoản tồn tại; quay lại bước 1.
-- E2 — Thiếu/sai CSRF, phiên hết hạn hoặc truy cập không đủ quyền: từ chối yêu cầu; yêu cầu xác thực lại phù hợp.
-- E3 — Database lỗi: thông báo dịch vụ chưa sẵn sàng; không cấp phiên quản trị giả.
+## 5.7. Nhóm 05 — Quản lý điểm tham quan
 
+Admin quản lý thông tin, ảnh, tọa độ, bán kính và trạng thái của điểm.
 
-**Hậu điều kiện:** Thành công có phiên Admin hợp lệ; thất bại không cấp quyền.
+**[CHÈN HÌNH USE CASE NHÓM 05 — ADMIN NỐI TRỰC TIẾP VỚI THÊM, SỬA, XÓA, ẨN/HIỆN; KHÔNG CÓ UC-S01.]**
 
-**Quy tắc nghiệp vụ:** BR-01, BR-24.
+### UC05.1 — Thêm điểm tham quan
 
-**Điểm liên quan:** UC09–UC14; chế độ bỏ đăng nhập demo không phải luồng vận hành chuẩn. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.11. UC09 — Quản lý điểm tham quan
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC09 / Focused |
 | Tác nhân | Admin |
-| Mục tiêu / tóm tắt | Tạo, cập nhật hoặc ẩn điểm cùng tọa độ và vùng thuyết minh. |
-| Kích hoạt | Admin mở danh sách điểm tham quan. |
-| Giả định | Ảnh định dạng được hỗ trợ; dữ liệu GPS do nhóm xác minh. |
-| Tiền điều kiện | Phiên Admin hợp lệ. |
-
+| Mục tiêu | Tạo điểm tham quan mới |
+| Kích hoạt | Chọn thêm điểm |
+| Tiền điều kiện | Admin đã đăng nhập, phiên còn hiệu lực |
+| Hậu điều kiện | Điểm mới được lưu và hiển thị trong quản trị |
+| Quy tắc | BR-01, BR-04–BR-06 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Mở danh sách và chọn Thêm mới hoặc Sửa. | Hiển thị form tên/mô tả tiếng Việt, loại, tọa độ, bán kính, ưu tiên và ảnh. |
-| 2 | Nhập dữ liệu và chọn file ảnh. | Kiểm tra định dạng, giới hạn và hiển thị lỗi theo trường nếu có. |
-| 3 | Bấm Lưu. | Sinh mã duy nhất khi thêm; lưu thông tin khu, file ảnh và đường dẫn; xử lý nội dung theo revision nháp. |
-| 4 | Xem kết quả. | Hiển thị khu và trạng thái; khu chưa có bản xuất bản không tự xuất hiện public. |
+| 1 | Chọn thêm điểm. | Mở biểu mẫu. |
+| 2 | Nhập tên/mô tả tiếng Việt, loại, GPS, bán kính, ưu tiên và chọn ảnh. | Tiếp nhận thông tin, hiển thị ảnh xem trước. |
+| 3 | Nhấn lưu. | Kiểm tra dữ liệu, sinh mã duy nhất. [E1] |
+| 4 | Xem kết quả. | Lưu điểm và ảnh; nội dung chưa xuất bản chưa được dùng công khai. |
 
+**E1 — Dữ liệu không hợp lệ tại bước 3**
 
-**Luồng thay thế**
+Thông báo đúng trường cần sửa, giữ dữ liệu form. Admin sửa và lưu lại.
 
-- A1 — Chọn Ẩn tại bước 1 và xác nhận: đặt khu không hoạt động, loại khỏi public/nhận diện vùng ở lần làm mới kế tiếp; giữ dữ liệu lịch sử.
-- A2 — Hủy form trước bước 3: không ghi thay đổi.
-- A3 — Sửa tọa độ/bán kính/ảnh là thuộc tính khu: hiệu lực sau lưu và public refresh; sửa nội dung thuyết minh phải qua bản nháp/xuất bản.
+Nội dung giới thiệu đa ngôn ngữ được quản lý theo quy trình bản nháp của điểm, tránh tạo hai nguồn dữ liệu công khai không đồng nhất.
 
+**[CHÈN HÌNH ACTIVITY UC05.1 — NHẬP THÔNG TIN → KIỂM TRA → SINH MÃ → LƯU ĐIỂM.]**
 
-**Luồng ngoại lệ**
+### UC05.2 — Sửa điểm tham quan
 
-- E1 — Bước 2 tọa độ/bán kính/ảnh không hợp lệ: từ chối lưu, giữ dữ liệu form để sửa.
-- E2 — Bước 3 lỗi kho file hoặc SQL: không báo thành công khi mới lưu một phần; có cơ chế dọn file thừa nếu cần.
-- E3 — Xung đột thao tác quản trị: thông báo đang được xử lý, tải lại trước khi ghi tiếp.
-
-
-**Hậu điều kiện:** Khu được lưu hoặc ẩn nhất quán; không xóa mất phiên bản thuyết minh khi chỉ ẩn khu.
-
-**Quy tắc nghiệp vụ:** BR-04–BR-06, BR-12, BR-13.
-
-**Điểm liên quan:** UC10, UC13. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.12. UC10 — Tạo bản thuyết minh
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC10 / Focused |
 | Tác nhân | Admin |
-| Mục tiêu / tóm tắt | Soạn nội dung gốc tiếng Việt dưới dạng bản nháp có phiên bản. |
-| Kích hoạt | Admin chọn một khu và tạo/sửa bản nháp. |
-| Giả định | Khu đã tồn tại; có thông tin tham quan đáng tin cậy. |
-| Tiền điều kiện | Phiên Admin hợp lệ; revision được sửa có trạng thái Draft. |
-
-
-**Luồng chính**
-
-| Bước | Hành động tác nhân | Phản hồi hệ thống |
-|---|---|---|
-| 1 | Chọn khu và tạo bản thuyết minh. | Tạo bản nháp với số phiên bản mới và ghi tác giả/thời điểm. |
-| 2 | Nhập tiêu đề, mô tả và nội dung tiếng Việt. | Hiển thị form và kiểm tra trường bắt buộc, độ dài theo cấu hình API. |
-| 3 | Bấm Lưu nháp. | Lưu script; nếu script thay đổi, vô hiệu hóa các kết quả dịch/audio phụ thuộc không còn phù hợp. |
-| 4 | Kiểm tra nội dung nháp. | Hiển thị trạng thái cần dịch/tạo audio; bản public hiện có vẫn được phục vụ. |
-
-
-**Luồng thay thế**
-
-- A1 — Chọn bản đã Published: chỉ xem; muốn sửa tạo bản nháp mới rồi quay lại bước 2.
-- A2 — Hủy thay đổi chưa lưu: giữ nội dung đã lưu trước đó.
-
-
-**Luồng ngoại lệ**
-
-- E1 — Bước 2 nội dung rỗng/quá giới hạn: báo lỗi, quay lại bước 2.
-- E2 — Bước 3 lỗi lưu hoặc xung đột phiên bản: giữ form để xử lý, không thay đổi con trỏ public.
-
-
-**Hậu điều kiện:** Bản nháp được lưu, chưa công khai; audio cũ không được coi là hợp lệ cho văn bản đã thay đổi.
-
-**Quy tắc nghiệp vụ:** BR-12–BR-14.
-
-**Điểm liên quan:** UC11, UC13. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.13. UC11 — Tạo bản dịch và âm thanh
-
-| Thuộc tính | Đặc tả |
-|---|---|
-| Mã / mức chi tiết | UC11 / Focused |
-| Tác nhân | Admin; Azure Translator và Azure Speech hỗ trợ |
-| Mục tiêu / tóm tắt | Sinh nội dung và audio cho đủ 5 ngôn ngữ từ bản nháp. |
-| Kích hoạt | Admin chọn Tạo bản dịch và âm thanh. |
-| Giả định | Azure được cấu hình ở backend; kho media ghi được; hạn mức dịch vụ còn đáp ứng. |
-| Tiền điều kiện | Có bản Draft và script tiếng Việt hợp lệ; phiên Admin hợp lệ. |
-
+| Mục tiêu | Cập nhật thông tin điểm |
+| Kích hoạt | Chọn sửa |
+| Tiền điều kiện | Phiên Admin hợp lệ; điểm tồn tại |
+| Hậu điều kiện | Cập nhật thuộc tính điểm, giữ mã định danh và liên kết phiên bản |
+| Quy tắc | BR-05, BR-06, BR-14 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Chọn bản nháp và bấm tạo. | Kiểm tra revision, quyền, dữ liệu và ngăn tác vụ ghi trùng. |
-| 2 | Theo dõi trạng thái xử lý. | Dịch các trường nội dung cần thiết sang en/zh/ko/ja; giữ bản hiệu chỉnh thủ công theo quy tắc. |
-| 3 | Chờ tạo âm thanh. | Gửi script từng ngôn ngữ tới Azure Speech với voice phù hợp; nhận file audio. |
-| 4 | Xem kết quả từng ngôn ngữ. | Lưu file và metadata/hash/trạng thái; đánh dấu Ready chỉ khi kết quả hợp lệ. |
-| 5 | Nghe thử hoặc xem lỗi. | Cho phép preview nội dung nháp qua API có xác thực; hiển thị lỗi từng phần nếu có. |
+| 1 | Chọn điểm cần sửa. | Hiển thị thông tin hiện tại. |
+| 2 | Sửa thuộc tính điểm hoặc ảnh. | Tiếp nhận thay đổi. |
+| 3 | Nhấn lưu. | Kiểm tra và lưu dữ liệu hợp lệ. [E1] |
+| 4 | Xem kết quả. | Cập nhật thông tin; thay đổi GPS/ảnh có hiệu lực ở lần tải dữ liệu tiếp theo. |
 
+**E1 — Dữ liệu không hợp lệ tại bước 3**
 
-**Luồng thay thế**
+Chưa ghi thay đổi; thông báo trường cần sửa và cho lưu lại.
 
-- A1 — Bước 2 có bản dịch thủ công: giữ nguyên bản đó và tạo audio từ nội dung đã hiệu chỉnh.
-- A2 — Chạy lại sau lỗi: xử lý phần lỗi hoặc đã hết hiệu lực; tái dùng kết quả còn hợp lệ, tránh nhân bản tác vụ không cần thiết.
+Sửa nội dung thuyết minh đã công khai phải qua bản nháp, không ghi đè trực tiếp phiên bản đang phát cho khách.
 
+**[CHÈN HÌNH ACTIVITY UC05.2 — CHỌN ĐIỂM → SỬA → KIỂM TRA → LƯU.]**
 
-**Luồng ngoại lệ**
+### UC05.3 — Xóa điểm tham quan
 
-- E1 — Bước 2/3 Azure 400/401/403/429 hoặc timeout: ghi trạng thái lỗi và thông báo dễ hiểu; không để lộ khóa/bản ghi nhạy cảm ra GUI.
-- E2 — Bước 4 file rỗng hoặc không lưu được: không đánh dấu Ready, không cho xuất bản.
-- E3 — Nội dung đổi trong khi đang sinh: khóa ghi hoặc kiểm tra version/hash trước khi chấp nhận kết quả; không gắn audio cũ vào script mới.
-
-
-**Hậu điều kiện:** Có các kết quả hợp lệ theo ngôn ngữ hoặc lỗi cụ thể để chạy lại; chưa tự xuất bản.
-
-**Quy tắc nghiệp vụ:** BR-03, BR-14–BR-16.
-
-**Điểm liên quan:** UC12, UC13. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.14. UC12 — Hiệu chỉnh bản dịch
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC12 / Focused |
 | Tác nhân | Admin |
-| Mục tiêu / tóm tắt | Sửa bản dịch trước khi công bố để bảo đảm ý nghĩa phù hợp. |
-| Kích hoạt | Admin mở bản dịch của revision nháp. |
-| Giả định | Admin/người duyệt có khả năng đánh giá nội dung; bản dịch tự động không được xem là luôn đúng. |
-| Tiền điều kiện | Phiên Admin hợp lệ và bản Draft có nội dung dịch. |
-
+| Mục tiêu | Xóa điểm không còn cần và đủ điều kiện |
+| Kích hoạt | Chọn xóa |
+| Tiền điều kiện | Phiên Admin hợp lệ; điểm tồn tại |
+| Hậu điều kiện | Điểm đủ điều kiện bị xóa; không phá vỡ dữ liệu tham chiếu |
+| Quy tắc | BR-25 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Chọn ngôn ngữ cần hiệu chỉnh. | Hiển thị văn bản hiện tại cùng trạng thái audio. |
-| 2 | Sửa tiêu đề, mô tả hoặc script rồi lưu. | Kiểm tra dữ liệu, lưu chỉnh sửa và đánh dấu bản dịch thủ công. |
-| 3 | Yêu cầu tạo lại audio cho script đã sửa. | Vô hiệu hóa audio cũ và tạo audio tương ứng nội dung mới. |
-| 4 | Nghe thử và xác nhận nội dung. | Hiển thị kết quả mới để chuẩn bị xuất bản. |
+| 1 | Chọn xóa điểm. | Kiểm tra dữ liệu tham chiếu. [E1] |
+| 2 | Xác nhận xóa. | Tiếp nhận xác nhận. [A1] |
+| 3 | Xem danh sách. | Xóa điểm và cập nhật danh sách. |
 
+**A1 — Hủy tại bước 2**
 
-**Luồng thay thế**
+Giữ nguyên điểm, đóng hộp xác nhận.
 
-- A1 — Bước 2 hủy chỉnh sửa: giữ bản dịch đã lưu.
-- A2 — Muốn dùng lại bản dịch tự động: Admin chủ động xác nhận thay thế nội dung thủ công; thực hiện UC11 trước khi xuất bản.
+**E1 — Điểm có phiên bản tham chiếu tại bước 1**
 
+Từ chối xóa, thông báo lý do và hướng dẫn sử dụng chức năng ẩn.
 
-**Luồng ngoại lệ**
+**[CHÈN HÌNH ACTIVITY UC05.3 — KIỂM TRA RÀNG BUỘC → XÁC NHẬN → XÓA; CÓ NHÁNH HỦY VÀ KHÔNG ĐƯỢC XÓA.]**
 
-- E1 — Bước 2 bản đã xuất bản hoặc nội dung không hợp lệ: chặn lưu; yêu cầu tạo Draft mới hoặc sửa trường lỗi.
-- E2 — Bước 3 tạo audio lỗi: giữ văn bản mới nhưng trạng thái chưa sẵn sàng; chặn xuất bản cho tới khi khắc phục.
+### UC05.4 — Ẩn / hiện điểm tham quan
 
-
-**Hậu điều kiện:** Văn bản hiệu chỉnh được lưu; chỉ audio khớp script mới được chấp nhận.
-
-**Quy tắc nghiệp vụ:** BR-13–BR-16.
-
-**Điểm liên quan:** UC11, UC13. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.15. UC13 — Xuất bản thuyết minh
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC13 / Focused |
 | Tác nhân | Admin |
-| Mục tiêu / tóm tắt | Đưa một revision hoàn chỉnh thành nội dung công khai của khu. |
-| Kích hoạt | Admin chọn Xuất bản. |
-| Giả định | Admin đã kiểm tra tính đúng đắn và nghe thử các bản cần công bố. |
-| Tiền điều kiện | Phiên Admin hợp lệ; revision thuộc khu và có trạng thái Draft. |
-
+| Mục tiêu | Thay đổi khả năng hiển thị mà không xóa dữ liệu |
+| Kích hoạt | Chọn ẩn hoặc hiện |
+| Tiền điều kiện | Phiên Admin hợp lệ; điểm tồn tại |
+| Hậu điều kiện | Trạng thái được cập nhật, lịch sử được giữ |
+| Quy tắc | BR-04, BR-25 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Chọn bản nháp và bấm Xuất bản. | Kiểm tra đủ 5 ngôn ngữ, script, trạng thái/hash và file audio thực tế. |
-| 2 | Xác nhận công bố. | Trong thao tác nhất quán, chuyển bản public cũ sang Archived, bản mới sang Published và cập nhật PublishedRevisionId. |
-| 3 | Xem kết quả. | Hiển thị phiên bản/thời điểm xuất bản. |
-| 4 | Mở giao diện User kiểm tra. | Public API trả revision mới của khu đang hoạt động; frontend nhận qua lần tải/làm mới kế tiếp. |
+| 1 | Chọn ẩn điểm đang hiện. | Hiển thị trạng thái và yêu cầu xác nhận. [A1] |
+| 2 | Xác nhận. | Chuyển điểm sang trạng thái ẩn. |
+| 3 | Xem kết quả. | Loại điểm khỏi danh sách public ở lần cập nhật tiếp theo. |
 
+**A1 — Chọn hiện điểm tại bước 1**
 
-**Luồng thay thế**
+Chuyển điểm sang hoạt động. Chỉ đưa ra web User nếu có phiên bản công khai hợp lệ; bật hoạt động không tự xuất bản bản nháp.
 
-- A1 — Bước 1 còn thiếu bản dịch/audio: hiển thị rõ ngôn ngữ thiếu; quay lại UC11/UC12, chưa thay bản public.
-- A2 — Khu đang ẩn: cho biết bản có thể hoàn chỉnh nhưng không hiển thị User đến khi khu được bật lại.
+**[CHÈN HÌNH ACTIVITY UC05.4 — CHỌN ẨN/HIỆN → CẬP NHẬT TRẠNG THÁI → ÁP DỤNG ĐIỀU KIỆN CÔNG KHAI.]**
 
+---
 
-**Luồng ngoại lệ**
+## 5.8. Nhóm 06 — Quản lý bản thuyết minh
 
-- E1 — Bước 2 lỗi SQL hoặc xung đột: rollback thay đổi publication; bản public trước đó vẫn phục vụ được.
-- E2 — Bước 1 file mất hoặc hash không khớp: chặn xuất bản và yêu cầu tạo lại.
-- E3 — Bước 4 User chưa tải được dữ liệu mới do mạng: hiện trạng thái thử lại; không báo rằng bản nháp đã được public.
+Nhóm này quản lý nội dung từ bản nháp tiếng Việt đến bản dịch, audio và xuất bản.
 
+**[CHÈN HÌNH USE CASE NHÓM 06 — ADMIN NỐI VỚI UC06.1–UC06.7; AZURE HỖ TRỢ TẠO BẢN DỊCH/AUDIO; KHÔNG CÓ UC-S01.]**
 
-**Hậu điều kiện:** Một revision hợp lệ được trỏ làm public hoặc hệ thống giữ nguyên trạng thái công khai trước lỗi.
+### UC06.1 — Thêm bản nháp thuyết minh
 
-**Quy tắc nghiệp vụ:** BR-04, BR-12–BR-18.
-
-**Điểm liên quan:** UC04, UC06. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
-
-
-### 5.16. UC14 — Báo cáo thống kê
-
-| Thuộc tính | Đặc tả |
+| Thuộc tính | Nội dung |
 |---|---|
-| Mã / mức chi tiết | UC14 / Focused |
 | Tác nhân | Admin |
-| Mục tiêu / tóm tắt | Biết lượng truy cập từ QR và khung giờ có lượng truy cập cao nhất. |
-| Kích hoạt | Admin mở báo cáo và chọn khoảng thời gian. |
-| Giả định | Đã triển khai ghi nhận QR và quy tắc chống trùng; dữ liệu demo được đánh dấu. |
-| Tiền điều kiện | Phiên Admin hợp lệ; có quyền đọc báo cáo. |
-
+| Mục tiêu | Tạo phiên bản nội dung mới |
+| Kích hoạt | Chọn thêm bản nháp |
+| Tiền điều kiện | Phiên Admin hợp lệ; điểm tồn tại |
+| Hậu điều kiện | Lưu bản Draft liên kết với điểm |
+| Quy tắc | BR-13, BR-14 |
 
 **Luồng chính**
 
 | Bước | Hành động tác nhân | Phản hồi hệ thống |
 |---|---|---|
-| 1 | Mở Báo cáo thống kê. | Hiển thị bộ lọc ngày/giờ Việt Nam, mã QR và lựa chọn dữ liệu demo. |
-| 2 | Chọn khoảng thời gian và xem báo cáo. | Kiểm tra khoảng lọc; quy đổi sang UTC và truy vấn sự kiện hợp lệ. |
-| 3 | Xem tổng quan. | Trả tổng lượt truy cập QR, số VisitorId phân biệt và giải thích “khách ước tính”. |
-| 4 | Xem biểu đồ theo giờ. | Nhóm lượt theo từng khoảng một giờ, hiển thị các khung đông nhất và đồng hạng. |
-| 5 | Đổi bộ lọc khi cần. | Tính lại toàn bộ chỉ số từ cùng tập dữ liệu và hiển thị thời điểm cập nhật. |
+| 1 | Chọn điểm và thêm bản nháp. | Mở biểu mẫu nội dung. |
+| 2 | Nhập tiêu đề, mô tả và script tiếng Việt. | Tiếp nhận thông tin. |
+| 3 | Lưu bản nháp. | Kiểm tra nội dung, tạo số phiên bản và lưu Draft. [E1] |
 
+**E1 — Nội dung không hợp lệ tại bước 3**
 
-**Luồng thay thế**
+Thông báo phần cần bổ sung; Admin sửa và lưu lại.
 
-- A1 — Bước 3 không có dữ liệu: hiển thị 0 lượt, khách ước tính 0 và “Chưa có khung giờ cao điểm”; không tự tạo dữ liệu mẫu.
-- A2 — Bước 4 nhiều giờ cùng lớn nhất: liệt kê tất cả khung đồng hạng.
-- A3 — Admin chủ động bật bộ lọc demo: hiển thị rõ đang xem dữ liệu thử nghiệm.
+**[CHÈN HÌNH ACTIVITY UC06.1 — CHỌN ĐIỂM → NHẬP TIẾNG VIỆT → KIỂM TRA → LƯU DRAFT.]**
 
+### UC06.2 — Sửa bản nháp thuyết minh
 
-**Luồng ngoại lệ**
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Admin |
+| Mục tiêu | Điều chỉnh nội dung trước xuất bản |
+| Kích hoạt | Chọn sửa phiên bản |
+| Tiền điều kiện | Phiên Admin hợp lệ; phiên bản tồn tại |
+| Hậu điều kiện | Lưu bản nháp và cập nhật hiệu lực dữ liệu phụ thuộc |
+| Quy tắc | BR-14, BR-15 |
 
-- E1 — Bước 2 ngày kết thúc trước ngày bắt đầu hoặc quá giới hạn cho phép: báo lỗi và quay lại bước 2.
-- E2 — Bước 2 API/SQL lỗi: hiện lỗi tải báo cáo; không trình bày 0 lượt như kết quả thành công.
-- E3 — Phiên hết hạn: từ chối truy vấn quản trị và yêu cầu đăng nhập lại UC08.
+**Luồng chính**
 
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn phiên bản cần sửa. | Kiểm tra trạng thái cho phép sửa. [E1] |
+| 2 | Điều chỉnh nội dung tiếng Việt. | Tiếp nhận thay đổi. |
+| 3 | Nhấn lưu. | Kiểm tra, lưu và đánh dấu bản dịch/audio cần cập nhật. [E2] |
 
-**Hậu điều kiện:** Báo cáo hiển thị đúng bộ lọc, có đơn vị/múi giờ và giới hạn diễn giải.
+**E1 — Phiên bản không được phép sửa tại bước 1**
 
-**Quy tắc nghiệp vụ:** BR-19–BR-24.
+Không ghi đè bản đã xuất bản. Hướng dẫn tạo bản nháp mới.
 
-**Điểm liên quan:** UC01; yêu cầu mới, chưa xác nhận có trong code hiện tại. Các nhánh A/E ở trên là điểm phân nhánh nghiệp vụ; chưa quy định thêm quan hệ UML `extend`.
+**E2 — Nội dung không hợp lệ tại bước 3**
 
+Giữ bản đã lưu, thông báo trường cần sửa.
 
-### 5.17. Yêu cầu hỗ trợ giả lập và quản lý trạng thái
+**[CHÈN HÌNH ACTIVITY UC06.2 — KIỂM TRA TRẠNG THÁI → SỬA → LƯU → CẬP NHẬT HIỆU LỰC BẢN DỊCH/AUDIO.]**
 
-Giả lập là công cụ trình diễn UC05–UC07, không phải dữ liệu định vị thật. Người dùng chọn nguồn giả lập, điểm xuất phát, khu đích và tốc độ. Hệ thống tắt theo dõi GPS thật, cập nhật chấm di chuyển và gửi vị trí giả lập qua cùng API đánh giá vùng. Không giả định đường thẳng mô phỏng là đường đi bộ hợp lệ.
+### UC06.3 — Xóa bản nháp thuyết minh
 
-- Bắt đầu: bật tự phát, di chuyển tới đích; chỉ phát khi điều kiện vùng được đáp ứng.
-- Tạm dừng di chuyển: giữ vị trí, tắt tự phát; việc tạm dừng audio có điều khiển riêng.
-- Làm lại: dừng audio, về điểm xuất phát, xóa lịch sử đã nghe trong lượt demo và bỏ kết quả request cũ.
-- Thoát: dừng vị trí giả lập; không tự xin GPS thật khi chưa có thao tác của khách.
-- Mất API/audio: hiện lỗi thật, không thông báo demo thành công khi chưa phát được.
-- Không dùng giả lập để chứng minh độ chính xác GPS ngoài thực địa.
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Admin |
+| Mục tiêu | Loại bỏ bản nháp không sử dụng |
+| Kích hoạt | Chọn xóa bản nháp |
+| Tiền điều kiện | Phiên Admin hợp lệ; phiên bản tồn tại |
+| Hậu điều kiện | Bản nháp đủ điều kiện được xóa |
+| Quy tắc | BR-25, BR-27 |
 
-## 6. User Stories
+**Luồng chính**
 
-| Mã | Câu chuyện người dùng | UC | Tiêu chí chấp nhận |
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn xóa bản nháp. | Kiểm tra trạng thái và tác vụ liên quan. [E1] |
+| 2 | Xác nhận xóa. | Tiếp nhận xác nhận. [A1] |
+| 3 | Xem danh sách. | Xóa bản nháp và xử lý dữ liệu phụ thuộc theo chính sách. |
+
+**A1 — Hủy tại bước 2**
+
+Giữ nguyên bản nháp.
+
+**E1 — Không đủ điều kiện xóa tại bước 1**
+
+Từ chối nếu không phải Draft hoặc còn tác vụ đang xử lý. Không xóa phiên bản đang công khai.
+
+**[CHÈN HÌNH ACTIVITY UC06.3 — KIỂM TRA ĐIỀU KIỆN → XÁC NHẬN → XÓA BẢN NHÁP.]**
+
+### UC06.4 — Tạo bản dịch và audio
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân chính | Admin |
+| Dịch vụ hỗ trợ | Azure Translator, Azure Speech |
+| Mục tiêu | Tạo nội dung và audio cho 5 ngôn ngữ |
+| Kích hoạt | Chọn tạo bản dịch và audio |
+| Tiền điều kiện | Phiên Admin hợp lệ; có Draft và tiếng Việt hợp lệ |
+| Hậu điều kiện | Lưu kết quả và trạng thái theo từng ngôn ngữ |
+| Quy tắc | BR-15–BR-17, BR-27 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn bản nháp và yêu cầu tạo. | Kiểm tra dữ liệu, tạo GenerationJobs phù hợp. [A1] |
+| 2 | Theo dõi tiến trình. | Dịch sang en, zh, ko, ja; giữ bản hiệu chỉnh thủ công theo quy tắc. [A2] |
+| 3 | Tiếp tục theo dõi. | Tạo audio cho vi và 4 bản dịch, lưu file và metadata. [E1] |
+| 4 | Xem kết quả. | Cập nhật trạng thái job và từng ngôn ngữ; cho phép nghe thử. |
+
+**A1 — Đã có tác vụ tương ứng đang chạy tại bước 1**
+
+Hiển thị trạng thái tác vụ hiện có, không tạo trùng.
+
+**A2 — Có bản dịch đã hiệu chỉnh tại bước 2**
+
+Giữ bản dịch đó và tạo audio từ nội dung hiện tại, trừ khi Admin chủ động xác nhận thay thế bản dịch.
+
+**E1 — Một phần kết quả không hợp lệ tại bước 3**
+
+Giữ kết quả đã hoàn thành, ghi phần lỗi và cho phép tạo lại. Không coi phiên bản là đủ điều kiện xuất bản khi còn phần thiếu hoặc sai.
+
+GenerationJobs là dữ liệu theo dõi xử lý, không tự tạo thêm UC quản lý tác vụ riêng.
+
+**[CHÈN HÌNH ACTIVITY UC06.4 — TẠO JOB → DỊCH → TẠO AUDIO → LƯU KẾT QUẢ VÀ TRẠNG THÁI; CÓ NHÁNH TẠO LẠI PHẦN LỖI.]**
+
+### UC06.5 — Hiệu chỉnh bản dịch
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Admin |
+| Mục tiêu | Sửa bản dịch trước xuất bản |
+| Kích hoạt | Chọn bản dịch cần sửa |
+| Tiền điều kiện | Phiên Admin hợp lệ; bản dịch thuộc Draft |
+| Hậu điều kiện | Lưu bản dịch, đánh dấu audio cần cập nhật nếu script thay đổi |
+| Quy tắc | BR-15, BR-16 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn ngôn ngữ. | Hiển thị bản dịch. |
+| 2 | Chỉnh sửa nội dung. | Tiếp nhận thay đổi. |
+| 3 | Nhấn lưu. | Kiểm tra, lưu và đánh dấu hiệu chỉnh thủ công. [E1] |
+| 4 | Xem kết quả. | Đánh dấu audio hết hiệu lực nếu script đã thay đổi. |
+
+**E1 — Nội dung không hợp lệ tại bước 3**
+
+Thông báo và cho sửa lại, không ghi đè dữ liệu hợp lệ trước đó.
+
+**[CHÈN HÌNH ACTIVITY UC06.5 — CHỌN NGÔN NGỮ → HIỆU CHỈNH → LƯU → ĐÁNH DẤU AUDIO CẦN TẠO LẠI.]**
+
+### UC06.6 — Nghe thử thuyết minh
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Admin |
+| Mục tiêu | Kiểm tra audio trước công bố |
+| Kích hoạt | Chọn nghe thử |
+| Tiền điều kiện | Phiên Admin hợp lệ; phiên bản tồn tại |
+| Hậu điều kiện | Admin nghe được audio hợp lệ để kiểm tra |
+| Quy tắc | BR-15, BR-19 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn phiên bản và ngôn ngữ. | Kiểm tra audio tương ứng. [E1] |
+| 2 | Nhấn nghe thử. | Phát audio qua chức năng preview dành cho Admin. |
+| 3 | Nghe và đối chiếu. | Hiển thị văn bản và điều khiển phát. |
+
+**E1 — Audio chưa có hoặc không khớp nội dung tại bước 1**
+
+Thông báo cần tạo hoặc tạo lại. Không trình bày audio cũ như kết quả hợp lệ.
+
+**[CHÈN HÌNH ACTIVITY UC06.6 — CHỌN NGÔN NGỮ → KIỂM TRA AUDIO → PHÁT NGHE THỬ.]**
+
+### UC06.7 — Xuất bản thuyết minh
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Admin |
+| Mục tiêu | Đưa phiên bản hoàn chỉnh vào sử dụng công khai |
+| Kích hoạt | Chọn xuất bản |
+| Tiền điều kiện | Phiên Admin hợp lệ; có bản Draft |
+| Hậu điều kiện | Cập nhật phiên bản công khai nhất quán hoặc giữ nguyên bản cũ |
+| Quy tắc | BR-04, BR-17–BR-19 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn xuất bản. | Kiểm tra đủ 5 ngôn ngữ, audio khớp nội dung và tác vụ liên quan đã hoàn tất. [E1] |
+| 2 | Xác nhận công bố. | Tiếp nhận xác nhận. [A1] |
+| 3 | Xem kết quả. | Cập nhật trạng thái và PublishedRevisionId nhất quán. |
+| 4 | Kiểm tra web User. | Cung cấp phiên bản mới nếu điểm đang hoạt động. [A2] |
+
+**A1 — Hủy tại bước 2**
+
+Giữ bản nháp và phiên bản công khai cũ.
+
+**A2 — Điểm đang ẩn tại bước 4**
+
+Phiên bản vẫn được xuất bản nhưng điểm chưa xuất hiện trên web User cho đến khi được bật hoạt động.
+
+**E1 — Chưa đủ điều kiện tại bước 1**
+
+Liệt kê ngôn ngữ hoặc audio cần hoàn thiện; không thay đổi phiên bản công khai.
+
+**[CHÈN HÌNH ACTIVITY UC06.7 — KIỂM TRA ĐIỀU KIỆN → XÁC NHẬN → XUẤT BẢN → CẬP NHẬT DỮ LIỆU PUBLIC.]**
+
+---
+
+## 5.9. Nhóm 07 — Xem báo cáo thống kê
+
+Báo cáo phản ánh lượt truy cập đã ghi nhận, không phải số người thực tế.
+
+**[CHÈN HÌNH USE CASE NHÓM 07 — LỌC THỜI GIAN, PHÂN BỐ THEO GIỜ VÀ GIỜ CAO ĐIỂM; KHÔNG CÓ BỘ LỌC MÃ QR.]**
+
+### UC07.1 — Lọc theo khoảng thời gian
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Admin |
+| Mục tiêu | Xem báo cáo trong khoảng thời gian mong muốn |
+| Kích hoạt | Áp dụng bộ lọc |
+| Tiền điều kiện | Phiên Admin hợp lệ |
+| Hậu điều kiện | Báo cáo sử dụng đúng khoảng đã chọn |
+| Quy tắc | BR-21–BR-24, BR-26 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn ngày bắt đầu và kết thúc. | Tiếp nhận điều kiện lọc. |
+| 2 | Nhấn áp dụng. | Kiểm tra và quy đổi khoảng thời gian. [E1] |
+| 3 | Xem báo cáo. | Tổng hợp lượt phù hợp. [A1] |
+
+**A1 — Không có lượt tại bước 3**
+
+Hiển thị 0 lượt và thông báo chưa có dữ liệu; không tạo số liệu mẫu.
+
+**E1 — Khoảng thời gian không hợp lệ tại bước 2**
+
+Thông báo và yêu cầu sửa; chưa áp dụng bộ lọc.
+
+**[CHÈN HÌNH ACTIVITY UC07.1 — CHỌN THỜI GIAN → KIỂM TRA → TỔNG HỢP → HIỂN THỊ.]**
+
+### UC07.2 — Xem phân bố truy cập theo giờ
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Admin |
+| Mục tiêu | So sánh lượt truy cập giữa các giờ trong ngày |
+| Kích hoạt | Mở phần phân bố theo giờ |
+| Tiền điều kiện | Phiên Admin hợp lệ; có khoảng lọc |
+| Hậu điều kiện | Hiển thị số lượt của 24 khung giờ |
+| Quy tắc | BR-23, BR-24 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn xem phân bố theo giờ. | Lấy dữ liệu trong khoảng lọc. |
+| 2 | Xem biểu đồ/bảng. | Quy đổi giờ Việt Nam và cộng lượt vào 24 khung giờ. [A1] |
+| 3 | So sánh các khung. | Hiển thị nhãn giờ và số lượt. |
+
+**A1 — Không có dữ liệu tại bước 2**
+
+Hiển thị trạng thái chưa có dữ liệu hoặc các khung bằng 0.
+
+Nếu lọc nhiều ngày, lượt ở cùng giờ của các ngày được cộng vào cùng khung. Giao diện phải ghi rõ cách tổng hợp này.
+
+**[CHÈN HÌNH ACTIVITY UC07.2 — LẤY DỮ LIỆU → QUY ĐỔI GIỜ → NHÓM THEO 24 KHUNG → HIỂN THỊ.]**
+
+### UC07.3 — Xem khung giờ cao điểm
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác nhân | Admin |
+| Mục tiêu | Xác định giờ có nhiều lượt truy cập nhất |
+| Kích hoạt | Xem thông tin cao điểm |
+| Tiền điều kiện | Phiên Admin hợp lệ; có khoảng lọc |
+| Hậu điều kiện | Hiển thị giờ cao điểm và số lượt hoặc thông báo chưa có dữ liệu |
+| Quy tắc | BR-23, BR-24 |
+
+**Luồng chính**
+
+| Bước | Hành động tác nhân | Phản hồi hệ thống |
+|---|---|---|
+| 1 | Chọn xem giờ cao điểm. | Lấy số lượt theo 24 khung giờ. [A1] |
+| 2 | Chờ tổng hợp. | Tìm giá trị lớn nhất và khung tương ứng. [A2] |
+| 3 | Xem kết quả. | Hiển thị giờ cao điểm, số lượt và khoảng lọc. |
+
+**A1 — Không có lượt tại bước 1**
+
+Thông báo chưa đủ dữ liệu để xác định cao điểm. Kết thúc.
+
+**A2 — Nhiều giờ đồng hạng tại bước 2**
+
+Hiển thị tất cả khung giờ có cùng số lượt lớn nhất.
+
+**[CHÈN HÌNH ACTIVITY UC07.3 — KIỂM TRA DỮ LIỆU → TÌM CỰC ĐẠI → HIỂN THỊ CÁC GIỜ CAO ĐIỂM.]**
+
+## 5.10. Giả lập vị trí phục vụ demo
+
+Giả lập là chức năng hỗ trợ kiểm thử nhóm 02 và 03, không phải dữ liệu GPS thật.
+
+- Chọn giả lập thì ngừng theo dõi GPS thật.
+- Chọn điểm xuất phát, điểm đích và tốc độ.
+- Vị trí giả lập được gửi qua cùng quy trình đánh giá vùng.
+- Tạm dừng di chuyển khác với tạm dừng audio.
+- Làm lại đưa về vị trí xuất phát, dừng audio và đặt lại lịch sử của lượt demo.
+- Thoát giả lập không tự xin quyền GPS khi chưa có thao tác của khách.
+- Kết quả request cũ phải được bỏ qua sau khi đổi chế độ hoặc đặt lại.
+- Không dùng giả lập để khẳng định độ chính xác GPS thực địa.
+
+---
+
+# 6. User Stories
+
+| Mã | User Story | UC liên quan | Tiêu chí chấp nhận |
 |---|---|---|---|
-| US-01 | Là du khách, tôi muốn quét QR để mở web mà không cài ứng dụng. | UC01 | Link HTTPS mở từ điện thoại khác; không hỏi đăng nhập khách. |
-| US-02 | Là khách quốc tế, tôi muốn chọn ngôn ngữ trước khi bắt đầu. | UC02–UC03 | Có đủ 5 lựa chọn; không gọi GPS trước khi chọn/xác nhận và chủ động bắt đầu. |
-| US-03 | Là khách từ chối GPS, tôi vẫn muốn xem khu và nghe thủ công. | UC03–UC04, UC06 | Không có vị trí giả; có danh sách/marker và nút nghe hợp lệ. |
-| US-04 | Là du khách đang di chuyển, tôi muốn bài tương ứng phát khi vào vùng. | UC05–UC06 | Ngoài vùng không phát; trong vùng ổn định chọn đúng khu; không lặp cùng bài trong phiên. |
-| US-05 | Là du khách, tôi muốn tạm dừng hoặc nghe tiếp khi cần. | UC07 | Tiến độ được giữ khi pause; không xuất hiện hai bài phát đồng thời. |
-| US-06 | Là Admin, tôi muốn chọn ảnh và thiết lập vùng cho khu mới. | UC09 | Mã tự sinh; ảnh tải lên hợp lệ; tọa độ/bán kính lưu đúng; khu chưa xuất bản chưa public. |
-| US-07 | Là Admin, tôi muốn nhập tiếng Việt một lần để sinh đủ bản dịch/audio. | UC10–UC11 | Có kết quả từng ngôn ngữ, trạng thái lỗi/thành công, nghe thử và chạy lại phần lỗi. |
-| US-08 | Là Admin, tôi muốn sửa bản dịch trước khi công bố. | UC12–UC13 | Sửa script làm audio cũ hết hiệu lực; chỉ xuất bản khi audio mới hợp lệ. |
-| US-09 | Là Admin, tôi muốn xem lượt truy cập QR và giờ cao điểm. | UC14 | Tổng số khớp dữ liệu; refresh không đếm trùng; giờ Việt Nam; đồng hạng hiển thị đúng. |
+| US-01 | Là du khách, tôi muốn mở web qua QR để không cần cài ứng dụng. | UC01.3 | Mở đúng URL public, ghi nhận không trùng |
+| US-02 | Là du khách, tôi muốn chọn ngôn ngữ trước khi tham quan. | UC01.1, UC01.2 | Có 5 ngôn ngữ; chọn trước khi hỏi GPS |
+| US-03 | Là du khách không cấp GPS, tôi vẫn muốn xem và nghe thủ công. | UC01.2, UC02.1, UC03.1–03.2 | Không tạo vị trí giả; vẫn chọn điểm và nghe được |
+| US-04 | Là du khách, tôi muốn thấy vị trí và thông tin các khu. | UC02.1–02.2 | Hiển thị đúng điểm công khai và tọa độ hợp lệ |
+| US-05 | Là du khách đang di chuyển, tôi muốn nghe đúng bài khi vào vùng. | UC03.1–03.2 | Đúng vùng, ngôn ngữ, phiên bản; không phát chồng |
+| US-06 | Là du khách, tôi muốn tạm dừng, tiếp tục và nghe lại. | UC03.3–03.5 | Pause giữ thời điểm; tiếp tục đúng chỗ; nghe lại từ đầu |
+| US-07 | Là du khách, tôi muốn đổi ngôn ngữ mà không mất hành trình. | UC03.6 | Không reload, không mất điểm đã đi qua và lịch sử nghe |
+| US-08 | Là Admin, tôi muốn đăng nhập để quản trị nội dung. | UC04.1 | Chỉ tài khoản hợp lệ được tạo phiên |
+| US-09 | Là Admin, tôi muốn quản lý điểm và vùng GPS. | UC05.1–05.4 | Mã tự sinh, ảnh tải lên, kiểm tra dữ liệu và bảo toàn tham chiếu |
+| US-10 | Là Admin, tôi muốn soạn và quản lý bản nháp. | UC06.1–06.3 | Không sửa trực tiếp bản công khai; không xóa nhầm lịch sử |
+| US-11 | Là Admin, tôi muốn tạo bản dịch/audio và theo dõi kết quả. | UC06.4 | Có trạng thái job, kết quả từng ngôn ngữ và khả năng tạo lại |
+| US-12 | Là Admin, tôi muốn hiệu chỉnh và nghe thử trước công bố. | UC06.5–06.6 | Audio khớp bản dịch hiện hành; preview chỉ dành cho Admin |
+| US-13 | Là Admin, tôi muốn xuất bản nội dung đã hoàn chỉnh. | UC06.7 | Kiểm tra đủ 5 ngôn ngữ; User lấy đúng phiên bản |
+| US-14 | Là Admin, tôi muốn biết số lượt truy cập và giờ cao điểm. | UC07.1–07.3 | Đúng khoảng lọc, giờ Việt Nam, không trùng và có xử lý đồng hạng |
 
-## 7. Luồng người dùng
+---
 
-### 7.1. Luồng khởi đầu của du khách
+# 7. Luồng người dùng
 
-1. Du khách quét QR và mở web.
-2. Website nhận diện nguồn QR, ghi nhận sự kiện theo phiên nhưng không chặn trải nghiệm nếu thống kê lỗi.
-3. Hiển thị màn hình chọn ngôn ngữ; khách chọn hoặc xác nhận ngôn ngữ đã lưu.
-4. Giải thích nhu cầu vị trí, khách chủ động chọn bắt đầu.
-5. Trình duyệt yêu cầu quyền hoặc trả trạng thái quyền đã có.
-6. Nếu đồng ý và có vị trí: bản đồ hiển thị vị trí, cho phép bật tự phát. Nếu từ chối/lỗi: bản đồ và nghe thủ công vẫn dùng được.
-7. Vào vùng hợp lệ: nhận diện khu, tải audio public đúng ngôn ngữ và phát; nếu bị chặn có nút nghe thủ công.
+## 7.1. Khởi đầu tham quan
 
-**CHÈN HÌNH 03 — USER FLOW DU KHÁCH: QUÉT QR → CHỌN NGÔN NGỮ → ĐỀ NGHỊ QUYỀN VỊ TRÍ → BẢN ĐỒ → NHẬN DIỆN VÙNG → NGHE; CÓ NHÁNH TỪ CHỐI GPS VÀ NGHE THỦ CÔNG.**
+Quét QR → mở website → ghi nhận truy cập theo phiên → chọn ngôn ngữ → giải thích quyền vị trí → cấp hoặc không cấp quyền → mở bản đồ.
 
-### 7.2. Luồng xử lý GPS và âm thanh
+Ghi nhận thống kê không làm chặn bước chọn ngôn ngữ.
 
-Hệ thống đánh giá vị trí tuần tự, không gửi nhiều yêu cầu đánh giá chồng nhau. Kết quả cũ phải bị loại khi đổi nguồn vị trí, đặt lại lượt demo hoặc thay trạng thái khiến kết quả không còn phù hợp. Việc nhận diện vùng và việc phát audio là hai bước khác nhau: nhận diện được khu không có nghĩa trình duyệt chắc chắn cho phát.
+**[CHÈN HÌNH USER FLOW DU KHÁCH — QR → NGÔN NGỮ → QUYỀN VỊ TRÍ → BẢN ĐỒ.]**
 
-**CHÈN HÌNH 04 — ACTIVITY DIAGRAM NHẬN DIỆN VÙNG VÀ PHÁT AUDIO: CÓ ĐIỀU KIỆN VỊ TRÍ HỢP LỆ, TRONG/NGOÀI VÙNG, ƯU TIÊN VÙNG CHỒNG, XÁC NHẬN ỔN ĐỊNH, ĐÃ NGHE VÀ TRÌNH DUYỆT CHẶN PHÁT.**
+## 7.2. Nghe theo vị trí
 
-### 7.3. Luồng quản trị nội dung
+Bật tự phát → tiếp nhận vị trí hợp lệ → xác định vùng → chọn điểm → kiểm tra chống lặp/phát chồng → lấy phiên bản public theo ngôn ngữ → phát audio.
 
-Admin đăng nhập, chọn hoặc tạo khu, soạn bản nháp tiếng Việt, tạo bản dịch/audio, kiểm tra kết quả, hiệu chỉnh nếu cần, tạo lại audio đã hết hiệu lực và xuất bản. Bản đang public vẫn được phục vụ trong quá trình chuẩn bị bản mới.
+Nhận diện được điểm không đồng nghĩa trình duyệt chắc chắn cho phép tự phát. Nếu tự phát bị chặn, giao diện cung cấp thao tác nghe chủ động.
 
-**CHÈN HÌNH 05 — ACTIVITY DIAGRAM QUẢN TRỊ THUYẾT MINH: TẠO NHÁP → DỊCH → TẠO AUDIO → NGHE THỬ/HIỆU CHỈNH → KIỂM TRA ĐỦ ĐIỀU KIỆN → XUẤT BẢN; CÓ NHÁNH AZURE LỖI VÀ TẠO LẠI.**
+## 7.3. Quản trị nội dung
 
-### 7.4. Luồng demo giả lập
+Đăng nhập → chọn/tạo điểm → tạo bản nháp tiếng Việt → dịch và tạo audio → hiệu chỉnh nếu cần → tạo lại audio hết hiệu lực → nghe thử → xuất bản.
 
-Mở bản đồ → bật giả lập (tắt GPS thật) → chọn khu đích → đặt điểm xuất phát ngoài vòng xanh → chọn tốc độ → bắt đầu → API nhận diện vùng → nghe đúng audio. “Làm lại” khởi tạo lượt demo mới; “Thoát giả lập” quay lại trạng thái không theo dõi vị trí cho đến khi khách bật GPS.
+Trong quá trình chuẩn bị bản mới, bản public cũ vẫn được phục vụ.
 
-### 7.5. Luồng báo cáo QR
+**[CHÈN HÌNH LUỒNG QUẢN TRỊ NỘI DUNG — NHÁP → DỊCH/AUDIO → HIỆU CHỈNH → NGHE THỬ → XUẤT BẢN.]**
 
-Khách mở URL có nguồn QR → GUI tạo khóa sự kiện/phiên → backend kiểm tra mã QR và chống trùng → DAL lưu UTC → Admin lọc khoảng ngày → BUS tổng hợp theo giờ Việt Nam → GUI hiển thị lượt và cao điểm. Không dùng việc tải ảnh QR hoặc tải trang hiển thị QR của người trình bày làm sự kiện khách truy cập.
+## 7.4. Truy cập QR và báo cáo
 
-**CHÈN HÌNH 06 — ACTIVITY DIAGRAM THỐNG KÊ QR: GHI NHẬN MỞ LINK, CHỐNG TRÙNG PHIÊN, LƯU UTC, LỌC NGÀY, TỔNG HỢP THEO GIỜ VIỆT NAM VÀ HIỂN THỊ GIỜ CAO ĐIỂM.**
+URL có dấu nguồn QR → tạo/khôi phục SessionId → backend chống trùng → lưu QrVisits → Admin chọn khoảng ngày → tổng hợp giờ Việt Nam → hiển thị tổng lượt và cao điểm.
 
-## 8. Yêu cầu phi chức năng
+Không ghi nhận việc mở trang hiển thị QR của người trình bày là lượt khách truy cập.
 
-### 8.1. Hiệu năng và khả năng chịu tải
+## 7.5. Đổi URL demo
 
-| Mã | Yêu cầu / mục tiêu | Cách đo |
+Khởi động tunnel mới → lấy URL mới → cập nhật QR → khách mở URL mới → tiếp tục ghi vào cùng database.
+
+Đổi URL không xóa lịch sử SQL. Tuy nhiên, định danh lưu theo origin trình duyệt có thể thay đổi, nên không cam kết nhận diện cùng một khách giữa hai URL.
+
+---
+
+# 8. Yêu cầu phi chức năng
+
+## 8.1. Hiệu năng
+
+| Mã | Mục tiêu | Cách xác minh |
 |---|---|---|
-| NFR-P01 | Trang thiết lập ban đầu tương tác được trong ≤3 giây ở điều kiện kiểm thử 4G ổn định | Ghi cấu hình thiết bị, mạng, cache; đo ít nhất 20 lần và báo p95 |
-| NFR-P02 | Public API đọc/đánh giá vùng có p95 ≤1 giây ở tải 20 khách đồng thời | Kiểm thử cả DB; tách thời gian tunnel và Azure; không tính sinh audio vào CRUD |
-| NFR-P03 | Dữ liệu public mới xuất hiện trong ≤15 giây khi tab hoạt động và mạng bình thường | Đo từ lúc publish thành công đến lúc User tải được revision mới |
-| NFR-P04 | Sau xác nhận vùng, yêu cầu phát được khởi tạo trong ≤1 giây phía GUI | Đo riêng thời gian xác nhận GPS và thời gian tải audio; không hứa phát ngay tại mép vùng |
-| NFR-P05 | Sinh audio dài hiển thị trạng thái và không bị hiểu nhầm là thành công sớm | Kiểm thử timeout, tạo lại và từng ngôn ngữ; không đặt thời gian cố định khi chưa đo Azure |
+| NFR-P01 | Trang thiết lập tương tác được trong khoảng 3 giây ở mạng kiểm thử ổn định | Ghi thiết bị, mạng và đo nhiều lần |
+| NFR-P02 | API đọc/đánh giá vùng có p95 không quá 1 giây ở tải mục tiêu 20 khách đồng thời | Đo cả backend và SQL; ghi ảnh hưởng tunnel |
+| NFR-P03 | Nội dung public mới được nhận trong 15 giây khi tab hoạt động và mạng bình thường | Đo từ publish tới lần đồng bộ dữ liệu User |
+| NFR-P04 | Tác vụ Azure hiển thị trạng thái thực tế | Kiểm tra tạo mới, lỗi, tạo lại và từng ngôn ngữ |
 
-20 khách đồng thời là mức mục tiêu ban đầu để nhóm xác minh, không phải công suất đã chứng minh. Báo cáo phải ghi rõ giới hạn máy demo và Quick Tunnel.
+Các ngưỡng là mục tiêu kiểm thử, chưa phải công suất được chứng minh.
 
-### 8.2. Bảo mật
+## 8.2. Bảo mật
 
-| Mã | Yêu cầu |
+- Hash mật khẩu bằng cơ chế thống nhất giữa tạo và xác minh.
+- Backend xác thực phiên với mọi API quản trị.
+- Không coi việc ẩn nút trên GUI là biện pháp bảo vệ API.
+- Nếu dùng cookie, áp dụng HttpOnly, Secure theo môi trường và bảo vệ CSRF phù hợp.
+- Không đưa Azure key hoặc connection string nhạy cảm lên Git.
+- Kiểm tra đầu vào và file tải lên.
+- Preview nháp yêu cầu đăng nhập; audio public phải kiểm tra điều kiện công khai.
+- Bỏ qua đăng nhập chỉ là cấu hình demo, phải tắt khi vận hành.
+
+## 8.3. Khả dụng và tương thích
+
+- Giao diện thích ứng màn hình điện thoại.
+- Kiểm tra trên Safari iPhone, Chrome Android và trình duyệt máy tính.
+- GPS và audio dùng HTTPS trên thiết bị khách.
+- Không để bảng điều khiển che toàn bộ bản đồ.
+- Phân biệt lỗi tải dữ liệu với danh sách rỗng.
+- Không cam kết theo dõi GPS/audio liên tục khi ứng dụng bị treo nền hoặc màn hình khóa.
+- Trạng thái có chữ/biểu tượng, không chỉ dùng màu.
+
+## 8.4. Riêng tư và thống kê
+
+- Không yêu cầu tên, số điện thoại hoặc tài khoản của du khách.
+- SessionId phục vụ chống trùng lượt, không phải danh tính cá nhân.
+- Không mặc định lưu lịch sử tọa độ.
+- Chỉ số chính là lượt truy cập, không gọi là số người duy nhất.
+- Thời hạn lưu dữ liệu QR được nhóm xác nhận trước vận hành; đề xuất ban đầu là 90 ngày.
+
+## 8.5. Tin cậy và bảo trì
+
+- Không báo thành công khi dữ liệu/file chưa lưu đầy đủ.
+- Có log lỗi nhưng không để lộ bí mật.
+- Kết quả Azure chỉ được gắn vào đúng phiên bản và script còn hiệu lực.
+- Backup SQL và kho media phải khôi phục được liên kết dữ liệu–file.
+- Kiểm tra trạng thái job bị gián đoạn sau khi backend khởi động lại; không để “đang xử lý” vô thời hạn.
+- Phân biệt lỗi kỹ thuật trong kế hoạch kiểm thử dù không lặp chúng trong mọi đặc tả UC.
+
+---
+
+# 9. Công nghệ và thiết kế hệ thống
+
+## 9.1. Công nghệ
+
+| Thành phần | Công nghệ |
 |---|---|
-| NFR-S01 | Hash mật khẩu bằng PasswordHasher của ASP.NET Core Identity, thống nhất tạo và xác minh; không lưu mật khẩu rõ. |
-| NFR-S02 | API quản trị yêu cầu vai trò Admin; GUI ẩn nút không thay thế phân quyền backend. |
-| NFR-S03 | Cookie phiên HttpOnly, cấu hình Secure phù hợp môi trường; thao tác ghi dùng CSRF khi xác thực bằng cookie. |
-| NFR-S04 | Azure key, connection string nhạy cảm nằm ở cấu hình server/User Secrets hoặc biến môi trường; không commit hoặc trả về trình duyệt. |
-| NFR-S05 | Kiểm tra đầu vào, loại file/kích thước/nội dung ảnh; chặn path traversal; hiển thị văn bản Admin nhập bằng cơ chế escape an toàn. |
-| NFR-S06 | Public audio endpoint xác minh khu/revision đang public; preview bản nháp yêu cầu Admin. |
-| NFR-S07 | Chế độ bỏ qua đăng nhập demo bị tắt trong vận hành; không coi cảnh báo trên GUI là biện pháp phân quyền. |
-| NFR-S08 | Đề xuất giới hạn tần suất đăng nhập, sinh nội dung và ghi nhận QR; cần kiểm thử cấu hình trước triển khai công khai. |
+| Frontend | React, TypeScript, Vite, CSS |
+| Bản đồ | Leaflet và nguồn tile được cấu hình |
+| Tạo QR | Thư viện mã hóa URL thành QR |
+| Backend | C#, ASP.NET Core Web API |
+| Nghiệp vụ | Zoo.BUS |
+| Truy cập dữ liệu | Zoo.DAL, Entity Framework Core |
+| Database | SQL Server |
+| Dịch | Azure Translator |
+| Tạo audio | Azure Speech |
+| Media | File trên máy chủ; SQL lưu đường dẫn/metadata |
+| Demo public | Cloudflare Quick Tunnel |
+| Quản lý mã nguồn | Git, GitHub |
 
-### 8.3. Tương thích và khả dụng
+Phiên bản công nghệ phải lấy theo file cấu hình của bản mã nguồn dùng để nộp.
 
-- Kiểm thử ít nhất Chrome/Edge trên Windows, Safari trên iPhone và Chrome trên Android; ghi phiên bản thực tế vào biên bản thay vì khẳng định mọi phiên bản đều hỗ trợ.
-- Giao diện thích ứng từ 360 px; nút chạm rõ, menu/bảng điều khiển không che toàn bộ bản đồ hoặc nút nghe.
-- HTTPS trên thiết bị khách; mở ngoài trình duyệt nhúng nếu định vị/audio bị hạn chế.
-- Cho phép dùng bàn phím với các nút/form; nhãn input và trạng thái lỗi phải rõ; không dùng màu làm tín hiệu duy nhất.
-- Khi mất mạng, phân biệt lỗi tải với danh sách rỗng; không hiển thị dữ liệu giả như dữ liệu SQL thật.
-- Không cam kết GPS/audio liên tục khi trình duyệt bị hệ điều hành treo nền hoặc điện thoại khóa màn hình.
+## 9.2. Kiến trúc ba lớp
 
-### 8.4. Quyền riêng tư và dữ liệu thống kê
+| Lớp / thành phần | Trách nhiệm |
+|---|---|
+| GUI — web | Giao diện, lấy vị trí, bản đồ, player, quản trị và báo cáo |
+| BUS — Zoo.BUS | Quy tắc vùng, nội dung, phiên bản, xuất bản, điều phối Azure và thống kê |
+| DAL — Zoo.DAL | DbContext, repository, lưu/đọc dữ liệu; adapter tích hợp theo cấu trúc dự án |
+| API — Zoo.Api | Đầu vào HTTP, xác thực, ánh xạ request/response và gọi BUS |
 
-Chỉ thu dữ liệu cần cho chức năng. Tọa độ phục vụ đánh giá vùng, không mặc định lưu lịch sử hành trình. QR analytics dùng VisitorId và SessionId ẩn danh; cần thông báo việc dùng bộ nhớ trình duyệt. Không ghi vị trí chính xác vào bảng truy cập QR nếu không có mục đích riêng đã thống nhất. Khi trình duyệt không cho lưu định danh, chỉ thống kê lượt theo phiên khả dụng và ghi rõ giới hạn số khách ước tính.
+Luồng xử lý điển hình:
 
-Thời hạn lưu sự kiện QR thô đề xuất là 90 ngày; nhóm/đơn vị cần phê duyệt trước vận hành. Dữ liệu tổng hợp có thể lưu lâu hơn theo chính sách được xác nhận. Đây là quyết định thiết kế, không phải kết luận tuân thủ pháp lý.
+GUI → Zoo.Api → BUS → DAL → SQL Server hoặc kho media.
 
-### 8.5. Độ tin cậy và bảo trì
+Azure được gọi từ phía backend qua thành phần tích hợp; không đưa khóa Azure cho trình duyệt.
 
-- Có log lỗi theo tác vụ/ngôn ngữ/revision nhưng không lộ bí mật cấu hình.
-- Sinh lại nội dung phải kiểm tra kết quả còn hợp lệ, tránh tạo nhiều bản không cần thiết.
-- Backup SQL và kho media cùng thời điểm phù hợp để khôi phục được liên kết dữ liệu–file.
-- Tách cấu hình Development và vận hành; migration có hướng dẫn áp dụng và khôi phục.
-- Quy tắc nghiệp vụ không nên nằm rải rác trong GUI; mục tiêu tập trung ở BUS và dùng DAL qua interface.
+API là đầu vào HTTP của backend. Việc có project API riêng không tạo thêm một lớp nghiệp vụ thứ tư.
 
-## 9. Công nghệ sử dụng và thiết kế hệ thống
+Đây là kiến trúc mục tiêu. Cần đối chiếu mã nguồn trước khi khẳng định mọi controller đã tuân thủ hoàn toàn.
 
-### 9.1. Tech Stack
+**[CHÈN HÌNH KIẾN TRÚC BA LỚP — GUI, API ĐẦU VÀO, BUS, DAL VÀ CÁC HỆ THỐNG LƯU TRỮ/TÍCH HỢP.]**
 
-| Thành phần | Công nghệ định hướng / đang dùng | Ghi chú |
+## 9.3. Component Diagram
+
+Các thành phần chính:
+
+- User UI, Admin UI.
+- Language Context và dịch vụ SiteTexts.
+- Geolocation/Simulation.
+- Audio Player.
+- API Client.
+- Auth, Places, Narration, Visit, Reporting API.
+- BUS Services.
+- Repositories.
+- Azure Translator/Speech adapters.
+- Media Storage.
+
+**[CHÈN HÌNH COMPONENT DIAGRAM — THÀNH PHẦN PHẦN MỀM, INTERFACE VÀ QUAN HỆ PHỤ THUỘC.]**
+
+## 9.4. Deployment Diagram
+
+Môi trường demo gồm:
+
+- Thiết bị du khách/Admin chạy trình duyệt.
+- Cloudflare Tunnel cung cấp URL HTTPS.
+- Máy demo chạy frontend, backend và cloudflared.
+- SQL Server.
+- Kho file ảnh/audio.
+- Dịch vụ Azure và nền bản đồ bên ngoài.
+
+Cổng thực tế được lấy từ cấu hình khởi động. Không coi cổng ví dụ là giá trị cố định của mọi môi trường.
+
+**[CHÈN HÌNH DEPLOYMENT DIAGRAM — THIẾT BỊ, MÁY CHỦ/ TIẾN TRÌNH DEMO, SQL SERVER, KHO MEDIA, AZURE VÀ GIAO THỨC KẾT NỐI.]**
+
+Quick Tunnel dùng cho demo, không phải cam kết hosting lâu dài.
+
+## 9.5. Thiết kế cơ sở dữ liệu
+
+Thiết kế gồm 7 bảng. Bỏ bảng QrCodes nhưng giữ QrVisits, GenerationJobs và SiteTexts.
+
+Tên cột dưới đây là hợp đồng thiết kế cần đối chiếu với entity/migration trước khi lập lược đồ vật lý.
+
+| Bảng | Vai trò | Thuộc tính chính |
 |---|---|---|
-| GUI | React, TypeScript, Vite, CSS | Dùng phiên bản khóa trong package-lock.json |
-| Bản đồ | Leaflet và nguồn tile OpenStreetMap hiện cấu hình | Giữ attribution; kiểm tra điều kiện dịch vụ khi vận hành |
-| QR | qrcode.react | Mã hóa URL public; không tự ghi lịch sử quét |
-| Backend | C#, ASP.NET Core Web API | Phiên bản SDK theo csproj của dự án |
-| BUS | Class library Zoo.BUS | DTO, kiểm tra vùng, quy tắc nội dung/xuất bản |
-| DAL | Zoo.DAL, Entity Framework Core | DbContext, repositories, integrations, storage |
-| Database | SQL Server | Khu, revision, bản dịch, job, tài khoản; bổ sung analytics |
-| Dịch và TTS | Azure Translator, Azure Speech | Gọi phía server, sinh trước khi public |
-| Kho media | File trên máy chủ hiện tại | DB lưu đường dẫn/metadata; có thể chuyển object storage sau |
-| Quản lý mã nguồn | Git và GitHub | Nhóm thống nhất nhánh và review trước merge |
-| Demo HTTPS | Cloudflare Quick Tunnel | Địa chỉ tạm, phụ thuộc máy demo đang chạy |
+| AdminUsers | Tài khoản Admin | Id, Username, PasswordHash, IsActive |
+| Places | Điểm và vùng tham quan | Id, Code, Category, Icon, Latitude, Longitude, RadiusMeters, Priority, MapX, MapY, ImageUrl, IsActive, PublishedRevisionId |
+| NarrationRevisions | Phiên bản nội dung | Id, PlaceId, Version, Status, CreatedByAdminId, CreatedAtUtc, PublishedAtUtc |
+| NarrationTranslations | Nội dung và audio theo ngôn ngữ | Id, RevisionId, Language, Title, Description, Script, IsManualEdited, AudioPath, AudioStatus, ScriptHash, AudioScriptHash |
+| GenerationJobs | Trạng thái tác vụ dịch/tạo audio | Id, RevisionId, Language, Stage, Status, AttemptCount, LastError, CreatedAtUtc, UpdatedAtUtc |
+| SiteTexts | Văn bản giao diện đa ngôn ngữ | Id, Key, Language, Value |
+| QrVisits | Lượt truy cập từ QR | Id, SessionId, VisitedAtUtc, IsDemo |
 
-### 9.2. Kiến trúc ba lớp
+### Quan hệ và ràng buộc
 
-- **GUI — thư mục web:** tương tác người dùng, hiển thị dữ liệu, chọn ngôn ngữ, định vị/giả lập, bộ phát và báo cáo.
-- **BUS — Zoo.BUS:** xác định khu, lựa chọn phiên bản public, validation nghiệp vụ, dịch/sinh nội dung theo quy tắc, xuất bản và tổng hợp thống kê.
-- **DAL — Zoo.DAL:** truy cập SQL, repository, lưu file và adapter gọi dịch vụ ngoài.
-- **Zoo.Api:** lớp tiếp nhận HTTP của backend, xác thực/phân quyền, ánh xạ request/response và gọi BUS. Không coi API là một database hoặc là GUI.
-
-**CHÈN HÌNH 07 — SƠ ĐỒ KIẾN TRÚC BA LỚP: GUI GỌI ZOO.API, API GỌI BUS, BUS GỌI DAL; DAL KẾT NỐI SQL SERVER, KHO MEDIA VÀ CÁC DỊCH VỤ AZURE.**
-
-Hiện một số controller trong bản nguồn còn gọi DbContext trực tiếp. Hình kiến trúc ba lớp là định hướng cần hoàn thiện; phần hiện thực phải được đối chiếu và ghi nhận chênh lệch, không trình bày là đã tách lớp tuyệt đối.
-
-### 9.3. Component Diagram
-
-Các component cần thể hiện: User UI, Admin UI, Language Context, Geolocation/Simulation, Audio Player, API client, Auth API, Places API, Narration API, Visit API, Reporting API (bổ sung), BUS services, repositories, Azure adapters và MediaStorage. Các mũi tên thể hiện dependency/interface, không dùng để mô tả thứ tự thời gian.
-
-**CHÈN HÌNH 08 — COMPONENT DIAGRAM: THỂ HIỆN THÀNH PHẦN GUI/API/BUS/DAL, INTERFACE GIỮA CÁC THÀNH PHẦN, CÙNG ADAPTER AZURE VÀ KHO FILE; ĐÁNH DẤU REPORTING LÀ PHẦN BỔ SUNG.**
-
-### 9.4. Deployment Diagram
-
-Bản demo gồm thiết bị khách, Internet, Cloudflare, tiến trình cloudflared trên máy demo, Vite cổng 5173, API cổng 5230, SQL Server và kho file. Public request đi qua HTTPS của tunnel; proxy Vite chuyển /api về backend. Azure và nguồn tile bản đồ là dịch vụ ngoài, không chạy trong SQL Server.
-
-**CHÈN HÌNH 09 — DEPLOYMENT DIAGRAM BẢN DEMO: ĐIỆN THOẠI/TRÌNH DUYỆT, CLOUDFLARE, MÁY DEMO CHẠY TUNNEL + VITE + API, SQL SERVER, KHO FILE VÀ AZURE; GHI GIAO THỨC/CỔNG TRÊN KẾT NỐI.**
-
-Vận hành chính thức cần frontend build tĩnh, backend host ổn định, HTTPS và tên miền cố định; không dùng Vite dev server/Quick Tunnel như cam kết triển khai lâu dài. SQL không được mở trực tiếp cho điện thoại khách. Script start-demo chỉ khởi động các thành phần, không thay thế kiểm thử truy cập đầu-cuối.
-
-### 9.5. Thiết kế dữ liệu và ERD
-
-| Thực thể | Vai trò | Khóa / thuộc tính quan trọng | Trạng thái |
-|---|---|---|---|
-| AdminUsers | Tài khoản quản trị | Id, Username unique, PasswordHash, Role, IsActive | Có trong cấu trúc đã xem |
-| Places | Điểm tham quan | Id, Code unique, Latitude, Longitude, RadiusMeters, Priority, IsActive, ImageUrl, PublishedRevisionId | Có |
-| NarrationRevisions | Phiên bản nội dung | Id, PlaceId, Version, Status, CreatedByAdminId, CreatedAt, PublishedAt | Có |
-| NarrationTranslations | Nội dung theo ngôn ngữ | Id, RevisionId, Language; tiêu đề/mô tả/script, đường dẫn/hash/trạng thái audio | Có; dùng đúng tên property khi vẽ lược đồ vật lý |
-| GenerationJobs | Theo dõi tác vụ sinh nội dung | Id, RevisionId, Language, Stage, Status, AttemptCount, LastError | Có; không suy ra đã có background worker chỉ vì có bảng job |
-| SiteTexts | Văn bản giao diện theo khóa | Id, Key, Language | Có; cần kiểm tra phần GUI thực sự sử dụng |
-| QrCodes | Danh mục QR nguồn | Id, Code unique, Label, IsActive, IsDemo | Đề xuất bổ sung |
-| QrVisits | Sự kiện mở link QR | Id, QrCodeId, VisitorId nullable, SessionId, VisitedAtUtc, IsDemo | Đề xuất bổ sung |
-
-Quan hệ chính:
-
-- Places 1 — 0..N NarrationRevisions qua PlaceId; unique (PlaceId, Version).
-- Places có 0..1 PublishedRevision qua PublishedRevisionId. Revision phải thuộc cùng Place; FK đơn lẻ chưa đủ bảo đảm điều kiện này, BUS phải kiểm tra.
-- NarrationRevisions 1 — 0..N NarrationTranslations; unique (RevisionId, Language).
+- AdminUsers 1 — 0..N NarrationRevisions qua CreatedByAdminId.
+- Places 1 — 0..N NarrationRevisions qua PlaceId.
+- Unique (PlaceId, Version).
+- Places có 0..1 PublishedRevision qua PublishedRevisionId.
+- PublishedRevision phải thuộc chính Place và có trạng thái Published.
+- NarrationRevisions 1 — 0..N NarrationTranslations.
+- Unique (RevisionId, Language).
 - NarrationRevisions 1 — 0..N GenerationJobs.
-- CreatedByAdminId biểu diễn người tạo; entity hiện có trường này nhưng DbContext đã xem chưa khai báo FK tới AdminUsers. ERD mục tiêu đề xuất AdminUsers 1 — 0..N NarrationRevisions, cho phép null nếu giữ dữ liệu cũ; cần migration trước khi gọi là FK hiện hữu.
-- QrCodes 1 — 0..N QrVisits; unique (QrCodeId, SessionId) chống trùng và index VisitedAtUtc phục vụ báo cáo.
-- SiteTexts độc lập với Places trong mô hình hiện tại.
+- Unique (Key, Language) trong SiteTexts.
+- Unique SessionId trong QrVisits để chống trùng lượt.
+- Index VisitedAtUtc hỗ trợ lọc báo cáo.
+- QrVisits và SiteTexts không cần quan hệ với Places.
+- Không có QrCodeId hoặc FK tới QrCodes.
 
-**CHÈN HÌNH 10 — ERD LOGIC MỤC TIÊU: THỂ HIỆN CÁC THỰC THỂ, KHÓA, BỘI SỐ QUAN HỆ, HAI LIÊN KẾT PLACE–REVISION; PHÂN BIỆT BẢNG QR VÀ QUAN HỆ TÁC GIẢ ĐỀ XUẤT VỚI CẤU TRÚC ĐÃ CÓ.**
+Các quan hệ và ràng buộc nêu trên phải được kiểm tra trong migration trước khi mô tả là đã triển khai.
 
-**CHÈN HÌNH 11 — LƯỢC ĐỒ CƠ SỞ DỮ LIỆU VẬT LÝ: DÙNG ĐÚNG TÊN BẢNG/CỘT, KIỂU DỮ LIỆU, PK, FK, UNIQUE, NULL VÀ INDEX CỦA MIGRATION ĐƯỢC CHỐT; KHÔNG VẼ FK CHƯA TỒN TẠI NHƯ ĐÃ ÁP DỤNG.**
 
-File audio/ảnh lưu trong kho media theo triển khai hiện tại; SQL lưu thông tin liên kết. Không mô tả mặc định rằng toàn bộ byte âm thanh đã được lưu trong SQL.
+Dấu nguồn như `source=qr` chỉ xác định loại liên kết truy cập, không chứng minh hành động camera quét.
 
-### 9.6. Hợp đồng API và dữ liệu GUI
+**[CHÈN HÌNH ERD LOGIC — 7 BẢNG, KHÔNG CÓ QRCODES; GIỮ GENERATIONJOBS, SITETEXTS VÀ QRVISITS.]**
 
-| Nhóm | Hợp đồng cần có | Ghi chú |
-|---|---|---|
-| Auth | Login, me, logout, csrf | Theo endpoint đang có trong Zoo.Api |
-| Places public | Danh sách/chi tiết khu public | Thống nhất id là string GUID, lat/lng, radiusMeters, name/desc/script theo ngôn ngữ, revisionId/version, audioUrl |
-| Places admin | Danh sách, thêm/sửa ảnh và khu, ẩn | FormData khi upload ảnh; phân quyền Admin |
-| Narration admin | Tạo/sửa Draft, generate, preview, publish, trạng thái job | Chặn sửa Published; kết quả theo revision/ngôn ngữ |
-| Visit | POST /api/visit/evaluate | Nhận lat/lng/accuracy; trả accepted, reasonCode, placeId, distanceMeters khi phù hợp |
-| Audio | Public audio và preview riêng | Public kiểm tra revision đang công bố; preview có xác thực |
-| QR analytics (đề xuất) | POST /api/qr-visits | Code, SessionId, VisitorId; thời gian server; gửi trùng trả kết quả idempotent |
-| Reporting (đề xuất) | GET /api/admin/reports/qr-visits | Khoảng thời gian, QrCode, includeDemo; tổng lượt, khách ước tính, buckets và peakIntervals |
+**[CHÈN HÌNH LƯỢC ĐỒ VẬT LÝ — TÊN CỘT, KIỂU DỮ LIỆU, PK, FK, UNIQUE VÀ INDEX THEO MIGRATION ĐÃ CHỐT.]**
 
-Không đổi tên lat/lng thành latitude/longitude ở một phía mà không sửa mapping. Các endpoint đề xuất cần được nhóm chốt trước khi lập trình. Response lỗi có mã và thông báo; không dùng HTTP thành công với dữ liệu giả để che lỗi server.
+## 9.6. Hợp đồng API
 
-### 9.7. Các sơ đồ tương tác và trạng thái cần có
+Đường dẫn cụ thể phải được đối chiếu với controller; bảng này mô tả chức năng API cần có.
 
-**CHÈN HÌNH 12 — SEQUENCE DIAGRAM GPS/AUDIO: DU KHÁCH, GUI, VISIT API/BUS, DAL/SQL VÀ AUDIO ENDPOINT; CÓ NHÁNH NGOÀI VÙNG, TRONG VÙNG VÀ AUDIO BỊ CHẶN/LỖI.**
+| Nhóm API | Trách nhiệm |
+|---|---|
+| Auth | Đăng nhập, trạng thái phiên, đăng xuất |
+| Places public | Trả điểm đủ điều kiện công khai |
+| Places admin | Thêm, sửa, xóa đủ điều kiện, ẩn/hiện và upload ảnh |
+| Narration admin | Quản lý Draft, generate, hiệu chỉnh, preview, publish |
+| Generation status | Trả trạng thái xử lý theo phiên bản/ngôn ngữ |
+| Visit evaluate | Nhận tọa độ và trả kết quả đánh giá vùng |
+| Audio | Phân biệt audio public và preview nháp |
+| SiteTexts | Trả văn bản giao diện theo khóa/ngôn ngữ |
+| QR visits | Nhận SessionId; server ghi UTC; chống gửi trùng |
+| Reporting | Nhận khoảng thời gian và lựa chọn dữ liệu demo; trả tổng lượt, 24 khung giờ và cao điểm |
 
-**CHÈN HÌNH 13 — SEQUENCE DIAGRAM DỊCH VÀ TẠO AUDIO: ADMIN, API/BUS, AZURE TRANSLATOR, AZURE SPEECH, DAL/KHO MEDIA; CÓ LƯU TRẠNG THÁI VÀ XỬ LÝ KẾT QUẢ LỖI TỪNG NGÔN NGỮ.**
+Yêu cầu thống nhất:
 
-**CHÈN HÌNH 14 — STATE DIAGRAM PHIÊN BẢN THUYẾT MINH: DRAFT → PUBLISHED → ARCHIVED; CHỈ DRAFT ĐƯỢC SỬA, SỬA NỘI DUNG ĐÃ CÔNG BỐ PHẢI TẠO DRAFT MỚI; TRẠNG THÁI JOB/AUDIO KHÔNG TRỘN VỚI TRẠNG THÁI REVISION.**
+- ID GUID được truyền dưới dạng chuỗi.
+- GUI dùng lat/lng thì API phải trả đúng hoặc có mapping rõ.
+- Nội dung public kèm revisionId/version.
+- Văn bản và audio cùng phiên bản.
+- QR visits không yêu cầu QrCodeId.
+- Reporting không có bộ lọc mã QR.
+- Thời gian ghi nhận không lấy trực tiếp từ đồng hồ khách.
 
-### 9.8. Yêu cầu giao diện
+## 9.7. Trạng thái và tương tác
 
-- Màu chủ đạo xanh lá, điểm nhấn tím; độ tương phản đủ cho nội dung và nút điều khiển.
-- Menu trái cho Trang chủ, Bản đồ, QR; Admin có khu, thuyết minh, media và báo cáo theo phạm vi được triển khai.
-- Thiết lập ngôn ngữ/quyền vị trí dễ hiểu; không đặt hộp GPS che toàn bộ nội dung trên điện thoại.
-- Nháp, đã xuất bản, đang tạo, lỗi có nhãn rõ; không chỉ phân biệt bằng màu.
-- Báo cáo có đơn vị “lượt truy cập từ QR”, “khách ước tính”, múi giờ và khoảng lọc.
+Trạng thái phiên bản:
 
-**CHÈN HÌNH 15 — WIREFRAME/GIAO DIỆN DU KHÁCH: CHỌN NGÔN NGỮ, GIẢI THÍCH QUYỀN GPS, BẢN ĐỒ VỚI VÙNG KÍCH HOẠT VÀ THANH AUDIO TRÊN ĐIỆN THOẠI.**
+Draft → Published → Archived.
 
-**CHÈN HÌNH 16 — WIREFRAME/GIAO DIỆN ADMIN: FORM KHU VÀ ẢNH, NỘI DUNG TIẾNG VIỆT, BẢN DỊCH NĂM NGÔN NGỮ, TRẠNG THÁI AUDIO, PREVIEW VÀ NÚT XUẤT BẢN.**
+Trạng thái job:
 
-**CHÈN HÌNH 17 — WIREFRAME BÁO CÁO QR: BỘ LỌC THỜI GIAN/MÃ QR, TỔNG LƯỢT, KHÁCH ƯỚC TÍNH, BIỂU ĐỒ THEO GIỜ VÀ CÁC KHUNG GIỜ CAO ĐIỂM; GHI RÕ LÀ THIẾT KẾ NẾU CHƯA HIỆN THỰC.**
+Pending → Running → Succeeded hoặc Failed.
 
-## 10. Phương pháp phát triển
+Trạng thái audio:
 
-### 10.1. Phương pháp luận
+Chưa có / đang tạo / hợp lệ / lỗi / hết hiệu lực.
 
-Áp dụng phân tích hướng đối tượng kết hợp phát triển lặp theo chức năng. Bắt đầu từ vấn đề và tác nhân, mô hình hóa UC, xác định quy tắc và dữ liệu, thiết kế thành phần/API, hiện thực một luồng đầu-cuối, kiểm thử rồi điều chỉnh. UML dùng cho hành vi và cấu trúc; ERD dùng cho dữ liệu; black-box và kiểm thử tích hợp dùng để kiểm chứng yêu cầu.
+Ba loại trạng thái phục vụ ba mục đích khác nhau, không dùng thay thế lẫn nhau.
 
-Không sao chép mô hình Waterfall từ mẫu nếu nhóm thực tế đang lặp và sửa sau demo. Nhóm cần xác nhận cách làm và ghi nhận bằng commit, checklist, biên bản họp và kết quả test.
+**[CHÈN HÌNH STATE DIAGRAM — VÒNG ĐỜI PHIÊN BẢN DRAFT, PUBLISHED, ARCHIVED.]**
 
-### 10.2. Quy trình làm việc
+**[CHÈN HÌNH SEQUENCE GPS/AUDIO — GUI → API/BUS → DỮ LIỆU PUBLIC → TRÌNH PHÁT.]**
 
-1. Chốt yêu cầu và mã UC; ghi các quyết định chưa thống nhất.
-2. Chốt DTO, endpoint, tên cột, quy tắc trạng thái và điều kiện publish.
-3. Lập trình trên nhánh chức năng, giữ secret ngoài Git.
-4. Review thay đổi, kiểm tra build và test liên quan trước merge.
-5. Demo trên máy tính và điện thoại; ghi lỗi theo bước tái hiện.
-6. Cập nhật code, PRD, sơ đồ và test theo cùng phiên bản.
+**[CHÈN HÌNH SEQUENCE AZURE — ADMIN → API/BUS → GENERATIONJOBS → AZURE → MEDIA/TRANSLATIONS → CẬP NHẬT KẾT QUẢ.]**
 
-### 10.3. Phân công nhóm 3 người
+## 9.8. Giao diện
 
-| Thành viên theo vai trò | Trách nhiệm chính | Điểm phối hợp |
-|---|---|---|
-| TV1 — GUI | User/Admin, ngôn ngữ, QR, bản đồ, player, báo cáo | Chốt DTO với TV2; kiểm thử điện thoại |
-| TV2 — API/BUS | Auth, validation, vùng GPS, version/publish, điều phối Azure, thống kê | Chốt hợp đồng repository và transaction với TV3 |
-| TV3 — DAL/Database | SQL, migration, repository, media, dữ liệu mẫu, truy vấn báo cáo | Đồng bộ schema và khóa với TV2; hỗ trợ dữ liệu cho TV1 |
+- Xanh lá chủ đạo, tím làm điểm nhấn.
+- Menu điều hướng Trang chủ, Bản đồ và trang QR phục vụ truy cập/demo.
+- Bản đồ hiển thị vùng kích hoạt và vị trí.
+- Player thống nhất cho các bài thuyết minh.
+- Admin phân biệt rõ Draft, Published và trạng thái audio.
+- Báo cáo có khoảng lọc, múi giờ, đơn vị lượt và nhãn dữ liệu demo.
 
-Ghi tên thật sau khi nhóm xác nhận; không suy ra tên người chịu trách nhiệm chỉ từ lịch sử trao đổi.
+**[CHÈN HÌNH GIAO DIỆN DU KHÁCH — NGÔN NGỮ, GPS, BẢN ĐỒ VÀ PLAYER.]**
 
-### 10.4. Sản phẩm thiết kế và CI/CD
+**[CHÈN HÌNH GIAO DIỆN ADMIN — ĐIỂM, BẢN NHÁP, BẢN DỊCH, JOB, AUDIO VÀ XUẤT BẢN.]**
 
-PRD.md, bộ sơ đồ Hình 01–17, đặc tả API, migration/SQL khởi tạo, bộ dữ liệu demo, test case và hướng dẫn chạy. CI mục tiêu gồm restore/install, build frontend/backend, chạy test, kiểm tra cấu hình không chứa secret. CD là bước triển khai sau khi nhóm duyệt môi trường; script demo và Cloudflare tunnel không đồng nghĩa có pipeline CD. Chưa xác nhận workflow GitHub Actions hiện tại đã tồn tại.
+**[CHÈN HÌNH GIAO DIỆN BÁO CÁO — TỔNG LƯỢT, 24 KHUNG GIỜ VÀ GIỜ CAO ĐIỂM.]**
 
-## 11. Kế hoạch kiểm thử
+---
 
-### 11.1. Phạm vi và môi trường
+# 10. Phương pháp phát triển và phân công
 
-- Unit test: khoảng cách, ngưỡng vùng, ưu tiên, hiệu lực audio/script, tổng hợp QR.
-- Integration test: SQL thật/migration, repository, publish nhất quán, auth/CSRF, API media và ghi QR idempotent.
-- Black-box GUI: thực hiện các luồng UC với dữ liệu hợp lệ/lỗi.
-- End-to-end: Admin tạo → dịch/audio → publish → điện thoại tải đúng khu và nghe.
-- GPS thực địa và giả lập phải có kết quả riêng; mock Azure không chứng minh Azure thật chạy thành công.
+## 10.1. Phương pháp
 
-### 11.2. Danh sách kiểm thử chấp nhận
+Phát triển theo vòng lặp ngắn:
 
-| TC | UC / yêu cầu | Kịch bản | Kết quả mong đợi |
+Chốt yêu cầu → thiết kế → hiện thực → kiểm thử → demo → điều chỉnh.
+
+Mỗi thay đổi nghiệp vụ phải được cập nhật đồng thời trong đặc tả, sơ đồ, dữ liệu/API và test case liên quan.
+
+## 10.2. Phân công theo Use Case
+
+| Thành viên | Nhóm phụ trách | UC | Số UC |
+|---|---|---|---:|
+| TV1 — bổ sung tên | Nhóm 01, 02, 07 | UC01.1–01.3; UC02.1–02.2; UC07.1–07.3 | 8 |
+| TV2 — bổ sung tên | Nhóm 03, 04 | UC03.1–03.6; UC04.1 | 7 |
+| TV3 — bổ sung tên | Nhóm 05, 06 | UC05.1–05.4; UC06.1–06.7 | 11 |
+
+Không phân công UC-S01 vì đã bỏ chức năng này khỏi danh mục.
+
+Mỗi thành viên phụ trách:
+
+- Đặc tả và quy tắc của UC.
+- Sơ đồ Use Case nhóm.
+- Activity Diagram từng UC.
+- User Stories và test case liên quan.
+- Rà soát dữ liệu/API phục vụ chức năng.
+- Báo cáo tiến độ và lỗi còn tồn tại.
+
+Phân công theo UC là trách nhiệm đầu mối nghiệp vụ. Công việc GUI, BUS và DAL vẫn cần phối hợp; không bắt buộc mỗi người tự làm tách biệt toàn bộ các lớp.
+
+## 10.3. Điểm phối hợp
+
+| Thành viên | Nội dung |
+|---|---|
+| TV1 và TV2 | Ngôn ngữ, quyền GPS, điểm công khai, tọa độ và trạng thái tham quan |
+| TV2 và TV3 | Nội dung/audio public cùng phiên bản; thay đổi ngôn ngữ; điều kiện xuất bản |
+| TV1 và TV3 | Thông tin điểm, ẩn/hiện, ảnh, vùng GPS và dữ liệu công khai |
+| Cả nhóm | DTO, schema, thuật ngữ, mã UC và tiêu chí nghiệm thu |
+
+## 10.4. Quản lý mã nguồn và CI/CD
+
+- Làm việc trên nhánh chức năng.
+- Review trước merge.
+- Không commit secret, file build hoặc dữ liệu nhạy cảm.
+- CI mục tiêu: cài dependency, build frontend/backend và chạy test liên quan.
+- Chỉ mô tả CI/CD là đã có khi tồn tại cấu hình và kết quả chạy.
+- Script khởi động demo và tunnel không được coi là pipeline CD.
+
+---
+
+# 11. Kế hoạch kiểm thử
+
+## 11.1. Phạm vi
+
+- Unit test cho quy tắc vùng, phiên bản, hiệu lực audio và tổng hợp báo cáo.
+- Integration test cho SQL, publication, API quản trị và ghi nhận QR.
+- Kiểm thử GUI theo các UC.
+- Kiểm thử đầu-cuối từ Admin tạo nội dung đến điện thoại nghe.
+- Kiểm thử GPS thực địa tách riêng giả lập.
+
+## 11.2. Kiểm thử chấp nhận
+
+| TC | UC | Kịch bản | Kết quả mong đợi |
 |---|---|---|---|
-| TC01 | UC01 | Quét QR từ điện thoại khác máy host | Mở đúng web HTTPS, không dùng localhost |
-| TC02 | UC02–03 | Lượt truy cập mới | Chọn/xác nhận ngôn ngữ trước khi gọi GPS |
-| TC03 | UC03 | Từ chối quyền vị trí | Không tự phát, vẫn xem và nghe thủ công |
-| TC04 | UC04 | API lỗi và API trả [] | Hai thông báo khác nhau; không hiển thị lỗi là 0 khu thành công |
-| TC05 | UC04 | Khu Draft hoặc bị ẩn | Không xuất hiện public |
-| TC06 | UC05 | Vị trí ngoài bán kính | Không kích hoạt bài |
-| TC07 | UC05 | Điểm đúng biên và ngay trong vùng | So sánh ≤ bán kính; ổn định theo số lần xác nhận |
-| TC08 | UC05 | Sai số >25 m / vị trí quá 15 giây | Bỏ vị trí, không phát |
-| TC09 | UC05 | Hai vùng chồng nhau | Chọn Priority cao hơn; nếu bằng chọn gần hơn |
-| TC10 | UC06–07 | Vào lại vùng đã nghe / chọn nghe lại | Không tự lặp; nghe lại thủ công được |
-| TC11 | UC06 | Autoplay bị trình duyệt chặn | Có nút nghe; chưa đánh dấu đã nghe trước khi play thành công |
-| TC12 | UC02, UC06 | Đổi ngôn ngữ lúc đang nghe | Dừng bài cũ; lần nghe mới đúng ngôn ngữ |
-| TC13 | UC08 | Mật khẩu đúng/sai, account inactive | Chỉ phiên hợp lệ được quyền; không tiết lộ thông tin nhạy cảm |
-| TC14 | UC09 | Upload ảnh sai loại, tọa độ/bán kính sai | Chặn lưu; lỗi đúng trường |
-| TC15 | UC10–12 | Sửa script sau khi đã tạo audio | Audio cũ mất hiệu lực; yêu cầu sinh lại |
-| TC16 | UC11 | Một ngôn ngữ lỗi Azure | Lưu lỗi riêng, chạy lại được, không báo đủ điều kiện publish |
-| TC17 | UC12 | Sinh lại sau hiệu chỉnh thủ công | Không tự ghi đè bản dịch thủ công |
-| TC18 | UC13 | Thiếu audio/file mất/hash lệch | Không xuất bản |
-| TC19 | UC13 | Publish thành công rồi SQL lỗi ở lần khác | Bản thành công nhất quán; lần lỗi không để public cập nhật một phần |
-| TC20 | UC04, UC06 | Admin xuất bản revision mới | User nhận đúng revision/audio sau refresh; không dùng bản nháp |
-| TC21 | UC14 | Gửi lại sự kiện QR cùng phiên | Một bản ghi hợp lệ; không cộng trùng |
-| TC22 | UC14 | Lọc qua ranh giới ngày Việt Nam | Sự kiện UTC được xếp đúng ngày/giờ |
-| TC23 | UC14 | Hai khung giờ đồng hạng và bộ dữ liệu rỗng | Hiện đủ đồng hạng; dữ liệu rỗng không có cao điểm |
-| TC24 | UC14 | Hai trình duyệt/cùng người | Diễn giải là khách ước tính; không cam kết người duy nhất |
-| TC25 | Giả lập | Chạy, pause, reset, thoát khi request đang chờ | Không nhận kết quả cũ; không chạy GPS và giả lập đồng thời |
-| TC26 | Triển khai | Tắt backend hoặc tunnel | Thông báo kết nối lỗi; QR không được coi là đảm bảo dịch vụ luôn chạy |
-| TC27 | Bảo mật | Gọi API admin/preview khi chưa đăng nhập | Từ chối; public không trả bản nháp |
-| TC28 | QR demo | Lượt có cờ demo | Bị loại khỏi báo cáo vận hành mặc định |
+| TC01 | UC01.3 | Mở QR trên điện thoại khác | Truy cập đúng URL public |
+| TC02 | UC01.1–01.2 | Bắt đầu phiên tham quan | Chọn ngôn ngữ trước hỏi GPS |
+| TC03 | UC01.2 | Không cấp GPS | Vẫn xem và nghe thủ công |
+| TC04 | UC01.3 | Gửi lại cùng SessionId | Không cộng trùng |
+| TC05 | UC01.3 | Mở lại sau khi phiên hết hạn | Tạo phiên mới theo quy tắc |
+| TC06 | UC02.1 | Điểm ẩn hoặc chỉ có Draft | Không hiển thị public |
+| TC07 | UC02.2 | Xác định vị trí | Chỉ hiển thị tọa độ hợp lệ |
+| TC08 | UC03.1 | Ngoài vùng, đúng biên, trong vùng | Đánh giá đúng bán kính và xác nhận ổn định |
+| TC09 | UC03.1 | GPS cũ hoặc sai số lớn | Không dùng để kích hoạt |
+| TC10 | UC03.1 | Vùng chồng nhau | Chọn đúng ưu tiên và khoảng cách |
+| TC11 | UC03.1 | Đang có bài phát hoặc đã nghe | Không phát chồng/tự lặp |
+| TC12 | UC03.2 | Ngôn ngữ hoặc audio không hợp lệ | Không tự phát ngôn ngữ khác |
+| TC13 | UC03.3–03.4 | Tạm dừng rồi tiếp tục | Giữ và dùng đúng thời điểm |
+| TC14 | UC03.5 | Nghe lại | Phát từ đầu, giữ lịch sử |
+| TC15 | UC03.6 | Đổi ngôn ngữ khi đang nghe | Dừng bài cũ, không reload, giữ trạng thái |
+| TC16 | UC04.1 | Đúng/sai mật khẩu; tài khoản inactive | Chỉ cấp phiên cho tài khoản hợp lệ |
+| TC17 | UC05.1–05.2 | Dữ liệu GPS/ảnh không hợp lệ | Không lưu, báo đúng trường |
+| TC18 | UC05.3 | Xóa điểm có phiên bản tham chiếu | Từ chối, gợi ý ẩn |
+| TC19 | UC05.4 | Ẩn rồi hiện điểm | Giữ dữ liệu, áp dụng đúng điều kiện public |
+| TC20 | UC06.1–06.2 | Tạo/sửa Draft | Không thay đổi nội dung public cũ |
+| TC21 | UC06.3 | Xóa Draft; thử xóa Published | Chỉ xóa bản đủ điều kiện |
+| TC22 | UC06.4 | Tạo đủ 5 ngôn ngữ | Job và kết quả đúng phiên bản |
+| TC23 | UC06.4 | Lỗi một ngôn ngữ, tạo lại | Giữ kết quả hợp lệ; không tạo trùng |
+| TC24 | UC06.5 | Sửa script bản dịch | Audio cũ hết hiệu lực |
+| TC25 | UC06.6 | Preview nháp khi chưa đăng nhập | Bị từ chối |
+| TC26 | UC06.7 | Thiếu file/audio hoặc hash lệch | Không xuất bản |
+| TC27 | UC06.7 | Xuất bản bản mới | Con trỏ public và trạng thái nhất quán |
+| TC28 | UC07.1 | Khoảng lọc sai hoặc không có dữ liệu | Báo lỗi đúng hoặc trả 0 hợp lệ |
+| TC29 | UC07.2 | Sự kiện sát ranh giới ngày | Xếp đúng giờ Việt Nam |
+| TC30 | UC07.3 | Đồng hạng; không có lượt | Hiện đủ đồng hạng; không tạo cao điểm giả |
+| TC31 | QR/report | URL tunnel đổi, giữ cùng DB | Lịch sử cũ còn, lượt mới tiếp tục được lưu |
+| TC32 | SiteTexts | Đổi ngôn ngữ giao diện | Đọc đúng khóa/ngôn ngữ, có dự phòng thiết yếu |
+| TC33 | GenerationJobs | Backend gián đoạn khi tạo | Không báo thành công giả; xử lý trạng thái gián đoạn |
+| TC34 | Giả lập | Bắt đầu, dừng, làm lại, thoát | Không trộn GPS thật và kết quả request cũ |
+| TC35 | Bảo mật | Gọi API Admin không có phiên | Từ chối |
+| TC36 | Báo cáo demo | Có sự kiện IsDemo | Loại khỏi báo cáo vận hành mặc định |
 
-Trạng thái ban đầu của mọi TC là **CHƯA NGHIỆM THU**. Nhóm bổ sung: người chạy, ngày, thiết bị, dữ liệu, kết quả thực tế, ảnh/log và mã lỗi.
+Mỗi TC cần ghi: người chạy, ngày, môi trường, dữ liệu, kết quả thực tế và bằng chứng. Chưa chạy thì ghi “Chưa kiểm thử”.
 
-### 11.3. Bộ dữ liệu kiểm thử đề xuất
+## 11.3. Bộ dữ liệu kiểm thử
 
-- 7 khu với tọa độ đã kiểm tra; ít nhất một cặp vùng chồng nhau, một khu ẩn, một khu chỉ có Draft.
-- Một khu có revision Published và Draft mới, để kiểm tra phân tách public/preview.
-- Mỗi ngôn ngữ có một bài ngắn đã duyệt; một trường hợp audio mất file, một trường hợp script thay đổi.
-- QR analytics: sự kiện trùng phiên, khách lặp lại, hai mã QR khác nhau, lượt demo và thời điểm sát 00:00 giờ Việt Nam.
-- Ví dụ báo cáo: ngày kiểm thử có 3 lượt lúc 09:00–10:00 và 3 lượt lúc 14:00–15:00; cả hai khung phải được báo đồng hạng cao điểm.
+- 7 điểm với tọa độ đã kiểm tra.
+- Một cặp vùng chồng nhau.
+- Một điểm ẩn và một điểm chỉ có Draft.
+- Một điểm có Published và Draft mới.
+- Audio đủ 5 ngôn ngữ; trường hợp file mất hoặc script thay đổi.
+- Job thành công, lỗi và bị gián đoạn.
+- SiteTexts đủ 5 ngôn ngữ cho các khóa trọng tâm.
+- QrVisits có phiên trùng, phiên mới, lượt demo và thời điểm sát ranh giới ngày.
+- Hai khung giờ có cùng tổng lượt lớn nhất để kiểm tra đồng hạng.
 
-### 11.4. Đánh giá tính dễ sử dụng
+---
 
-Thử với ít nhất 5 người, ghi khả năng hoàn thành các tác vụ cốt lõi và lỗi gặp phải. Nếu giảng viên yêu cầu SUS, dùng bảng hỏi chuẩn, ghi số người và cách tính, không tự ghi điểm đạt khi chưa khảo sát. Mục tiêu hoàn thành tác vụ tại OBJ-08 là điều kiện nghiệm thu đề xuất.
+# 12. Lộ trình và mức độ ưu tiên
 
-## 12. Lộ trình và mức độ ưu tiên
+## 12.1. Mức ưu tiên
 
-### 12.1. Các mốc hoàn thiện
+| Mức | Nội dung |
+|---|---|
+| P0 | Luồng QR–ngôn ngữ–GPS–bản đồ–nghe; quản trị điểm/nội dung; đăng nhập và xuất bản |
+| P1 | Hoàn thiện báo cáo, khả dụng, kiểm thử đa thiết bị và tài liệu; bắt buộc trước nghiệm thu toàn bộ phạm vi |
+| P2 | Tên miền ổn định, xuất báo cáo, cải tiến vận hành ngoài phạm vi hiện tại |
 
-Không gán ngày lịch cụ thể khi chưa chốt hạn nộp. Ba mốc dưới đây dùng làm ba lần họp tổng kết, phù hợp nhóm 3 người.
+GenerationJobs và SiteTexts là thành phần hỗ trợ trong phạm vi đã chọn, không phải các phân hệ quản trị mới.
 
-| Mốc | Nội dung phải rà soát | Đầu ra cuộc họp |
+## 12.2. Ba lần họp tổng kết
+
+| Mốc | Nội dung | Đầu ra |
 |---|---|---|
-| M1 — Hợp đồng và luồng cốt lõi | UC, quyền truy cập, DTO, schema, khởi tạo DB, public map | Danh sách endpoint/schema đã chốt; lỗi chặn tích hợp |
-| M2 — Nội dung và GPS | Draft, Azure, hiệu chỉnh, publish, audio, GPS/giả lập | Demo đầu-cuối; kết quả TC trọng tâm và lỗi còn lại |
-| M3 — Báo cáo và nghiệm thu | QR analytics, cao điểm, responsive, bảo mật, tài liệu/sơ đồ | Biên bản test, giới hạn còn tồn tại, PRD và sơ đồ đồng bộ |
+| M1 | Chốt UC, luồng, BR, schema 7 bảng và API | Danh sách thống nhất và điểm còn vướng |
+| M2 | Kiểm tra GUI–API–BUS–DAL; dịch/audio, GPS và publication | Demo đầu-cuối và danh sách lỗi |
+| M3 | Kiểm tra QR/report, thiết bị thật, sơ đồ và PRD | Biên bản nghiệm thu, giới hạn và bản nộp |
 
-Nếu vẫn áp dụng kế hoạch tăng tốc 3 ngày × 12 giờ/người, mỗi ngày kết thúc bằng một mốc họp; phải giảm phạm vi hoặc kéo dài lịch khi P0 chưa qua test, không tự đánh dấu đã hoàn thành vì hết thời gian.
+Nếu áp dụng kế hoạch 3 ngày × 12 giờ/người, mỗi ngày kết thúc bằng một mốc họp. Tiến độ hoàn thành dựa vào kết quả kiểm thử, không chỉ dựa vào thời gian đã làm.
 
-### 12.2. Trạng thái đối chiếu
+## 12.3. Theo dõi tiến độ
 
-| Nhóm yêu cầu | Cơ sở hiện có | Công việc còn phải xác minh/hoàn thiện |
-|---|---|---|
-| Auth và quản trị | Có GUI/API cookie, tài khoản và các controller | Kiểm thử đủ quyền/CSRF; tắt demo bypass khi vận hành |
-| Khu, phiên bản và Azure | Có cấu trúc Place/Revision/Translation/Job | Test Azure thật, file/hash, publication và truy cập bản nháp |
-| Bản đồ/GPS/audio | Có nền tảng API và GUI; có bản vá giả lập | GPS thực địa, autoplay trên điện thoại, race khi đổi chế độ |
-| QR | Có trang QR và script tunnel | Luồng ngôn ngữ trước GPS phải rà lại theo yêu cầu mới |
-| Báo cáo QR | Mới thống nhất yêu cầu trong trao đổi | Tạo schema, API ghi nhận/chống trùng và GUI báo cáo |
-| Kiến trúc ba lớp | Có 3 project và web | Rà các controller truy cập DbContext trực tiếp |
-| Sơ đồ/tài liệu | Có UC tổng và PRD mẫu | Hoàn thiện Hình 01–17, migration/API và biên bản test |
+| Nhóm | Người phụ trách | Đặc tả | Sơ đồ | Hiện thực | Kiểm thử |
+|---|---|---|---|---|---|
+| 01 | TV1 | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế |
+| 02 | TV1 | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế |
+| 03 | TV2 | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế |
+| 04 | TV2 | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế |
+| 05 | TV3 | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế |
+| 06 | TV3 | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế |
+| 07 | TV1 | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế | Cập nhật thực tế |
 
-### 12.3. Phần mở rộng sau nghiệm thu
+---
 
-P2: xuất báo cáo PDF/Excel; dashboard health; deployment có tên miền cố định; cache media có kiểm soát. Chatbot, thanh toán, định tuyến đi bộ tối ưu và hơn 5 ngôn ngữ thuộc phiên bản tương lai, không tự mở rộng phạm vi vì có trong mẫu giảng viên.
+# 13. Định nghĩa hoàn thành
 
-## 13. Định nghĩa hoàn thành
+- [ ] Các UC có đặc tả và Activity khớp nhau.
+- [ ] Danh mục UC, User Stories và test case dùng cùng mã.
+- [ ] GUI, API, BUS và DAL thống nhất dữ liệu.
+- [ ] Schema 7 bảng được đối chiếu với migration.
+- [ ] Không còn phụ thuộc QrCodes/QrCodeId trong phạm vi thống kê đã chọn.
+- [ ] Build frontend/backend thành công.
+- [ ] Admin được xác thực ở backend.
+- [ ] Nội dung public và audio cùng phiên bản, cùng ngôn ngữ.
+- [ ] Bản nháp không lộ qua API/audio công khai.
+- [ ] GenerationJobs phản ánh đúng tiến trình và kết quả.
+- [ ] SiteTexts phục vụ đúng văn bản giao diện theo ngôn ngữ.
+- [ ] GPS thực địa và giả lập được kiểm tra riêng.
+- [ ] QR được thử trên thiết bị khác.
+- [ ] Báo cáo không trùng lượt, đúng giờ Việt Nam và xử lý đồng hạng.
+- [ ] Hình ảnh, PRD, ERD, Component và Deployment thống nhất.
+- [ ] Có hướng dẫn chạy, dữ liệu demo và danh sách giới hạn còn lại.
 
-Một chức năng chỉ hoàn thành khi thỏa toàn bộ điều kiện liên quan:
+---
 
-- [ ] Luồng chính, thay thế và ngoại lệ đã được hiện thực hoặc giới hạn được chấp nhận bằng văn bản.
-- [ ] GUI, API, BUS, DAL thống nhất DTO và quy tắc; migration/dữ liệu mẫu tái lập được.
-- [ ] Build frontend/backend thành công và test liên quan đạt.
-- [ ] Không còn lỗi chặn hoặc lỗi làm sai dữ liệu/phiên bản public.
-- [ ] Thao tác Admin được kiểm tra quyền ở backend; không đưa secret lên GitHub.
-- [ ] Luồng QR → ngôn ngữ → GPS → bản đồ → nghe được kiểm tra trên điện thoại thật.
-- [ ] Kiểm thử GPS thực tế được tách khỏi demo giả lập.
-- [ ] Audio đúng ngôn ngữ và script/revision; bản nháp không lộ qua public endpoint.
-- [ ] Báo cáo QR có chống trùng, giờ Việt Nam, đồng hạng và chú thích khách ước tính.
-- [ ] PRD, Use Case tổng, ERD, component/deployment diagram và hướng dẫn chạy thống nhất với phiên bản nộp.
-- [ ] Tất cả dòng CHÈN HÌNH đã được thay bằng hình hoặc có lý do hoãn được giảng viên/nhóm chấp nhận.
-- [ ] Có biên bản demo và danh sách giới hạn còn tồn tại, không dùng kết quả mock thay kết quả thật.
+# PHỤ LỤC
 
-## Phụ lục
-
-### A. Ma trận quyền
+## A. Khả năng truy cập
 
 | Chức năng | Du khách | Admin |
 |---|---|---|
-| Mở web, chọn ngôn ngữ, xem bản đồ public | Có | Có như khách |
-| GPS/giả lập và nghe audio public | Có | Có như khách |
-| Xem/sửa bản nháp, preview audio nháp | Không | Có |
-| Thêm/sửa/ẩn khu | Không | Có |
-| Dịch, tạo audio, hiệu chỉnh, xuất bản | Không | Có |
-| Gửi sự kiện truy cập QR hợp lệ | Có, có kiểm tra/chống trùng | Có khi truy cập như khách; demo phải đánh dấu |
-| Đọc báo cáo QR chi tiết/tổng hợp | Không | Có |
+| Chọn ngôn ngữ, bản đồ, GPS | Có | Có khi sử dụng như khách |
+| Nghe audio public | Có | Có |
+| Thêm/sửa/xóa/ẩn điểm | Không | Có |
+| Quản lý Draft và preview | Không | Có |
+| Dịch, tạo audio, xuất bản | Không | Có |
+| Gửi sự kiện QR | Có | Có khi truy cập như khách |
+| Xem báo cáo | Không | Có |
 
-### B. Thuật ngữ và quyết định cần chốt
+Hệ thống có một vai trò Admin, không thiết kế phân quyền quản trị nhiều cấp trong phiên bản này.
+
+## B. Ánh xạ UC cũ sang mới
+
+| UC cũ | Chức năng mới |
+|---|---|
+| UC01 — Truy cập QR | Luồng mở website và UC01.3 |
+| UC02 — Chọn ngôn ngữ | UC01.1, UC03.6 |
+| UC03 — Quyền vị trí | UC01.2, phần liên quan UC02.2 |
+| UC04 — Bản đồ | UC02.1–UC02.2 |
+| UC05 — Nhận diện điểm | UC03.1 |
+| UC06 — Nghe | UC03.2 |
+| UC07 — Điều khiển audio | UC03.3–UC03.5 |
+| UC08 — Đăng nhập | UC04.1 |
+| UC09 — Quản lý điểm | UC05.1–UC05.4 |
+| UC10 — Bản thuyết minh | UC06.1–UC06.3 |
+| UC11 — Dịch/audio | UC06.4, UC06.6 |
+| UC12 — Hiệu chỉnh | UC06.5 |
+| UC13 — Xuất bản | UC06.7 |
+| UC14 — Báo cáo | UC07.1–UC07.3 |
+
+Các thao tác xóa và một số UC tách riêng là phần được làm rõ trong bản cập nhật; cần đối chiếu hiện thực trước nghiệm thu.
+
+## C. Ma trận truy vết theo nhóm
+
+| Nhóm | User Stories | Test case trọng tâm | Phụ trách |
+|---|---|---|---|
+| 01 | US-01–US-03 | TC01–TC05 | TV1 |
+| 02 | US-03–US-04 | TC06–TC07 | TV1 |
+| 03 | US-05–US-07 | TC08–TC15 | TV2 |
+| 04 | US-08 | TC16, TC35 | TV2 |
+| 05 | US-09 | TC17–TC19 | TV3 |
+| 06 | US-10–US-13 | TC20–TC27, TC33 | TV3 |
+| 07 | US-14 | TC28–TC31, TC36 | TV1 |
+
+TC32 và TC34 là kiểm thử hỗ trợ xuyên nhóm, cần phối hợp.
+
+## D. Thuật ngữ
 
 | Thuật ngữ | Ý nghĩa |
 |---|---|
-| POI / điểm tham quan | Một khu được quản lý với tọa độ, bán kính và nội dung |
-| Geofence / vùng kích hoạt | Vùng tròn xác định bởi tâm và bán kính |
-| Revision | Phiên bản thuyết minh của một khu |
-| Draft / Published / Archived | Nháp / công bố / lưu trữ |
-| TTS | Tổng hợp âm thanh từ văn bản |
-| QR visit | Lượt mở web từ link QR đã được backend ghi nhận |
-| VisitorId | Mã trình duyệt ẩn danh để ước tính khách, không phải danh tính người |
-| SessionId | Mã phiên dùng chống trùng sự kiện QR |
-| PID | Mã tiến trình; không phải tài liệu yêu cầu sản phẩm |
-| PRD | Tài liệu yêu cầu sản phẩm |
+| Điểm tham quan / POI | Điểm được quản lý với tọa độ, vùng và nội dung |
+| Geofence | Vùng kích hoạt quanh điểm |
+| Revision | Phiên bản thuyết minh |
+| Draft | Bản nháp được phép chỉnh sửa |
+| Published | Phiên bản đã công bố |
+| Archived | Phiên bản được giữ trong lịch sử |
+| TTS | Chuyển văn bản thành giọng nói |
+| GenerationJob | Bản ghi theo dõi tác vụ sinh nội dung |
+| SiteText | Văn bản giao diện theo khóa và ngôn ngữ |
+| QR visit | Lượt mở liên kết QR đã được lưu |
+| SessionId | Mã phiên chống ghi nhận trùng |
+| Public | Nội dung được phép cung cấp cho du khách |
+| Preview | Xem/nghe thử nội dung qua quyền Admin |
 
-Các quyết định cần xác nhận trước khi chốt phiên bản: danh sách 7 khu/tọa độ thực; giới hạn độ dài script và upload ảnh thống nhất API/GUI; chính sách 30 phút cho phiên QR; thời hạn lưu QR 90 ngày; quy tắc tie-break cuối của vùng; nơi host và domain vận hành; bộ test hiệu năng; người duyệt chất lượng bản dịch; deadline và người phụ trách thật.
+## E. Danh mục hình
 
-### C. Danh mục toàn bộ hình cần bổ sung
+### Hình chức năng
 
-Danh sách này là bộ hình cho bản PRD mở rộng theo yêu cầu, không khẳng định mọi PRD đều bắt buộc có đủ các loại sơ đồ. Không cần vẽ thêm 14 Activity Diagram giống nhau cho từng UC; ưu tiên các luồng trọng tâm ở mục 7.
+- Một BFD của 7 nhóm.
+- Một Use Case tổng quan.
+- Bảy Use Case Diagram nhóm.
+- Hai mươi sáu Activity Diagram tương ứng UC01.1 đến UC07.3.
+- Không có sơ đồ UC-S01.
 
-| Hình | Loại / tên | Vị trí | Tên file đề nghị | Nguồn / lưu ý |
-|---|---|---|---|---|
-| 01 | BFD | 4.1 | `01-bfd.png` | Vẽ từ các phân hệ đã chốt |
-| 02 | Use Case tổng quan | 4.2 | `02-use-case-tong.png` | Đã có ảnh nhóm gửi; kiểm tra font và mã UC |
-| 03 | User Flow du khách | 7.1 | `03-user-flow.png` | Ngôn ngữ trước quyền GPS; có nhánh từ chối |
-| 04 | Activity GPS/audio | 7.2 | `04-activity-gps.png` | Tách nhận diện và phát; xử lý lỗi |
-| 05 | Activity quản trị nội dung | 7.3 | `05-activity-noi-dung.png` | Nháp, Azure, duyệt và xuất bản |
-| 06 | Activity QR/report | 7.5 | `06-activity-qr-report.png` | Yêu cầu mới, không ghi đã triển khai |
-| 07 | Kiến trúc ba lớp | 9.2 | `07-kien-truc-ba-lop.png` | Định hướng và chênh lệch code phải ghi rõ |
-| 08 | Component Diagram | 9.3 | `08-component.png` | Thành phần, interface và dependency |
-| 09 | Deployment Diagram demo | 9.4 | `09-deployment.png` | Node, artifact, cổng và giao thức |
-| 10 | ERD logic mục tiêu | 9.5 | `10-erd.png` | Bội số và quan hệ, đánh dấu đề xuất |
-| 11 | Lược đồ vật lý | 9.5 | `11-database-schema.png` | Theo migration/schema thật cuối cùng |
-| 12 | Sequence GPS/audio | 9.7 | `12-sequence-gps.png` | Request/response và các nhánh alt |
-| 13 | Sequence dịch/TTS | 9.7 | `13-sequence-azure.png` | Dịch vụ ngoài, file và trạng thái lỗi |
-| 14 | State revision | 9.7 | `14-state-revision.png` | Draft, Published, Archived |
-| 15 | UI du khách | 9.8 | `15-ui-user.png` | Wireframe hoặc ảnh chụp có ghi nhãn |
-| 16 | UI Admin | 9.8 | `16-ui-admin.png` | Khu, bản dịch, audio và publish |
-| 17 | UI báo cáo | 9.8 | `17-ui-report.png` | Thiết kế nếu chức năng chưa có |
+### Hình luồng và thiết kế
 
-Các hình cần thống nhất tên tác nhân, mã UC, tên bảng và luồng với tài liệu. Mũi tên association Use Case không dùng làm mũi tên tiến trình. Deployment không thay thế Component Diagram; ERD logic không thay thế lược đồ vật lý.
+- User Flow du khách.
+- Luồng quản trị nội dung.
+- Kiến trúc ba lớp.
+- Component Diagram.
+- Deployment Diagram.
+- ERD logic 7 bảng.
+- Lược đồ cơ sở dữ liệu vật lý.
+- State Diagram phiên bản.
+- Sequence GPS/audio.
+- Sequence dịch và tạo audio.
+- Giao diện Du khách.
+- Giao diện Admin.
+- Giao diện báo cáo.
 
-### D. Hướng dẫn chèn hình vào PRD.md — ví dụ UC tổng
+Hình phải thống nhất mã UC, tác nhân, tên bảng và quy tắc với nội dung tài liệu.
 
-1. Đặt `PRD.md` ở thư mục gốc repository. Tạo thư mục `docs/images` trong cùng repository.
-2. Sao chép hình `usecasetong.drawio(1).png` vào thư mục đó và đổi tên thành `02-use-case-tong.png`. Chỉ đổi tên, không cần đổi nội dung ảnh. Nên giữ file `.drawio` gốc riêng để chỉnh sửa.
-3. Mở `PRD.md`, tìm dòng **CHÈN HÌNH 02** ở mục 4.2.
-4. Xóa riêng dòng giữ chỗ đó và thay bằng đoạn sau (không giữ hàng rào code khi dán vào nội dung thật):
 
-```markdown
-![Sơ đồ Use Case tổng quan hệ thống thuyết minh Thảo Cầm Viên](docs/images/02-use-case-tong.png)
+## F. Quyết định thiết kế
 
-*Hình 02. Sơ đồ Use Case tổng quan hệ thống thuyết minh tự động Thảo Cầm Viên Sài Gòn.*
-```
+| Nội dung | Quyết định |
+|---|---|
+| Phân nhóm chức năng | 7 nhóm, 26 UC chi tiết |
+| Kiểm tra quyền riêng | Bỏ UC-S01; giữ xác thực backend và tiền điều kiện đăng nhập |
+| Kiến trúc | Giữ ba lớp; API là đầu vào HTTP backend |
+| Database | 7 bảng |
+| QrCodes | Bỏ |
+| QrVisits | Giữ để thống kê |
+| GenerationJobs | Giữ để theo dõi dịch/audio |
+| SiteTexts | Giữ cho văn bản giao diện đa ngôn ngữ |
+| Chỉ số báo cáo chính | Tổng lượt truy cập, phân bố theo giờ, giờ cao điểm |
+| Số người duy nhất | Không cam kết đo được |
+| Quản lý SiteTexts qua GUI | Chưa đưa thành chức năng quản trị riêng |
+| Quản lý job riêng | Chưa đưa thành UC riêng |
+| Phân công | Theo nhóm UC, phối hợp xuyên các lớp |
 
-5. Trong VS Code nhấn `Ctrl + Shift + V` để xem Markdown Preview. Nếu ảnh chưa hiện, kiểm tra tên, chữ hoa/thường và vị trí file.
-6. Commit cả Markdown lẫn ảnh lên **cùng nhánh** GitHub; ảnh chỉ có trên máy tính sẽ không hiện trên GitHub.
-7. Mở file `PRD.md` trên GitHub để kiểm tra lại ảnh và chú thích.
+Các thông tin còn cần điền: tên người phụ trách TV1–TV3, mã sinh viên đầy đủ của Hậu, tên giảng viên, thông số triển khai và kết quả kiểm thử.
 
-Đường dẫn hình được tính từ vị trí của file Markdown. Nếu chuyển PRD vào `docs/PRD.md`, đường dẫn ảnh đổi thành `images/02-use-case-tong.png`. Không dán đường dẫn ổ đĩa như `D:\...` vào Markdown. Tên file không dấu, không khoảng trắng giúp tránh sai đường dẫn.
+## G. Tài liệu tham khảo
 
-Nếu muốn giới hạn chiều rộng ảnh UC tổng vốn rất cao, có thể dùng HTML trong Markdown GitHub:
+- PRD gốc của nhóm.
+- Mẫu PRD và mẫu đặc tả Use Case được cung cấp.
+- Bộ Use Case và Activity đã thống nhất trong quá trình phân tích.
+- Mã nguồn, entity, migration và cấu hình của phiên bản dùng để nộp.
+- Biên bản kiểm thử và demo của nhóm.
 
-```html
-<p align="center">
-  <img src="docs/images/02-use-case-tong.png"
-       alt="Use Case tổng quan Thảo Cầm Viên"
-       width="650">
-</p>
+Mẫu tham khảo chỉ dùng cho cách trình bày; không tự đưa nghiệp vụ của dự án khác vào phạm vi.
 
-<p align="center"><em>Hình 02. Sơ đồ Use Case tổng quan.</em></p>
-```
+## H. Lịch sử chỉnh sửa
 
-Không dùng cả hai cách cùng lúc nếu không muốn ảnh xuất hiện hai lần. Với hình PNG nền trong suốt có nét đen, nên kiểm tra chế độ sáng/tối của GitHub; nếu khó đọc, xuất lại từ draw.io với nền trắng và độ phân giải đủ rõ, không chụp màn hình bị cắt chữ.
-
-Các hình còn lại làm tương tự, theo tên file ở Phụ lục C. Khi chưa có hình, giữ nguyên dòng IN HOA để nhóm nhận biết phần chưa hoàn thiện; không chèn liên kết tới file chưa tồn tại rồi coi như đã xong.
-
-### E. Tài liệu tham khảo và cách sử dụng
-
-- PRD hệ thống thông tin học đường tiếng Việt: tham khảo cấu trúc 13 mục; không sử dụng nghiệp vụ học vụ cho dự án này.
-- Focused Use Cases — Course Cast: tham khảo cấu trúc tác nhân/phản hồi, luồng thay thế, ngoại lệ, tiền/hậu điều kiện; không sao chép quy tắc đăng nhập cũ của mẫu.
-- PRD GPS – Chùa Linh Ứng: tham khảo Problem Alignment, Approach, Narrative, Goals, Key Features/Flows/Logic và Launch Plan. Thanh toán, chatbot, 15+ ngôn ngữ và “chỉ tải dữ liệu một lần” không áp dụng tự động cho dự án Thảo Cầm Viên.
-- Hình Use Case tổng của nhóm: nguồn mã/tên UC01–UC14 và hai tác nhân.
-- ZIP feature-be (2), bản vá giả lập và trao đổi triển khai: cơ sở tham khảo hiện trạng, không thay thế kiểm tra phiên bản GitHub cuối cùng.
-
-### F. Lịch sử chỉnh sửa
-
-| Phiên bản | Ngày | Nội dung | Trạng thái |
-|---|---|---|---|
-| 1.0 | 25/10/2026 | Viết lại theo cấu trúc PRD mẫu, bổ sung 14 UC, quy tắc nghiệp vụ, yêu cầu QR analytics, thiết kế hệ thống và 17 vị trí hình | Chờ nhóm/giảng viên rà soát |
-
-Tài liệu được cập nhật khi có thay đổi yêu cầu đã thống nhất. Khi sửa một UC hoặc quy tắc, cần kiểm tra lại User Story, API/dữ liệu, sơ đồ liên quan và test case tương ứng.
+| Phiên bản | Ngày | Nội dung |
+|---|---|---|
+| 1.0 | 25/10/2026 | Bản PRD ban đầu theo 14 UC |
+| 1.1 | 29/10/2026 | Chuyển sang 7 nhóm và 26 UC; bỏ UC-S01; bỏ QrCodes; giữ GenerationJobs, SiteTexts và QrVisits; đồng bộ User Stories, kiến trúc, kiểm thử, phân công và phụ lục |
