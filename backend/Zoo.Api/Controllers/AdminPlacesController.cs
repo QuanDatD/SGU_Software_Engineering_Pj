@@ -4,6 +4,7 @@ using Zoo.BUS.DTOs;
 using Zoo.BUS.Interfaces;
 using Zoo.BUS.Services;
 using Zoo.Api.Filters;
+
 namespace Zoo.Api.Controllers;
 
 [ApiController]
@@ -25,6 +26,22 @@ public sealed class AdminPlacesController(IAdminPlaceService places, PlaceEditin
     [HttpPatch("{id:guid}/hide")]
     public async Task<IActionResult> Hide(Guid id, CancellationToken ct)
         => await editing.HideAsync(id, ct) ? NoContent() : NotFound();
+
+    [HttpPatch("{id:guid}/show")]
+    public async Task<IActionResult> Show(Guid id, CancellationToken ct)
+        => await editing.ShowAsync(id, ct) ? NoContent() : NotFound();
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    {
+        var result = await editing.DeleteAsync(id, ct);
+        return result switch
+        {
+            DeletePlaceResult.NotFound    => NotFound(new { message = "Không tìm thấy điểm tham quan." }),
+            DeletePlaceResult.HasRevisions => Conflict(new { message = "Không thể xóa điểm đang có phiên bản thuyết minh. Hãy dùng chức năng ẩn." }),
+            _                              => NoContent()
+        };
+    }
     private async Task<IActionResult> Save(Guid? id, PlaceForm form, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(form.NameVi)) return BadRequest(new { message = "Cần nhập tên tiếng Việt." });

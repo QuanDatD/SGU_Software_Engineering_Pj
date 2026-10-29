@@ -1,9 +1,8 @@
 import { QRCodeSVG } from "qrcode.react";
 
 export default function QrPage() {
-  // Mở trang bằng link Cloudflare thì QR dùng đúng link Cloudflare.
-  // Dẫn khách về trang chủ của website.
-  const websiteUrl = `${window.location.origin}/`;
+  // Thêm ?source=qr để backend ghi nhận lượt truy cập (UC01.3, BR-20)
+  const websiteUrl = `${window.location.origin}/?source=qr`;
 
   const isLocal =
     window.location.hostname === "localhost" ||

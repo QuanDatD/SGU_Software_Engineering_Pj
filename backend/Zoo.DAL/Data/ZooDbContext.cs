@@ -13,6 +13,7 @@ public class ZooDbContext : DbContext
     public DbSet<NarrationTranslation> NarrationTranslations => Set<NarrationTranslation>();
     public DbSet<GenerationJob> GenerationJobs => Set<GenerationJob>();
     public DbSet<SiteText> SiteTexts => Set<SiteText>();
+    public DbSet<QrVisit> QrVisits => Set<QrVisit>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -86,6 +87,14 @@ public class ZooDbContext : DbContext
             e.Property(x => x.Key).HasMaxLength(150).IsRequired();
             e.Property(x => x.Language).HasMaxLength(10).IsRequired();
             e.HasIndex(x => new { x.Key, x.Language }).IsUnique();
+        });
+
+        modelBuilder.Entity<QrVisit>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.SessionId).HasMaxLength(200).IsRequired();
+            e.HasIndex(x => x.SessionId).IsUnique(); // chống trùng lượt — BR-21
+            e.HasIndex(x => x.VisitedAtUtc);         // hỗ trợ lọc báo cáo — BR-23
         });
     }
 }

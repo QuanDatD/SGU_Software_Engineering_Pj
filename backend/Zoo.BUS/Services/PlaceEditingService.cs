@@ -4,7 +4,11 @@ using Zoo.DAL.Data;
 using Zoo.DAL.Entities;
 using Zoo.DAL.Enums;
 using Zoo.DAL.Interfaces;
+
 namespace Zoo.BUS.Services;
+
+public enum DeletePlaceResult { Ok, NotFound, HasRevisions }
+
 public sealed class PlaceEditingService(ZooDbContext db, IMediaStorage storage)
 {
     public async Task<Guid?> SaveAsync(Guid? id, SavePlaceRequest input, string? imageName, Stream? image, CancellationToken ct)
@@ -49,5 +53,32 @@ public sealed class PlaceEditingService(ZooDbContext db, IMediaStorage storage)
         if (place == null) return false;
         place.IsActive = false; place.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct); return true;
+    }
+
+    public async Task<bool> ShowAsync(Guid id, CancellationToken ct)
+    {
+        var place = await db.Places.FindAsync([id], ct);
+        if (place == null) return false;
+        place.IsActive = true; place.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct); return true;
+    }
+
+    /// <summary>
+    /// UC05.3 — Xóa điểm chỉ khi không có phiên bản thuyết minh (BR-25).
+    /// </summary>
+    public async Task<DeletePlaceResult> DeleteAsync(Guid id, CancellationToken ct)
+    {
+        var place = await db.Places
+            .Include(p => p.Revisions)
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
+
+        if (place == null) return DeletePlaceResult.NotFound;
+
+        if (place.Revisions.Any())
+            return DeletePlaceResult.HasRevisions;
+
+        db.Places.Remove(place);
+        await db.SaveChangesAsync(ct);
+        return DeletePlaceResult.Ok;
     }
 }

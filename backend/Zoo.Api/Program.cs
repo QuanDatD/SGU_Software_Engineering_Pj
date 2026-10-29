@@ -164,6 +164,14 @@ if (args.Contains("--seed-admin"))
     return;
 }
 
+// Tự động migrate và seed dữ liệu mẫu khi khởi động
+using (var seedScope = app.Services.CreateScope())
+{
+    var seedDb = seedScope.ServiceProvider.GetRequiredService<ZooDbContext>();
+    var hasher = seedScope.ServiceProvider.GetRequiredService<IPasswordHasher<AdminUser>>();
+    await Zoo.DAL.Data.DbSeeder.SeedAsync(seedDb, (user, pwd) => hasher.HashPassword(user, pwd));
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -171,8 +179,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseHttpsRedirection();
-}
-var storageOptions = builder.Configuration.GetSection("MediaStorageOptions").Get<MediaStorageOptions>() ?? new MediaStorageOptions();
+}var storageOptions = builder.Configuration.GetSection("MediaStorageOptions").Get<MediaStorageOptions>() ?? new MediaStorageOptions();
 var resolvedStoragePath = Path.GetFullPath(storageOptions.RootPath, builder.Environment.ContentRootPath);
 
 if (!Directory.Exists(resolvedStoragePath))

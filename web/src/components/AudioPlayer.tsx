@@ -55,6 +55,17 @@ export default function AudioPlayer({ lang = "vi" }: Props) {
 
       {/* Controls */}
       <div className="audio-player__controls">
+        {/* Nghe lại từ đầu (UC03.5) */}
+        <button
+          className="audio-player__ctrl"
+          type="button"
+          aria-label="Nghe lại từ đầu"
+          onClick={() => { seek(0); if (!isPlaying) resume(); }}
+          title="Nghe lại từ đầu"
+        >
+          ↩
+        </button>
+
         {/* Tua lùi 10s */}
         <button
           className="audio-player__ctrl"

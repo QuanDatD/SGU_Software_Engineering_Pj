@@ -22,6 +22,7 @@ export default function NarrationAdmin() {
     const [editRevId, setEditRevId] = useState<string | null>(null);
     const [editLang, setEditLang] = useState<string>("vi");
     const [editText, setEditText] = useState("");
+    const [deleteRevId, setDeleteRevId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
@@ -113,6 +114,18 @@ export default function NarrationAdmin() {
         finally { setBusy(false); }
     }
 
+    /* UC06.3 — Xóa bản nháp */
+    async function handleDeleteRevision() {
+        if (!deleteRevId) return;
+        setBusy(true);
+        try {
+            await narrationApi.deleteRevision(deleteRevId);
+            setDeleteRevId(null);
+            await loadRevisions(activeId);
+        } catch (e) { alert(e instanceof Error ? e.message : "Xóa thất bại."); }
+        finally { setBusy(false); }
+    }
+
     if (loading) return <div className="admin-section" > <p>⏳ Đang tải…</p></div >;
     if (error) return (
         <div className= "admin-section" >
@@ -201,6 +214,17 @@ disabled = { busy || !sourceText.trim()}>
                       📢 Xuất bản
     </button>
                   )}
+{
+    rev.status === "draft" && (
+        <button
+            className="admin-btn admin-btn--sm admin-btn--danger"
+            onClick={() => setDeleteRevId(rev.id)}
+            disabled={busy}
+            title="Xóa bản nháp này"
+        >
+            🗑️ Xóa nháp
+        </button>
+    )}
 </div>
     </div>
 
@@ -285,6 +309,25 @@ onClick = {() => openEditTranslation(rev, l)}>
                 </div>
                 </div>
       )}
+
+{/* Modal xác nhận xóa bản nháp (UC06.3) */}
+{deleteRevId && (
+    <div className="admin-modal-overlay">
+        <div className="admin-modal" role="dialog" aria-modal="true">
+            <h3>🗑️ Xóa bản nháp</h3>
+            <p>Bạn có chắc muốn xóa bản nháp này?</p>
+            <p style={{ fontSize: 13, color: "#627568" }}>
+                Thao tác này không thể hoàn tác. Chỉ bản nháp mới có thể xóa — các phiên bản đã xuất bản hoặc lưu trữ không bị ảnh hưởng.
+            </p>
+            <div className="admin-modal__actions">
+                <button className="admin-btn" onClick={() => setDeleteRevId(null)} disabled={busy}>Hủy</button>
+                <button className="admin-btn admin-btn--danger" onClick={() => void handleDeleteRevision()} disabled={busy}>
+                    {busy ? "Đang xóa…" : "Xóa bản nháp"}
+                </button>
+            </div>
+        </div>
+    </div>
+)}
 </div>
   );
 }

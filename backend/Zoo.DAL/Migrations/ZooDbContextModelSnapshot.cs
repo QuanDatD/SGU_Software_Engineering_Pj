@@ -335,6 +335,33 @@ namespace Zoo.DAL.Migrations
                 {
                     b.Navigation("Revisions");
                 });
+
+            modelBuilder.Entity("Zoo.DAL.Entities.QrVisit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("VisitedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionId")
+                        .IsUnique();
+
+                    b.HasIndex("VisitedAtUtc");
+
+                    b.ToTable("QrVisits");
+                });
 #pragma warning restore 612, 618
         }
     }

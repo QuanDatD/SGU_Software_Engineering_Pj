@@ -32,4 +32,8 @@ export const narrationApi = {
   /* Xuất bản phiên bản */
   publish: (revisionId: string) =>
     api.post<{ message: string }>(`/api/admin/revisions/${revisionId}/publish`, {}),
+
+  /* Xóa bản nháp (UC06.3) */
+  deleteRevision: (revisionId: string) =>
+    api.delete<void>(`/api/admin/revisions/${revisionId}`),
 };

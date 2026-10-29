@@ -4,14 +4,16 @@ import ProtectedRoute from "../../components/ProtectedRoute";
 import SpotsAdmin    from "./SpotsAdmin";
 import NarrationAdmin from "./NarrationAdmin";
 import MediaAdmin    from "./MediaAdmin";
+import ReportingAdmin from "./ReportingAdmin";
 import "../../styles/AdminPage.css";
 
-type Tab = "spots" | "narration" | "media";
+type Tab = "spots" | "narration" | "media" | "reporting";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "spots",      label: "Điểm tham quan", icon: "📍" },
   { id: "narration",  label: "Thuyết minh",    icon: "🎙️" },
   { id: "media",      label: "Media",          icon: "🖼️"  },
+  { id: "reporting",  label: "Báo cáo",        icon: "📊"  },
 ];
 
 export default function AdminPage() {
@@ -78,6 +80,7 @@ function AdminLayout() {
         {tab === "spots"     && <SpotsAdmin />}
         {tab === "narration" && <NarrationAdmin />}
         {tab === "media"     && <MediaAdmin />}
+        {tab === "reporting" && <ReportingAdmin />}
       </main>
     </div>
   );

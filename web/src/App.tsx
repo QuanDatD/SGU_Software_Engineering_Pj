@@ -4,11 +4,14 @@ import MapPage  from "./pages/user/MapPage";
 import QrPage from "./pages/user/QrPage";
 import { useLang } from "./contexts/LanguageContext";
 import LanguageSelector from "./components/LanguageSelector";
+import { useQrVisit } from "./hooks/useQrVisit";
 import "./styles/global.css";
 
 type Page = "home" | "map" | "qr";
 
 export default function App() {
+  // UC01.3 — ghi nhận lượt truy cập qua QR ngay khi app mount
+  useQrVisit();
   const [page,     setPage]     = useState<Page>("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const { lang } = useLang();

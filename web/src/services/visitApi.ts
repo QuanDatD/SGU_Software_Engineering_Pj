@@ -8,4 +8,11 @@ export const visitApi = {
    */
   evaluate: (lat: number, lng: number, accuracy: number) =>
     api.post<EvaluateResult>("/api/visit/evaluate", { lat, lng, accuracy }),
+
+  /**
+   * POST /api/visit/qr
+   * Ghi nhận lượt truy cập qua QR (UC01.3, BR-20 – BR-26)
+   */
+  recordQrVisit: (sessionId: string, isDemo: boolean) =>
+    api.post<{ recorded: boolean; message: string }>("/api/visit/qr", { sessionId, isDemo }),
 };

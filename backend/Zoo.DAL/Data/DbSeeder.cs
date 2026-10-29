@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Zoo.DAL.Entities;
 
@@ -7,21 +5,27 @@ namespace Zoo.DAL.Data;
 
 public static class DbSeeder
 {
-    public static async Task SeedAsync(ZooDbContext db)
+    /// <param name="hashPassword">
+    /// Hàm hash mật khẩu được inject từ tầng trên (Zoo.Api) để tránh phụ thuộc
+    /// vào Microsoft.AspNetCore.Identity trong Zoo.DAL.
+    /// Dùng IPasswordHasher&lt;AdminUser&gt;.HashPassword từ Program.cs.
+    /// </param>
+    public static async Task SeedAsync(ZooDbContext db, Func<AdminUser, string, string> hashPassword)
     {
         await db.Database.MigrateAsync();
 
         // 1. Seed Admin mặc định (admin / Admin@123)
+        // hashPassword dùng IPasswordHasher<AdminUser> (PBKDF2) — khớp với AuthService
         if (!await db.AdminUsers.AnyAsync())
         {
-            var passwordHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes("Admin@123")));
-            db.AdminUsers.Add(new AdminUser
+            var admin = new AdminUser
             {
                 Username = "admin",
-                PasswordHash = passwordHash,
                 Role = "Admin",
                 IsActive = true
-            });
+            };
+            admin.PasswordHash = hashPassword(admin, "Admin@123");
+            db.AdminUsers.Add(admin);
         }
 
         // 2. Seed các khu Thảo Cầm Viên mẫu với tọa độ thật tại Quận 1, TP.HCM

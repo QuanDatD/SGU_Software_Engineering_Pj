@@ -18,6 +18,8 @@ export const placeApi = {
     return (await api.get<PlaceDetail[]>("/api/admin/places")).map(toPlace);
   },
   hide: (id: string) => api.patch<void>(`/api/admin/places/${id}/hide`, {}),
+  show: (id: string) => api.patch<void>(`/api/admin/places/${id}/show`, {}),
+  delete: (id: string) => api.delete<void>(`/api/admin/places/${id}`),
 };
 export interface SavePlaceDraftRequest {
   nameVi: string;

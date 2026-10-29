@@ -334,6 +334,29 @@ public class AdminNarrationController : ControllerBase
         return await Generate(job.RevisionId, ct);
     }
 
+    // UC06.3 — Xóa bản nháp (chỉ Draft, không xóa Published/Archived — BR-25)
+    [HttpDelete("revisions/{revisionId:guid}")]
+    public async Task<IActionResult> DeleteRevision(Guid revisionId, CancellationToken ct)
+    {
+        var revision = await _db.NarrationRevisions
+            .Include(r => r.Jobs)
+            .FirstOrDefaultAsync(r => r.Id == revisionId, ct);
+
+        if (revision == null) return NotFound(new { message = "Không tìm thấy phiên bản." });
+
+        if (revision.Status != RevisionStatus.Draft)
+            return Conflict(new { message = "Chỉ có thể xóa bản nháp (Draft). Phiên bản đã xuất bản hoặc lưu trữ không thể xóa." });
+
+        // BR-27: không xóa khi có job đang xử lý
+        bool hasRunning = revision.Jobs.Any(j => j.Status == JobStatus.Processing);
+        if (hasRunning)
+            return Conflict(new { message = "Đang có tác vụ xử lý. Vui lòng chờ hoàn tất rồi thử lại." });
+
+        _db.NarrationRevisions.Remove(revision);
+        await _db.SaveChangesAsync(ct);
+        return NoContent();
+    }
+
     // 7. Xuất bản phiên bản -> Cập nhật thẳng vào Place.PublishedRevisionId cho Web User
     [HttpPost("revisions/{revisionId:guid}/publish")]
     public async Task<IActionResult> Publish(Guid revisionId, CancellationToken ct)

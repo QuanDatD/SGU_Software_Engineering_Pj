@@ -120,6 +120,13 @@ export default function SpotsAdmin() {
     const [hiding, setHiding] = useState(false);
     const [hideError, setHideError] = useState<string | null>(null);
 
+    const [showTarget, setShowTarget] = useState<Place | null>(null);
+    const [showing, setShowing] = useState(false);
+
+    const [deleteTarget, setDeleteTarget] = useState<Place | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+
     const loadPlaces = useCallback(async () => {
         setLoading(true);
         setListError(null);
@@ -385,6 +392,39 @@ export default function SpotsAdmin() {
         }
     }
 
+    async function handleShow() {
+        if (!showTarget || showing) return;
+        setShowing(true);
+        try {
+            await placeApi.show(showTarget.id);
+            setShowTarget(null);
+            setNotice("Đã bật hiển thị điểm tham quan.");
+            await loadPlaces();
+        } catch (error) {
+            setNotice(getErrorMessage(error, "Không hiện được điểm tham quan."));
+        } finally {
+            setShowing(false);
+        }
+    }
+
+    async function handleDelete() {
+        if (!deleteTarget || deleting) return;
+        setDeleting(true);
+        setDeleteError(null);
+        try {
+            await placeApi.delete(deleteTarget.id);
+            setDeleteTarget(null);
+            setNotice("Đã xóa điểm tham quan.");
+            await loadPlaces();
+        } catch (error) {
+            setDeleteError(
+                getErrorMessage(error, "Không xóa được điểm tham quan."),
+            );
+        } finally {
+            setDeleting(false);
+        }
+    }
+
     const displayedImage =
         previewUrl || form?.currentImageUrl || null;
 
@@ -502,9 +542,26 @@ onClick = {() => {
                 >
     Ẩn
     </button>
-    </span>
-    </div>
-          ))}
+
+    {!place.isActive && (
+        <button
+            type="button"
+            className="admin-btn admin-btn--sm"
+            onClick={() => setShowTarget(place)}
+        >
+            Hiện
+        </button>
+    )}
+
+    <button
+        type="button"
+        className="admin-btn admin-btn--sm admin-btn--danger"
+        onClick={() => { setDeleteError(null); setDeleteTarget(place); }}
+        title="Chỉ xóa được khi chưa có thuyết minh"
+    >
+        Xóa
+    </button>
+    </span>    </div>          ))}
 </div>
       )}
 
@@ -851,6 +908,49 @@ onClick = {() => void handleHide()}
     </div>
     </div>
       )}
+
+{/* Dialog xác nhận Hiện lại điểm */}
+{showTarget && (
+    <div className="admin-modal-overlay">
+        <div className="admin-modal" role="dialog" aria-modal="true">
+            <h3>Hiện lại điểm tham quan</h3>
+            <p>Bật hiển thị <strong>{showTarget.name?.vi || showTarget.slug}</strong>?</p>
+            <p style={{ fontSize: 13, color: "#627568" }}>
+                Điểm chỉ xuất hiện trên web khách khi đã có thuyết minh được xuất bản.
+            </p>
+            <div className="admin-modal__actions">
+                <button type="button" className="admin-btn" disabled={showing} onClick={() => setShowTarget(null)}>
+                    Hủy
+                </button>
+                <button type="button" className="admin-btn admin-btn--primary" disabled={showing} onClick={() => void handleShow()}>
+                    {showing ? "Đang xử lý…" : "Hiện khu"}
+                </button>
+            </div>
+        </div>
+    </div>
+)}
+
+{/* Dialog xác nhận Xóa điểm */}
+{deleteTarget && (
+    <div className="admin-modal-overlay">
+        <div className="admin-modal" role="dialog" aria-modal="true">
+            <h3>Xóa điểm tham quan</h3>
+            <p>Xóa vĩnh viễn <strong>{deleteTarget.name?.vi || deleteTarget.slug}</strong>?</p>
+            <p style={{ fontSize: 13, color: "#627568" }}>
+                Chỉ xóa được khi điểm chưa có phiên bản thuyết minh. Nếu đã có thuyết minh, hãy dùng chức năng <strong>Ẩn</strong>.
+            </p>
+            {deleteError && <p role="alert" style={{ color: "#b42318" }}>{deleteError}</p>}
+            <div className="admin-modal__actions">
+                <button type="button" className="admin-btn" disabled={deleting} onClick={() => setDeleteTarget(null)}>
+                    Hủy
+                </button>
+                <button type="button" className="admin-btn admin-btn--danger" disabled={deleting} onClick={() => void handleDelete()}>
+                    {deleting ? "Đang xóa…" : "Xóa vĩnh viễn"}
+                </button>
+            </div>
+        </div>
+    </div>
+)}
 </div>
   );
 }

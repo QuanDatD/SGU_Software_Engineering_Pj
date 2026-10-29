@@ -1,32 +1,38 @@
-using System.Text.Json.Serialization;
-
 namespace Zoo.BUS.DTOs;
 
-public sealed class EvaluateVisitRequest
+// ── Geofence ─────────────────────────────────────────────
+// Giữ nguyên cấu trúc cũ để GeofenceService không bị ảnh hưởng
+
+public class EvaluateVisitRequest
 {
-    [JsonPropertyName("lat")]
-    public double? Lat { get; init; }
+    public double? ResolvedLatitude  { get; set; }
+    public double? ResolvedLongitude { get; set; }
+    public double? ResolvedAccuracy  { get; set; }
 
-    [JsonPropertyName("lng")]
-    public double? Lng { get; init; }
-
-    [JsonPropertyName("accuracy")]
-    public double? Accuracy { get; init; }
-
-    public double? Latitude { get; init; }
-    public double? Longitude { get; init; }
-    public double? AccuracyMeters { get; init; }
-    public DateTimeOffset? RecordedAt { get; init; }
-
-    public double? ResolvedLatitude => Lat ?? Latitude;
-    public double? ResolvedLongitude => Lng ?? Longitude;
-    public double? ResolvedAccuracy => Accuracy ?? AccuracyMeters ?? 10;
+    // Ánh xạ từ JSON { lat, lng, accuracy } mà frontend gửi
+    public double? Lat      { set => ResolvedLatitude  = value; }
+    public double? Lng      { set => ResolvedLongitude = value; }
+    public double? Accuracy { set => ResolvedAccuracy  = value; }
 }
 
-public sealed class EvaluateVisitResponse
+public class EvaluateVisitResponse
 {
-    public bool Accepted { get; init; }
-    public string? ReasonCode { get; init; }
-    public Guid? PlaceId { get; init; }
-    public double? DistanceMeters { get; init; }
+    public bool    Accepted        { get; set; }
+    public string? ReasonCode      { get; set; }
+    public Guid?   PlaceId         { get; set; }
+    public double? DistanceMeters  { get; set; }
 }
+
+// ── QR visit recording (UC01.3, BR-20 – BR-26) ───────────
+public record RecordQrVisitRequest(string SessionId, bool IsDemo);
+
+public record RecordQrVisitResponse(bool Recorded, string Message);
+
+// ── Reporting (UC07.1 – UC07.3) ──────────────────────────
+public record ReportingResponse(
+    int TotalVisits,
+    HourBucket[] HourBuckets,
+    int[] PeakHours          // các giờ đồng hạng (0–23, giờ VN)
+);
+
+public record HourBucket(int Hour, int Count);
