@@ -1,10 +1,14 @@
 using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Zoo.DAL.Data;
 
 #nullable disable
 
 namespace Zoo.DAL.Migrations
 {
+    [DbContext(typeof(ZooDbContext))]
+    [Migration("20261029120000_AddRevisionCreatedByFk")]
     /// <inheritdoc />
     public partial class AddRevisionCreatedByFk : Migration
     {

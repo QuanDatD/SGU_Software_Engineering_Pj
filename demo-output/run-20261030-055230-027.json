@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-10-30T05:52:43.2395139+07:00",
+    "BackendWindowPid":  27780,
+    "FrontendWindowPid":  28660,
+    "TunnelWindowPid":  25792,
+    "Website":  "https://national-orange-cruises-newer.trycloudflare.com",
+    "QrPage":  "https://national-orange-cruises-newer.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261030-055230-027.config.mjs",
+    "TunnelLog":  "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261030-055230-027.log",
+    "DemoAdmin":  false
+}

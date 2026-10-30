@@ -1,1 +1,4 @@
-﻿https://pace-teacher-term-alot.trycloudflare.com
+﻿Website: https://jet-stroke-reserve-provided.trycloudflare.com
+QR page: https://jet-stroke-reserve-provided.trycloudflare.com/qr
+Visitor link: https://jet-stroke-reserve-provided.trycloudflare.com/?source=qr
+Admin login: https://jet-stroke-reserve-provided.trycloudflare.com/admin/login

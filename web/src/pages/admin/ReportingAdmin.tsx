@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { reportingApi, type ReportingData } from "../../services/reportingApi";
 
 function todayStr(): string {
@@ -32,25 +32,53 @@ export default function ReportingAdmin() {
   const [error, setError] = useState<string | null>(null);
   const [applied, setApplied] = useState(false);
 
-  async function handleApply() {
-    if (!from || !to) { setError("Vui lòng chọn ngày bắt đầu và kết thúc."); return; }
-    // to exclusive: thêm 1 ngày để bao gồm ngày kết thúc
-    const toExclusive = new Date(to);
-    toExclusive.setDate(toExclusive.getDate() + 1);
+  const handleApply = useCallback(async () => {
+    if (!from || !to) {
+        setError("Vui lòng chọn ngày bắt đầu và kết thúc.");
+        return;
+    }
+
+    if (from > to) {
+        setError("Ngày bắt đầu không được sau ngày kết thúc.");
+        return;
+    }
+
+    // Ngày kết thúc trên giao diện là ngày được tính vào báo cáo.
+    // API nhận mốc kết thúc không bao gồm, nên cộng thêm một ngày.
+    const toExclusive = new Date(`${to}T00:00:00Z`);
+
+    toExclusive.setUTCDate(toExclusive.getUTCDate() + 1);
+
     const toStr = toExclusive.toISOString().slice(0, 10);
 
     setLoading(true);
     setError(null);
+
     try {
-      const result = await reportingApi.get(from, toStr, includeDemo);
-      setData(result);
-      setApplied(true);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Không tải được dữ liệu báo cáo.");
+        const result = await reportingApi.get(
+            from,
+            toStr,
+            includeDemo,
+        );
+
+        setData(result);
+        setApplied(true);
+    } catch (error: unknown) {
+        setData(null);
+
+        setError(
+            error instanceof Error
+                ? error.message
+                : "Không tải được dữ liệu báo cáo.",
+        );
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  }
+}, [from, to, includeDemo]);
+
+useEffect(() => {
+    void handleApply();
+}, [handleApply]);
 
   const maxCount = data ? Math.max(...data.hourBuckets.map(b => b.count), 1) : 1;
 

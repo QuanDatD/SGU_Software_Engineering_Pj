@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-10-30T06:34:29.0129101+07:00",
+    "BackendWindowPid":  22516,
+    "FrontendWindowPid":  21232,
+    "TunnelWindowPid":  18212,
+    "Website":  "https://jet-stroke-reserve-provided.trycloudflare.com",
+    "QrPage":  "https://jet-stroke-reserve-provided.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261030-063412-745.config.mjs",
+    "TunnelLog":  "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261030-063412-745.log",
+    "DemoAdmin":  false
+}

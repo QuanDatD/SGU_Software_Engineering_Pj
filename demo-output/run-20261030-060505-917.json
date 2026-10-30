@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-10-30T06:05:20.7388879+07:00",
+    "BackendWindowPid":  3340,
+    "FrontendWindowPid":  2300,
+    "TunnelWindowPid":  13104,
+    "Website":  "https://news-rocky-analysts-angela.trycloudflare.com",
+    "QrPage":  "https://news-rocky-analysts-angela.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261030-060505-917.config.mjs",
+    "TunnelLog":  "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261030-060505-917.log",
+    "DemoAdmin":  false
+}

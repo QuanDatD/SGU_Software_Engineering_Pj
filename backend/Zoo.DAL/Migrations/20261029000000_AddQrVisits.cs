@@ -1,10 +1,14 @@
 using System;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Zoo.DAL.Data;
 
 #nullable disable
 
 namespace Zoo.DAL.Migrations
 {
+    [DbContext(typeof(ZooDbContext))]
+    [Migration("20261029000000_AddQrVisits")]
     /// <inheritdoc />
     public partial class AddQrVisits : Migration
     {

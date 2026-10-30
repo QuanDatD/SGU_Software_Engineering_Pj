@@ -47,8 +47,8 @@ export function useQrVisit() {
     const isDemo = params.get("demo") === "true";
 
     // Fire-and-forget — không chặn UI dù backend lỗi
-    visitApi.recordQrVisit(sessionId, isDemo).catch(() => {
-      // Ghi nhận thất bại không ảnh hưởng hành trình của du khách
-    });
+    visitApi.recordQrVisit(sessionId, isDemo).catch((error: unknown) => {
+    console.error("Không ghi nhận được lượt truy cập QR:", error);
+});
   }, []); // chỉ chạy 1 lần khi mount
 }
