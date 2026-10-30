@@ -175,14 +175,7 @@ export default function App() {
           </nav>
         </>
       )}
-      <button
-     type="button"
-      className={page === "qr" ? "is-active" : ""}
-      aria-current={page === "qr" ? "page" : undefined}
-      onClick={() => changePage("qr")}
-    >
-  <span aria-hidden="true">📱</span> Mã QR truy cập
-</button>
+      
       <main>
          {page === "home" && (
           <HomePage onOpenMap={() => changePage("map")} />

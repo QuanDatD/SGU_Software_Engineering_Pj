@@ -12,6 +12,7 @@ import AudioPlayer from "../../components/AudioPlayer";
 import type { useVisitHistory } from "../../hooks/useVisitHistory";
 import GpsSimulationPanel from "../../components/GpsSimulationPanel";
 import type { useGpsSimulator } from "../../hooks/useGpsSimulator";
+import { useSiteTexts } from "../../hooks/useSiteTexts";
 interface MapPageProps {
     geolocation: ReturnType<typeof useGeolocation>;
     selectedId: string | null;
@@ -39,6 +40,8 @@ export default function MapPage({
     onStartSimulation,
 }: MapPageProps) {
   const { lang } = useLang();
+  const texts = useSiteTexts(lang);
+    const t = (key: string) => texts[key] ?? key;
   const audio = useAudio();
   const { gps, start, stop } = geolocation;
   const position = gps.status === "active" ? gps.position : null;
@@ -150,50 +153,188 @@ useEffect(() => {
   const sameTrack = !!url && audio.track?.url === url && audio.track.lang === lang;
   const playing = sameTrack && (audio.state === "playing" || audio.state === "loading");
   return (
+     
     <div className="live-map">
       <div ref={container} className="live-map__canvas" />
+
       <GpsSimulationPanel
-            places={places}
-            simulator={simulator}
-            onStart={onStartSimulation}
-            onStop={stop}
-        />
+        places={places}
+        simulator={simulator}
+        onStart={onStartSimulation}
+        onStop={stop}
+      />
+
+      {/* Bảng GPS: chỉ giữ một bảng này. */}
       <section className="live-map__gps">
         <strong>
-            {simulator.enabled ? "🧪 GPS giả lập" : "🛰️ GPS"}
-            {" · "}{places.length} khu đã xuất bản
+          {simulator.enabled
+            ? `🧪 ${t("gps.simulated")}`
+            : "🛰️ GPS"}
+          {" · "}
+          {places.length} {t("gps.published")}
         </strong>
+
         <small>
-            Đã tới: {visitHistory.visitedPlaceIds.length} điểm
-            {" · "}
-            Đã nghe: {visitHistory.heardPlaceIds.length} điểm
+          {t("gps.visited")}: {visitHistory.visitedPlaceIds.length}
+          {" · "}
+          {t("gps.heard")}: {visitHistory.heardPlaceIds.length}
         </small>
+
         <div>
-          <button onClick={() => { if (position) map.current?.flyTo([position.lat, position.lng], 18); else start(); }}>📍 Vị trí của tôi</button>
-          <button onClick={() => { stop(); setAutoPlay(false); }}>Tắt GPS</button>
+          <button
+            type="button"
+            onClick={() => {
+              if (position) {
+                map.current?.flyTo(
+                  [position.lat, position.lng],
+                  18,
+                );
+              } else {
+                start();
+              }
+            }}
+          >
+            📍 {t("gps.location")}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              stop();
+              setAutoPlay(false);
+            }}
+          >
+            {t("gps.stop")}
+          </button>
         </div>
-        {position ? <small>{position.lat.toFixed(6)}, {position.lng.toFixed(6)} · ±{Math.round(position.accuracy)} m</small>
-          : <small>{gps.status === "denied" ? "Bạn chưa cho phép truy cập vị trí." : gps.status === "unavailable" ? "Không lấy được GPS. Kiểm tra HTTPS và quyền vị trí." : gps.status === "requesting" ? "Đang tìm GPS…" : "Bật GPS để xác định khu đang đứng."}</small>}
-        <label><input type="checkbox" checked={autoPlay} onChange={e => { setAutoPlay(e.target.checked); if (e.target.checked && !position) start(); }} /> Tự phát khi vào vùng</label>
-        {position && position.accuracy > 25 && <small>GPS chưa đủ chính xác để tự phát (cần ≤25 m).</small>}
-        {loading && <small>Đang lấy dữ liệu từ API…</small>}
-        {error && <small role="alert">Không cập nhật được dữ liệu: {error}. Đang thử lại; tự phát tạm dừng.</small>}
-        {!loading && !error && places.length === 0 && <small>Chưa có khu đang bật với thuyết minh đã xuất bản.</small>}
+
+        {position ? (
+          <small>
+            {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
+            {" · ±"}
+            {Math.round(position.accuracy)} m
+          </small>
+        ) : (
+          <small>
+            {gps.status === "denied"
+              ? t("gps.denied")
+              : gps.status === "unavailable"
+                ? t("gps.unavailable")
+                : gps.status === "requesting"
+                  ? t("gps.searching")
+                  : t("gps.enable")}
+          </small>
+        )}
+
+        <label>
+          <input
+            type="checkbox"
+            checked={autoPlay}
+            onChange={(event) => {
+              const checked = event.target.checked;
+
+              if (checked && !position) {
+                start();
+              }
+
+              setAutoPlay(checked);
+            }}
+          />
+          {" "}
+          {t("gps.auto")}
+        </label>
+
+        {position && position.accuracy > 25 && (
+          <small>{t("gps.inaccurate")}</small>
+        )}
+
+        {loading && (
+          <small>{t("map.loading")}</small>
+        )}
+
+        {error && (
+          <small role="alert">{t("map.error")}</small>
+        )}
+
+        {!loading && !error && places.length === 0 && (
+          <small>{t("map.empty")}</small>
+        )}
       </section>
-      {selected && <section className="live-map__detail">
-        <button className="live-map__close" onClick={() => setSelectedId(null)} aria-label="Đóng">✕</button>
-        {selected.imageUrl && <img src={selected.imageUrl} alt={selected.name[lang] || selected.name.vi} />}
-        <h3>{selected.name[lang] || selected.name.vi}</h3>
-        <p>{selected.desc[lang] || selected.desc.vi}</p>
-        <small>Vùng GPS: {selected.radiusMeters} m · Phiên bản {selected.version}</small>
-        <details><summary>Nội dung thuyết minh ({lang.toUpperCase()})</summary><p>{selected.script?.[lang] || "Chưa có bản dịch."}</p></details>
-        <button disabled={!url} onClick={() => {
-          if (playing) audio.pause();
-          else if (sameTrack && audio.state === "paused") audio.resume();
-          else if (url) void audio.play({ placeId: selected.id, lang, url, title: selected.name[lang] || selected.name.vi });
-        }}>{playing ? "⏸ Tạm dừng" : url ? "▶ Nghe thuyết minh" : "Chưa có âm thanh ngôn ngữ này"}</button>
-        {sameTrack && audio.state === "error" && <p role="alert">Không phát được âm thanh. Nhấn Nghe để thử lại hoặc cho phép trình duyệt phát âm thanh.</p>}
-      </section>}
+
+      {/* Chi tiết điểm đang chọn. */}
+      {selected && (
+        <section className="live-map__detail">
+          <button
+            type="button"
+            className="live-map__close"
+            onClick={() => setSelectedId(null)}
+            aria-label={t("common.close")}
+          >
+            ✕
+          </button>
+
+          {selected.imageUrl && (
+            <img
+              src={selected.imageUrl}
+              alt={selected.name[lang] || selected.name.vi}
+            />
+          )}
+
+          <h3>
+            {selected.name[lang] || selected.name.vi}
+          </h3>
+
+          <p>
+            {selected.desc[lang] || selected.desc.vi}
+          </p>
+
+          <small>
+            {t("map.zone")}: {selected.radiusMeters} m
+            {" · "}
+            {t("map.version")} {selected.version}
+          </small>
+
+          <details>
+            <summary>
+              {t("map.script")} ({lang.toUpperCase()})
+            </summary>
+
+            <p>
+              {selected.script?.[lang] || t("map.noTranslation")}
+            </p>
+          </details>
+
+          <button
+            type="button"
+            disabled={!url || (sameTrack && audio.state === "loading")}
+            onClick={() => {
+              if (playing) {
+                audio.pause();
+              } else if (sameTrack && audio.state === "paused") {
+                audio.resume();
+              } else if (url) {
+                void audio.play({
+                  placeId: selected.id,
+                  lang,
+                  url,
+                  title: selected.name[lang] || selected.name.vi,
+                });
+              }
+            }}
+          >
+            {playing
+              ? `⏸ ${t("audio.pause")}`
+              : url
+                ? `▶ ${t("audio.listen")}`
+                : t("audio.missing")}
+          </button>
+
+          {sameTrack && audio.state === "error" && (
+            <p role="alert">{t("audio.error")}</p>
+          )}
+        </section>
+      )}
+
       <AudioPlayer lang={lang} />
     </div>
   );

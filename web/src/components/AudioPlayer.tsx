@@ -1,5 +1,6 @@
 import { useAudio } from "../contexts/AudioContext";
-
+import { useLang } from "../contexts/LanguageContext";
+import { useSiteTexts } from "../hooks/useSiteTexts";
 function fmt(s: number): string {
   if (!isFinite(s) || isNaN(s)) return "0:00";
   const m = Math.floor(s / 60);
@@ -11,9 +12,11 @@ interface Props {
   lang?: string;
 }
 
-export default function AudioPlayer({ lang = "vi" }: Props) {
+export default function AudioPlayer(_props: Props) {
   const { track, state, currentTime, duration, resume, pause, stop, seek } = useAudio();
-
+  const { lang: currentLang } = useLang();
+    const texts = useSiteTexts(currentLang);
+    const t = (key: string) => texts[key] ?? key;
   if (!track) return null;
 
   const isPlaying = state === "playing" || state === "loading";
@@ -24,7 +27,7 @@ export default function AudioPlayer({ lang = "vi" }: Props) {
   }
 
   return (
-    <div className="audio-player" role="region" aria-label={lang === "vi" ? "Trình phát âm thanh" : "Audio Player"}>
+    <div className="audio-player" role="region" aria-label={t("audio.player")}>
       {/* Tên bài */}
       <div className="audio-player__track">
         <span className="audio-player__icon">🎧</span>
@@ -48,7 +51,7 @@ export default function AudioPlayer({ lang = "vi" }: Props) {
           step={0.5}
           value={currentTime}
           onChange={handleSeek}
-          aria-label="Seek"
+          aria-label={t("audio.seek")}
         />
         <span className="audio-player__time">{fmt(duration)}</span>
       </div>
@@ -57,20 +60,26 @@ export default function AudioPlayer({ lang = "vi" }: Props) {
       <div className="audio-player__controls">
         {/* Nghe lại từ đầu (UC03.5) */}
         <button
-          className="audio-player__ctrl"
-          type="button"
-          aria-label="Nghe lại từ đầu"
-          onClick={() => { seek(0); if (!isPlaying) resume(); }}
-          title="Nghe lại từ đầu"
+            className="audio-player__ctrl"
+            type="button"
+            aria-label={t("audio.replay")}
+            title={t("audio.replay")}
+            onClick={() => {
+                seek(0);
+
+                if (!isPlaying) {
+                    resume();
+                }
+            }}
         >
-          ↩
+            ↩
         </button>
 
         {/* Tua lùi 10s */}
         <button
           className="audio-player__ctrl"
           type="button"
-          aria-label="Tua lùi 10 giây"
+          aria-label={t("audio.back")}
           onClick={() => seek(currentTime - 10)}
         >
           ⏮ 10s
@@ -80,7 +89,7 @@ export default function AudioPlayer({ lang = "vi" }: Props) {
         <button
           className="audio-player__ctrl audio-player__ctrl--main"
           type="button"
-          aria-label={isPlaying ? "Tạm dừng" : "Phát"}
+          aria-label={isPlaying ? t("audio.pause") : t("audio.play")}
           disabled={state === "loading"}
           onClick={() => isPlaying ? pause() : resume()}
         >
@@ -91,7 +100,7 @@ export default function AudioPlayer({ lang = "vi" }: Props) {
         <button
           className="audio-player__ctrl"
           type="button"
-          aria-label="Tua tới 10 giây"
+          aria-label={t("audio.forward")}
           onClick={() => seek(currentTime + 10)}
         >
           10s ⏭

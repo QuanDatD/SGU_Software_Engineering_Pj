@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-10-30T07:05:27.0648538+07:00",
+    "BackendWindowPid":  19512,
+    "FrontendWindowPid":  23500,
+    "TunnelWindowPid":  27496,
+    "Website":  "https://boundary-remained-movie-votes.trycloudflare.com",
+    "QrPage":  "https://boundary-remained-movie-votes.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261030-070504-555.config.mjs",
+    "TunnelLog":  "D:\\Learning PJ\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261030-070504-555.log",
+    "DemoAdmin":  false
+}

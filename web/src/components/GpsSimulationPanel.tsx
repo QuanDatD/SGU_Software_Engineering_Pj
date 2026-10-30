@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { PlaceDetail } from "../types/place";
 import type { useGpsSimulator } from "../hooks/useGpsSimulator";
+import { useLang } from "../contexts/LanguageContext";
+import { useSiteTexts } from "../hooks/useSiteTexts";
 
 interface Coordinate {
     lat: number;
@@ -24,6 +26,10 @@ export default function GpsSimulationPanel({
     onStart,
     onStop,
 }: Props) {
+    const { lang } = useLang();
+    const texts = useSiteTexts(lang);
+    const t = (key: string) => texts[key] ?? key;
+
     const [fromId, setFromId] = useState("outside");
     const [targetId, setTargetId] = useState("");
     const [speed, setSpeed] = useState(2);
@@ -87,41 +93,40 @@ export default function GpsSimulationPanel({
 
     return (
         <details className="live-map__simulation">
-            <summary>🧪 Giả lập GPS</summary>
+            	<summary>🧪 {t("sim.title")}</summary>
 
             <p>
-                Dùng để demo. Di chuyển theo đường thẳng,
-                không phải đường đi bộ thực tế.
+                	{t("sim.note")}
             </p>
 
             <label>
-                Xuất phát
+                	{t("sim.from")}
                 <select
                     value={fromId}
                     disabled={simulator.enabled}
                     onChange={(event) => setFromId(event.target.value)}
                 >
                     <option value="outside">
-                        Ngoài vùng của điểm đích
+                        	{t("sim.outside")}
                     </option>
 
                     {places.map((place) => (
                         <option key={place.id} value={place.id}>
-                            {place.name.vi || place.slug}
+                            {place.name[lang] || place.name.vi || place.slug}
                         </option>
                     ))}
                 </select>
             </label>
 
             <label>
-                Điểm đích
+                	{t("sim.to")}
                 <select
                     value={target?.id ?? ""}
                     disabled={simulator.enabled || places.length === 0}
                     onChange={(event) => setTargetId(event.target.value)}
                 >
                     {places.length === 0 && (
-                        <option value="">Chưa có dữ liệu</option>
+                        <option value="">	{t("sim.empty")}</option>
                     )}
 
                     {places.map((place) => (
@@ -133,7 +138,7 @@ export default function GpsSimulationPanel({
             </label>
 
             <label>
-                Tốc độ
+                	{t("sim.speed")}
                 <select
                     value={speed}
                     disabled={simulator.enabled}
@@ -141,9 +146,9 @@ export default function GpsSimulationPanel({
                         setSpeed(Number(event.target.value))
                     }
                 >
-                    <option value={1}>1 m/s — chậm</option>
-                    <option value={2}>2 m/s — vừa</option>
-                    <option value={4}>4 m/s — demo nhanh</option>
+                    <option value={1}>1 m/s — {t("sim.slow")}</option>
+                    <option value={2}>2 m/s — {t("sim.medium")}</option>
+                    <option value={4}>4 m/s — {t("sim.fast")}</option>
                 </select>
             </label>
 
@@ -155,16 +160,16 @@ export default function GpsSimulationPanel({
                     disabled={places.length === 0}
                     onClick={handleStart}
                 >
-                    Bắt đầu giả lập
+                    	{t("sim.start")}
                 </button>
             ) : (
                 <>
                     <p role="status">
                         {simulator.progress >= 1
-                            ? "Đã tới đích"
+                            ? t("sim.arrived")
                             : simulator.moving
-                              ? "Đang di chuyển"
-                              : "Đang đứng yên"}
+                              ? t("sim.moving")
+                              : t("sim.paused")}
                         {" · "}{percent}%
                     </p>
 
@@ -185,13 +190,13 @@ export default function GpsSimulationPanel({
                                 }
                             >
                                 {simulator.moving
-                                    ? "Tạm dừng di chuyển"
-                                    : "Tiếp tục di chuyển"}
+                                     ? t("sim.pause")
+                                    : t("sim.resume")}
                             </button>
                         )}
 
                         <button type="button" onClick={onStop}>
-                            Tắt giả lập
+                            	{t("sim.stop")}
                         </button>
                     </div>
                 </>
