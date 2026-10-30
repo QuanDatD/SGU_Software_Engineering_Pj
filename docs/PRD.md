@@ -1096,7 +1096,7 @@ Nhận diện được điểm không đồng nghĩa trình duyệt chắc chắ
 
 Trong quá trình chuẩn bị bản mới, bản public cũ vẫn được phục vụ.
 
-![HÌNH LUỒNG QUẢN TRỊ NỘI DUNG — NHÁP → DỊCH/AUDIO → HIỆU CHỈNH → NGHE THỬ → XUẤT BẢN.](imgs/AdminFlow_.png)
+![HÌNH LUỒNG QUẢN TRỊ NỘI DUNG — NHÁP → DỊCH/AUDIO → HIỆU CHỈNH → NGHE THỬ → XUẤT BẢN.](imgs/AdminFlow.png)
 
 ## 7.4. Truy cập QR và báo cáo
 
