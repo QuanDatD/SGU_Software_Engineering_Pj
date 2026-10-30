@@ -182,7 +182,7 @@ SQL Server và kho media là thành phần hạ tầng của hệ thống.
 
 Các nhóm dùng để tổ chức chức năng. Không dùng quan hệ `include` hoặc `extend` chỉ để thể hiện một chức năng thuộc nhóm.
 
-**[CHÈN HÌNH BFD — PHÂN RÃ HỆ THỐNG THÀNH 7 NHÓM CHỨC NĂNG VÀ CÁC CHỨC NĂNG CON TƯƠNG ỨNG.]**
+![HÌNH BFD — PHÂN RÃ HỆ THỐNG THÀNH 7 NHÓM CHỨC NĂNG VÀ CÁC CHỨC NĂNG CON TƯƠNG ỨNG.](imgs/BFD.jpg)
 
 ## 4.2. Sơ đồ Use Case tổng quan
 
@@ -1082,7 +1082,7 @@ Quét QR → mở website → ghi nhận truy cập theo phiên → chọn ngôn
 
 Ghi nhận thống kê không làm chặn bước chọn ngôn ngữ.
 
-**[CHÈN HÌNH USER FLOW DU KHÁCH — QR → NGÔN NGỮ → QUYỀN VỊ TRÍ → BẢN ĐỒ.]**
+![HÌNH USER FLOW DU KHÁCH — QR → NGÔN NGỮ → QUYỀN VỊ TRÍ → BẢN ĐỒ.](imgs/UserFlow_.png)
 
 ## 7.2. Nghe theo vị trí
 
@@ -1096,7 +1096,7 @@ Nhận diện được điểm không đồng nghĩa trình duyệt chắc chắ
 
 Trong quá trình chuẩn bị bản mới, bản public cũ vẫn được phục vụ.
 
-**[CHÈN HÌNH LUỒNG QUẢN TRỊ NỘI DUNG — NHÁP → DỊCH/AUDIO → HIỆU CHỈNH → NGHE THỬ → XUẤT BẢN.]**
+![HÌNH LUỒNG QUẢN TRỊ NỘI DUNG — NHÁP → DỊCH/AUDIO → HIỆU CHỈNH → NGHE THỬ → XUẤT BẢN.](imgs/AdminFlow_.png)
 
 ## 7.4. Truy cập QR và báo cáo
 
@@ -1278,8 +1278,7 @@ Các quan hệ và ràng buộc nêu trên phải được kiểm tra trong migr
 
 Dấu nguồn như `source=qr` chỉ xác định loại liên kết truy cập, không chứng minh hành động camera quét.
 
-
-**[CHÈN HÌNH LƯỢC ĐỒ VẬT LÝ — TÊN CỘT, KIỂU DỮ LIỆU, PK, FK, UNIQUE VÀ INDEX THEO MIGRATION ĐÃ CHỐT.]**
+![HÌNH LƯỢC ĐỒ VẬT LÝ – TÊN CỘT, KIỂU DỮ LIỆU, PK, FK, UNIQUE VÀ INDEX THEO MIGRATION ĐÃ CHỐT.](imgs/ERD_cnpm.png)
 
 ## 9.6. Hợp đồng API
 
