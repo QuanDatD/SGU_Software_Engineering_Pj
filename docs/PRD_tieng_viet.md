@@ -244,20 +244,20 @@ Không đưa UC “Kiểm tra quyền truy cập” thành chức năng riêng. 
 | BR-11 | Không tự phát lặp cùng điểm, ngôn ngữ và phiên bản trong một phiên tham quan; nghe lại thủ công được phép. |
 | BR-12 | Đổi ngôn ngữ không tải lại trang; giữ vị trí, điểm đang chọn, điểm đã đi qua và lịch sử nghe. Trạng thái đã đi qua khác với đã nghe. |
 | BR-13 | Mỗi điểm có nhiều phiên bản; cặp PlaceId và Version là duy nhất. Mỗi điểm có tối đa một phiên bản công khai hiện hành. |
-| BR-14 | Chỉ sửa bản Draft; thay đổi nội dung đã xuất bản phải thực hiện qua bản nháp mới. |
-| BR-15 | Sửa script làm audio tương ứng hết hiệu lực; sửa tiếng Việt làm các kết quả dịch phụ thuộc cần được cập nhật hoặc duyệt lại. |
-| BR-16 | Không tự ghi đè bản dịch đã hiệu chỉnh thủ công trong lần tạo lại mặc định. |
-| BR-17 | Xuất bản yêu cầu đủ nội dung và audio hợp lệ của 5 ngôn ngữ; audio phải khớp script hiện tại. |
-| BR-18 | Cập nhật trạng thái xuất bản và PublishedRevisionId phải nhất quán; bản public trước được giữ trong lịch sử. |
+| BR-14 | Admin chỉ được sửa nội dung phiên bản Draft. Khi phiên bản có tác vụ dịch hoặc tạo audio đang Running, hệ thống chặn sửa và xóa bản nháp. Backend và SQL bảo vệ nội dung và bản ghi của phiên bản Published và Archived khỏi thao tác sửa nội dung hoặc xóa. Khi cần cập nhật nội dung đã công bố, Admin làm việc trên phiên bản Draft. |
+| BR-15 |	Khi nguồn tiếng Việt của bản Draft thay đổi, hệ thống giữ nội dung các bản dịch hiện có và đánh dấu các bản dịch dựa trên nguồn cũ là Cần duyệt lại. Admin xác nhận giữ nguyên hoặc cập nhật từng bản dịch theo nguồn mới. Khi kịch bản đọc của một ngôn ngữ thay đổi, audio của ngôn ngữ đó hết hiệu lực. |
+| BR-16 | Hệ thống bảo toàn bản dịch đã được Admin hiệu chỉnh thủ công khi tạo lại hoặc thử lại tác vụ. Nếu chỉ cần tạo lại audio, hệ thống sử dụng kịch bản hiện tại của ngôn ngữ đó. |
+| BR-17 | 	Chỉ xuất bản bản Draft khi đủ nội dung và audio hợp lệ cho `vi`, `en`, `zh`, `ko`, `ja`, audio khớp kịch bản hiện tại, các tác vụ liên quan đã hoàn tất và mọi bản dịch cần duyệt đã được Admin xử lý. |
+| BR-18 | Khi xuất bản thành công, hệ thống chuyển bản nháp thành Published, chuyển bản công khai cũ của cùng điểm sang Archived nếu có và cập nhật PublishedRevisionId trong cùng một giao dịch. SQL chặn gán phiên bản công khai thuộc điểm khác. |
 | BR-19 | Văn bản và audio public phải thuộc cùng phiên bản; bản nháp chỉ được xem/nghe thử qua chức năng Admin. |
 | BR-20 | Chỉ ghi nhận lượt truy cập QR khi website mở từ liên kết có dấu nguồn QR và backend lưu sự kiện thành công. |
 | BR-21 | Mỗi SessionId chỉ được ghi một lượt QR. Tải lại trang hoặc gửi lại cùng sự kiện trong phiên không cộng thêm lượt. |
-| BR-22 | SessionId được duy trì trong phiên trình duyệt; mở lại sau ít nhất 30 phút không hoạt động tạo phiên mới. Quy tắc này không bảo đảm nhận diện một người duy nhất giữa các tab hoặc trình duyệt. |
+| BR-22 | Khi mở website từ liên kết QR, hệ thống dùng lại SessionId nếu trình duyệt đã có mã phiên. Nếu chưa có, hệ thống tạo mã phiên mới. |
 | BR-23 | Thời điểm sự kiện do server ghi UTC; báo cáo hiển thị giờ Việt Nam. Khoảng lọc sử dụng [bắt đầu, kết thúc). |
 | BR-24 | Báo cáo cộng lượt theo 24 khung giờ trong ngày của khoảng lọc; khung có tổng lớn nhất là cao điểm. Đồng hạng phải hiển thị đủ; không có lượt thì không kết luận cao điểm. |
-| BR-25 | Không xóa điểm đang có phiên bản thuyết minh tham chiếu; sử dụng chức năng ẩn. Chỉ xóa bản nháp đủ điều kiện, không xóa phiên bản đã xuất bản qua chức năng xóa nháp. |
+| BR-25 | Backend và SQL chặn xóa điểm còn bất kỳ phiên bản thuyết minh nào, kể cả Draft. Admin có thể ẩn điểm để ngừng hiển thị trên web du khách. Khi xóa bản Draft đủ điều kiện, hệ thống xóa kèm bản ghi bản dịch và tác vụ thuộc bản nháp đó. |
 | BR-26 | Dữ liệu được đánh dấu demo được loại khỏi báo cáo vận hành mặc định. Không mặc định mọi lượt qua URL tunnel đều là demo. |
-| BR-27 | GenerationJobs lưu trạng thái tác vụ tạo nội dung; trạng thái job không thay thế trạng thái phiên bản hoặc hiệu lực audio. |
+| BR-27 | Mỗi cặp phiên bản và ngôn ngữ có một GenerationJob. Tác vụ dùng các trạng thái Pending, Running, Succeeded và Failed. Hệ thống lưu trạng thái Running và giai đoạn xử lý trước khi gọi Azure. Khi thử lại, hệ thống cập nhật đúng tác vụ hiện có và tăng số lần thử. |
 | BR-28 | SiteTexts lưu văn bản giao diện theo khóa và ngôn ngữ; không lưu thuyết minh của từng điểm. |
 
 ## 5.2. Quy ước đặc tả và hình vẽ
@@ -296,12 +296,13 @@ Nhóm này hỗ trợ mở website qua QR, ghi nhận truy cập, chọn ngôn n
 |---|---|---|
 | 1 | Xem lựa chọn ngôn ngữ. | Hiển thị Việt, Anh, Trung, Hàn và Nhật. |
 | 2 | Chọn một ngôn ngữ. | Đánh dấu lựa chọn. |
-| 3 | Nhấn tiếp tục. | Lưu, áp dụng ngôn ngữ và chuyển sang UC01.2. |
+| 3 | Nhấn Tiếp tục thì kiểm tra lựa chọn [E1] | Lưu, áp dụng ngôn ngữ và chuyển sang UC01.2. |
 
-**Luồng thay thế / ngoại lệ:** Không có luồng riêng. Giao diện chỉ cho tiếp tục khi có lựa chọn hợp lệ.
+**Luồng thay thế / ngoại lệ:** 
 
-![HÌNH ACTIVITY UC01.1 — CHỌN NGÔN NGỮ → XÁC NHẬN → LƯU VÀ ÁP DỤNG.](imgs/uc01.1_act_cnpm.drawio.png
-)
+E1: Chưa chọn ngôn ngữ thì báo và giữ màn hình hiện tại.
+
+![HÌNH ACTIVITY UC01.1 — CHỌN NGÔN NGỮ → XÁC NHẬN → LƯU VÀ ÁP DỤNG.](imgs/uc01.1_act_cnpm.drawio.png)
 
 ### UC01.2 — Thiết lập quyền vị trí
 
@@ -1152,7 +1153,7 @@ Các ngưỡng là mục tiêu kiểm thử, chưa phải công suất được 
 - SessionId phục vụ chống trùng lượt, không phải danh tính cá nhân.
 - Không mặc định lưu lịch sử tọa độ.
 - Chỉ số chính là lượt truy cập, không gọi là số người duy nhất.
-- Thời hạn lưu dữ liệu QR được nhóm xác nhận trước vận hành; đề xuất ban đầu là 90 ngày.
+- Thời hạn lưu dữ liệu QR được nhóm xác nhận trước vận hành; Lượt truy cập QR được lưu trong 90 ngày kể từ thời điểm ghi nhận.
 
 ## 8.5. Tin cậy và bảo trì
 
@@ -1272,6 +1273,8 @@ Tên cột dưới đây là hợp đồng thiết kế cần đối chiếu v�
 - Index VisitedAtUtc hỗ trợ lọc báo cáo.
 - QrVisits và SiteTexts không cần quan hệ với Places.
 - Không có QrCodeId hoặc FK tới QrCodes.
+- Mỗi cặp RevisionId, Language trong GenerationJobs là duy nhất.
+- SQL chặn xóa điểm còn phiên bản. Khi xóa nháp hợp lệ, xóa cùng bản
 
 Các quan hệ và ràng buộc nêu trên phải được kiểm tra trong migration trước khi mô tả là đã triển khai.
 
@@ -1415,7 +1418,7 @@ Phân công theo UC là trách nhiệm đầu mối nghiệp vụ. Công việc 
 | TC02 | UC01.1–01.2 | Bắt đầu phiên tham quan | Chọn ngôn ngữ trước hỏi GPS |
 | TC03 | UC01.2 | Không cấp GPS | Vẫn xem và nghe thủ công |
 | TC04 | UC01.3 | Gửi lại cùng SessionId | Không cộng trùng |
-| TC05 | UC01.3 | Mở lại sau khi phiên hết hạn | Tạo phiên mới theo quy tắc |
+| TC05 | UC01.3 | Mở liên kết QR khi chưa có SessionId | Tạo phiên mới theo quy tắc |
 | TC06 | UC02.1 | Điểm ẩn hoặc chỉ có Draft | Không hiển thị public |
 | TC07 | UC02.2 | Xác định vị trí | Chỉ hiển thị tọa độ hợp lệ |
 | TC08 | UC03.1 | Ngoài vùng, đúng biên, trong vùng | Đánh giá đúng bán kính và xác nhận ổn định |
@@ -1436,7 +1439,7 @@ Phân công theo UC là trách nhiệm đầu mối nghiệp vụ. Công việc 
 | TC23 | UC06.4 | Lỗi một ngôn ngữ, tạo lại | Giữ kết quả hợp lệ; không tạo trùng |
 | TC24 | UC06.5 | Sửa script bản dịch | Audio cũ hết hiệu lực |
 | TC25 | UC06.6 | Preview nháp khi chưa đăng nhập | Bị từ chối |
-| TC26 | UC06.7 | Thiếu file/audio hoặc hash lệch | Không xuất bản |
+| TC26 | UC06.7 | Thiếu file/audio hoặc hash lệch hoặc còn bản dịch cần duyệt lại | Không xuất bản |
 | TC27 | UC06.7 | Xuất bản bản mới | Con trỏ public và trạng thái nhất quán |
 | TC28 | UC07.1 | Khoảng lọc sai hoặc không có dữ liệu | Báo lỗi đúng hoặc trả 0 hợp lệ |
 | TC29 | UC07.2 | Sự kiện sát ranh giới ngày | Xếp đúng giờ Việt Nam |
