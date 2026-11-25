@@ -182,7 +182,7 @@ SQL Server and media storage are part of the system infrastructure.
 
 Groups organize functionality. Do not use `include` or `extend` relationships solely to show group membership.
 
-![BFD — SYSTEM BREAKDOWN INTO SEVEN FUNCTIONAL GROUPS AND THEIR SUBFUNCTIONS.](imgs/BFD.jpg)
+![BFD — SYSTEM BREAKDOWN INTO SEVEN FUNCTIONAL GROUPS AND THEIR SUBFUNCTIONS.](imgs/en_bfd_cnpm.drawio.png)
 
 ## 4.2. Overall Use Case Diagram
 
@@ -302,7 +302,7 @@ This group covers opening the website through QR, recording access, selecting a 
 
 E1: If no language is selected, display a message and remain on the current screen.
 
-![UC01.1 ACTIVITY DIAGRAM — SELECT A LANGUAGE → CONFIRM → SAVE AND APPLY.](imgs/uc01.1_act_cnpm.drawio.png)
+![UC01.1 ACTIVITY DIAGRAM — SELECT A LANGUAGE → CONFIRM → SAVE AND APPLY.](imgs/en_uc01.1_act_cnpm.drawio.png)
 
 ### UC01.2 — Set Location Permission
 
@@ -328,7 +328,7 @@ E1: If no language is selected, display a message and remain on the current scre
 
 Open the map and allow the visitor to select points and listen manually. Do not display a simulated location or autoplay based on GPS. End the use case.
 
-![UC01.2 ACTIVITY DIAGRAM — BRANCHES FOR GRANTED AND DENIED GPS PERMISSION.](imgs/uc01.2_act_cnpm.drawio.png)
+![UC01.2 ACTIVITY DIAGRAM — BRANCHES FOR GRANTED AND DENIED GPS PERMISSION.](imgs/en_uc01.2_act_cnpm.drawio.png)
 
 ### UC01.3 — Record QR Access
 
@@ -355,7 +355,7 @@ Do not create another visit. Return an already-recorded result and let the visit
 
 Recording analytics does not block language selection.
 
-![UC01.3 ACTIVITY DIAGRAM — OPEN A QR LINK → CHECK THE SESSION → CHECK FOR DUPLICATES → RECORD OR SKIP.](imgs/uc01.3_act_cnpm.drawio.png)
+![UC01.3 ACTIVITY DIAGRAM — OPEN A QR LINK → CHECK THE SESSION → CHECK FOR DUPLICATES → RECORD OR SKIP.](imgs/en_uc01.3_act_cnpm.drawio.png)
 
 ---
 
@@ -388,7 +388,7 @@ This group covers viewing public points, their details, and the current location
 
 Selecting a point to view does not mark it as visited or listened to.
 
-![UC02.1 ACTIVITY DIAGRAM — SELECT A POINT → DISPLAY THE ZONE AND INFORMATION.](imgs/uc02.1_act_cnpm.drawio.png)
+![UC02.1 ACTIVITY DIAGRAM — SELECT A POINT → DISPLAY THE ZONE AND INFORMATION.](imgs/en_uc02.1_act_cnpm.drawio.png)
 
 ### UC02.2 — View My Location
 
@@ -417,7 +417,7 @@ Explain how to enable location permission. If granted, proceed to step 2. Otherw
 
 Show that location is being determined. Proceed to step 3 when valid data is available. Invalid coordinates must not trigger a zone.
 
-![UC02.2 ACTIVITY DIAGRAM — CHECK PERMISSION → GET COORDINATES → DISPLAY LOCATION.](imgs/uc02.2_act_cnpm.drawio.png)
+![UC02.2 ACTIVITY DIAGRAM — CHECK PERMISSION → GET COORDINATES → DISPLAY LOCATION.](imgs/en_uc02.2_act_cnpm.drawio.png)
 
 ---
 
@@ -981,7 +981,7 @@ Display zero visits and indicate that there is no data. Do not generate sample f
 
 Display a message and ask for a correction. Do not apply the filter.
 
-![UC07.1 ACTIVITY DIAGRAM — SELECT DATES → VALIDATE → AGGREGATE → DISPLAY.](imgs/uc07.1_act_cnpm.drawio.png)
+![UC07.1 ACTIVITY DIAGRAM — SELECT DATES → VALIDATE → AGGREGATE → DISPLAY.](imgs/en_uc07.1_act_cnpm.drawio.png)
 
 ### UC07.2 — View Hourly Visit Distribution
 
@@ -1008,7 +1008,7 @@ Display an empty state or show zero in every bucket.
 
 When the filter spans several days, visits at the same hour on different days are added to the same bucket. The interface must explain this aggregation.
 
-![ UC07.2 ACTIVITY DIAGRAM — RETRIEVE DATA → CONVERT TIMES → GROUP INTO 24 HOURLY BUCKETS → DISPLAY.](imgs/uc07.2_act_cnpm.drawio.png)
+![ UC07.2 ACTIVITY DIAGRAM — RETRIEVE DATA → CONVERT TIMES → GROUP INTO 24 HOURLY BUCKETS → DISPLAY.](imgs/en_uc07.2_act_cnpm.drawio.png)
 
 ### UC07.3 — View Peak Hours
 
@@ -1037,7 +1037,7 @@ Indicate that there is insufficient data to identify peak hours. End the use cas
 
 Display every hourly bucket with the highest visit count.
 
-![ UC07.3 ACTIVITY DIAGRAM — CHECK DATA → FIND THE MAXIMUM → DISPLAY PEAK HOURS.](imgs/uc07.3_act_cnpm.drawio.png)
+![ UC07.3 ACTIVITY DIAGRAM — CHECK DATA → FIND THE MAXIMUM → DISPLAY PEAK HOURS.](imgs/en_uc07.3_act_cnpm.drawio.png)
 
 ## 5.10. Location Simulation for Demos
 
@@ -1083,7 +1083,7 @@ Scan QR → open the website → record access by session → choose a language 
 
 Analytics recording does not block language selection.
 
-![VISITOR USER FLOW — QR → LANGUAGE → LOCATION PERMISSION → MAP.](imgs/UserFlow_.png)
+![VISITOR USER FLOW — QR → LANGUAGE → LOCATION PERMISSION → MAP.](imgs/en_userflow_cnpm.drawio.png)
 
 ## 7.2. Listen Based on Location
 
@@ -1097,7 +1097,7 @@ Sign in → select or create a point → create a Vietnamese draft → translate
 
 The existing public revision continues to be served while the new one is prepared.
 
-![CONTENT ADMINISTRATION FLOW — DRAFT → TRANSLATE AND GENERATE AUDIO → EDIT → PREVIEW → PUBLISH.](imgs/AdminFlow.png)
+![CONTENT ADMINISTRATION FLOW — DRAFT → TRANSLATE AND GENERATE AUDIO → EDIT → PREVIEW → PUBLISH.](imgs/en_adminworkflow_cnpm.drawio.png)
 
 ## 7.4. QR Access and Reporting
 
