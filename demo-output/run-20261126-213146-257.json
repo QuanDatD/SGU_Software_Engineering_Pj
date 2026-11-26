@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-26T21:32:08.7580384+07:00",
+    "BackendWindowPid":  22700,
+    "FrontendWindowPid":  31204,
+    "TunnelWindowPid":  37612,
+    "Website":  "https://spam-elvis-lee-together.trycloudflare.com",
+    "QrPage":  "https://spam-elvis-lee-together.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261126-213146-257.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261126-213146-257.log",
+    "DemoAdmin":  false
+}
