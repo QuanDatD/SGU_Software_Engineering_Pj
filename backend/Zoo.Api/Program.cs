@@ -77,6 +77,9 @@ builder.Services.AddScoped<IQrVisitService, QrVisitService>();
 builder.Services.AddScoped<IReportingService, ReportingService>();
 
 builder.Services.AddScoped<PlaceEditingService>();
+builder.Services.AddScoped<NarrationEditingService>();
+builder.Services.AddScoped<GenerationService>();
+builder.Services.AddScoped<PublicationService>();
 builder.Services.AddScoped<IPlaceService, PlaceService>();
 builder.Services.AddScoped<IAdminPlaceService, PlaceService>();
 builder.Services.AddScoped<Zoo.Api.Filters.ContentWriteFilter>();

@@ -26,6 +26,9 @@ public class AdminNarrationController : ControllerBase
     private readonly ITranslationClient _translator;
     private readonly ISpeechClient _speechClient;
     private readonly IMediaStorage _storage;
+    private readonly NarrationEditingService _narrationEditing;
+    private readonly GenerationService _generation;
+    private readonly PublicationService _publication;
 
     private static readonly string[] AllLangs = ["vi", "en", "zh", "ko", "ja"];
 
@@ -34,13 +37,19 @@ public class AdminNarrationController : ControllerBase
         IPlaceService placeService,
         ITranslationClient translator,
         ISpeechClient speechClient,
-        IMediaStorage storage)
+        IMediaStorage storage,
+        NarrationEditingService narrationEditing,
+        GenerationService generation,
+        PublicationService publication)
     {
         _db = db;
         _placeService = placeService;
         _translator = translator;
         _speechClient = speechClient;
         _storage = storage;
+        _narrationEditing = narrationEditing;
+        _generation = generation;
+        _publication = publication;
     }
 
     // 2. Lấy danh sách phiên bản thuyết minh của 1 khu
@@ -207,6 +216,42 @@ public class AdminNarrationController : ControllerBase
         return Ok(new { lang = targetLang, text = translation.ScriptText, isApproved = false });
     }
 
+    // 4b. Duyệt lại bản dịch khi script tiếng Việt thay đổi (Admin chọn giữ cũ hoặc cập nhật sang mới)
+    [HttpPost("revisions/{revisionId:guid}/translations/{lang}/review")]
+    public async Task<IActionResult> ReviewTranslation(Guid revisionId, string lang, [FromBody] ReviewTranslationRequest req, CancellationToken ct)
+    {
+        var targetLang = lang.ToLowerInvariant().Trim();
+        if (!AllLangs.Contains(targetLang))
+            return BadRequest(new { message = "Ngôn ngữ không hợp lệ." });
+
+        var result = await _narrationEditing.ReviewTranslationAsync(revisionId, targetLang, req, ct);
+        
+        return result switch
+        {
+            UpdateContentResult.Ok => Ok(new { message = $"Đã duyệt bản dịch {targetLang}." }),
+            UpdateContentResult.NotFound => NotFound(new { message = "Không tìm thấy phiên bản hoặc bản dịch." }),
+            UpdateContentResult.NotDraft => Conflict(new { message = "Chỉ duyệt bản nháp." }),
+            UpdateContentResult.HasProcessingJobs => Conflict(new { message = "Không thể duyệt khi có job đang xử lý." }),
+            _ => StatusCode(500, new { message = "Lỗi không xác định." })
+        };
+    }
+
+    // 4c. Cập nhật Vi content (title, description, script_text) với detection thay đổi để mark review
+    [HttpPut("revisions/{revisionId:guid}/content/vi")]
+    public async Task<IActionResult> UpdateViContent(Guid revisionId, [FromBody] NarrationContentRequest req, CancellationToken ct)
+    {
+        var result = await _narrationEditing.UpdateViContentWithReviewAsync(revisionId, req, ct);
+        
+        return result switch
+        {
+            UpdateContentResult.Ok => Ok(new { message = "Đã cập nhật nội dung tiếng Việt." }),
+            UpdateContentResult.NotFound => NotFound(new { message = "Không tìm thấy phiên bản." }),
+            UpdateContentResult.NotDraft => Conflict(new { message = "Chỉ cập nhật bản nháp." }),
+            UpdateContentResult.HasProcessingJobs => Conflict(new { message = "Không thể cập nhật khi có job đang xử lý." }),
+            _ => StatusCode(500, new { message = "Lỗi không xác định." })
+        };
+    }
+
     // 5. Dịch tự động qua Azure Translator & Tạo file MP3 qua Azure Speech
     [HttpPost("revisions/{revisionId:guid}/generate")]
     public async Task<IActionResult> Generate(Guid revisionId, CancellationToken ct)
@@ -333,6 +378,41 @@ public class AdminNarrationController : ControllerBase
             errorMessage = j.LastError, audioUrl = (string?)null, createdAt = j.CreatedAt, updatedAt = j.UpdatedAt }));
     }
 
+    // 5b. Tải audio để nghe thử (có kiểm tra hash hợp lệ)
+    [HttpGet("revisions/{revisionId:guid}/audio/{lang}")]
+    public async Task<IActionResult> GetAudio(Guid revisionId, string lang, [FromQuery] string? hash, CancellationToken ct)
+    {
+        var targetLang = lang.ToLowerInvariant().Trim();
+        if (!AllLangs.Contains(targetLang))
+            return BadRequest("Ngôn ngữ không hợp lệ.");
+
+        var translation = await _db.NarrationTranslations.AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Revision.Id == revisionId && t.Language == targetLang, ct);
+
+        if (translation == null || !PublicationRules.Ready(translation))
+            return NotFound("Bản dịch không sẵn sàng.");
+
+        // Verify content hash to prevent replay attacks
+        if (!string.IsNullOrWhiteSpace(hash) && hash != translation.AudioContentHash)
+            return BadRequest("Hash không hợp lệ.");
+
+        if (string.IsNullOrWhiteSpace(translation.AudioPath))
+            return NotFound("File audio không tồn tại.");
+
+        try
+        {
+            await using var audioStream = await _storage.OpenReadAudioAsync(translation.AudioPath, ct);
+            if (audioStream == null || audioStream.Length == 0)
+                return NotFound("File audio rỗng.");
+
+            return File(audioStream, "audio/mpeg", $"{targetLang}_narration.mp3");
+        }
+        catch
+        {
+            return NotFound("Không tìm thấy file audio.");
+        }
+    }
+
     // 6. Retry 1 job bị lỗi
     [HttpPost("jobs/{jobId:guid}/retry")]
     public async Task<IActionResult> RetryJob(Guid jobId, CancellationToken ct)
@@ -365,9 +445,31 @@ public class AdminNarrationController : ControllerBase
         return NoContent();
     }
 
-    // 7. Xuất bản phiên bản và cập nhật phiên bản công khai của điểm.
+    // 7a. Validate publish requirements
+    [HttpGet("revisions/{revisionId:guid}/publish/validate")]
+    public async Task<IActionResult> ValidatePublish(Guid revisionId, CancellationToken ct)
+    {
+        var result = await _publication.ValidatePublishRequirementsAsync(revisionId, ct);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    // 7b. Xuất bản phiên bản (yêu cầu xác nhận + lưu trữ bản cũ)
     [HttpPost("revisions/{revisionId:guid}/publish")]
-    public async Task<IActionResult> Publish(Guid revisionId, CancellationToken ct)
+    public async Task<IActionResult> Publish(Guid revisionId, [FromBody] PublishRevisionRequest request, CancellationToken ct)
+    {
+        Response.Headers.CacheControl = "no-store";
+
+        if (request == null)
+            return BadRequest(new { message = "Yêu cầu không hợp lệ." });
+
+        var result = await _publication.PublishAsync(revisionId, request, ct);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    // 7c. (Deprecated) Legacy publish endpoint - sử dụng POST /api/admin/revisions/{revisionId}/publish thay vào
+    [HttpPut("revisions/{revisionId:guid}/publish-legacy")]
+    [Obsolete("Use POST /api/admin/revisions/{revisionId}/publish instead")]
+    public async Task<IActionResult> PublishLegacy(Guid revisionId, CancellationToken ct)
     {
         var revision = await _db.NarrationRevisions
             .Include(r => r.Place)

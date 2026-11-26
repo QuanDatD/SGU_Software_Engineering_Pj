@@ -190,7 +190,7 @@ The diagram shows the two actors, Visitor and Admin, and their functions. Use fr
 
 Access checking is covered by the sign-in preconditions of the administrative use cases. It has no separate use case.
 
-![uctong](imgs/uctong_cnpm.drawio.png)
+![uctong](imgs/en_uctong_cnpm.drawio.png)
 
 ## 4.3. Use Case Catalog
 
@@ -277,7 +277,7 @@ Access checking is covered by the sign-in preconditions of the administrative us
 
 This group covers opening the website through QR, recording access, selecting a language, and setting location permission.
 
-![GROUP 01 USE CASE DIAGRAM — START A VISIT.](imgs/uc01_cnpm.drawio.png)
+![GROUP 01 USE CASE DIAGRAM — START A VISIT.](imgs/en_uc01_cnpm.drawio.png)
 
 ### UC01.1 — Select the Initial Language
 
@@ -363,7 +363,7 @@ Recording analytics does not block language selection.
 
 This group covers viewing public points, their details, and the current location.
 
-![GROUP 02 USE CASE DIAGRAM — VIEW THE VISITOR MAP.](imgs/uc02_cnpm.drawio.png)
+![GROUP 02 USE CASE DIAGRAM — VIEW THE VISITOR MAP.](imgs/en_uc02_cnpm.drawio.png)
 
 ### UC02.1 — View Point-of-Interest Information
 
@@ -425,7 +425,7 @@ Show that location is being determined. Proceed to step 3 when valid data is ava
 
 This group covers selecting a point, retrieving the appropriate content and audio, and controlling playback.
 
-![GROUP 03 USE CASE DIAGRAM — LISTEN TO NARRATION.](imgs/uc03_cnpm.drawio.png)
+![GROUP 03 USE CASE DIAGRAM — LISTEN TO NARRATION.](imgs/en_uc03_cnpm.drawio.png)
 
 ### UC03.1 — Identify the Point for Playback
 
@@ -459,7 +459,7 @@ Do not request autoplay. Continue monitoring the position and return to step 2 w
 
 If a track is already playing or the request is a repeat, hold off on autoplay. Continue monitoring location and playback state.
 
-![UC03.1 ACTIVITY DIAGRAM — A1 MANUAL PLAYBACK, A2 OUTSIDE THE ZONE, AND A3 AUTOPLAY CONDITIONS NOT MET.](imgs/uc03.1_act_cnpm.drawio.png)
+![UC03.1 ACTIVITY DIAGRAM — A1 MANUAL PLAYBACK, A2 OUTSIDE THE ZONE, AND A3 AUTOPLAY CONDITIONS NOT MET.](imgs/en_uc03.1_act_cnpm.drawio.png)
 
 ### UC03.2 — Retrieve Narration by Language
 
@@ -484,7 +484,7 @@ If a track is already playing or the request is a repeat, hold off on autoplay. 
 
 Indicate that matching narration is unavailable. Do not autoplay audio in another language. The visitor may change languages or select another point.
 
-![ UC03.2 ACTIVITY DIAGRAM — CHECK CONTENT AND AUDIO VALIDITY. INVALID CONTENT OR AUDIO LEADS TO E1.](imgs/uc03.2_act_cnpm.drawio.png)
+![ UC03.2 ACTIVITY DIAGRAM — CHECK CONTENT AND AUDIO VALIDITY. INVALID CONTENT OR AUDIO LEADS TO E1.](imgs/en_uc03.2_act_cnpm.drawio.png)
 
 ### UC03.3 — Pause Narration
 
@@ -506,7 +506,7 @@ Indicate that matching narration is unavailable. Do not autoplay audio in anothe
 
 **Alternative Flows and Exceptions:** None.
 
-![ UC03.3 ACTIVITY DIAGRAM — PRESS PAUSE → KEEP THE PLAYBACK POSITION → DISPLAY THE STATE.](imgs/uc03.3_act_cnpm.drawio.png)
+![ UC03.3 ACTIVITY DIAGRAM — PRESS PAUSE → KEEP THE PLAYBACK POSITION → DISPLAY THE STATE.](imgs/en_uc03.3_act_cnpm.drawio.png)
 
 ### UC03.4 — Resume Narration
 
@@ -528,7 +528,7 @@ Indicate that matching narration is unavailable. Do not autoplay audio in anothe
 
 **Alternative Flows and Exceptions:** None.
 
-![UC03.4 ACTIVITY DIAGRAM — PRESS RESUME → GET THE PLAYBACK POSITION → RESUME PLAYBACK.](imgs/uc03.4_act_cnpm.drawio.png)
+![UC03.4 ACTIVITY DIAGRAM — PRESS RESUME → GET THE PLAYBACK POSITION → RESUME PLAYBACK.](imgs/en_uc03.4_act_cnpm.drawio.png)
 
 ### UC03.5 — Replay Narration
 
@@ -552,7 +552,7 @@ Indicate that matching narration is unavailable. Do not autoplay audio in anothe
 
 Replaying does not clear visit history.
 
-![ UC03.5 ACTIVITY DIAGRAM — PRESS REPLAY → RETURN TO THE START → PLAY AUDIO.](imgs/uc03.5_act_cnpm.drawio.png)
+![ UC03.5 ACTIVITY DIAGRAM — PRESS REPLAY → RETURN TO THE START → PLAY AUDIO.](imgs/en_uc03.5_act_cnpm.drawio.png)
 
 ### UC03.6 — Change Narration Language
 
@@ -578,7 +578,7 @@ Replaying does not clear visit history.
 
 Changing languages alone does not restart playback. Stopping the previous audio is part of normal processing, not an exception.
 
-![UC03.6 ACTIVITY DIAGRAM — SELECT A LANGUAGE → SAVE → STOP PREVIOUS AUDIO IF PLAYING → UPDATE CONTENT AND PRESERVE STATE.](imgs/uc03.6_act_cnpm.drawio.png)
+![UC03.6 ACTIVITY DIAGRAM — SELECT A LANGUAGE → SAVE → STOP PREVIOUS AUDIO IF PLAYING → UPDATE CONTENT AND PRESERVE STATE.](imgs/en_uc03.6_act_cnpm.drawio.png)
 
 ---
 
@@ -586,7 +586,7 @@ Changing languages alone does not restart playback. Stopping the previous audio 
 
 This group authenticates accounts for access to the Admin area.
 
-![ GROUP 04 USE CASE DIAGRAM — ADMIN SIGN-IN.](imgs/uc04_cnpm.drawio.png)
+![ GROUP 04 USE CASE DIAGRAM — ADMIN SIGN-IN.](imgs/en_uc04_cnpm.drawio.png)
 
 ### UC04.1 — Authenticate an Admin Account
 
@@ -613,7 +613,7 @@ Deny sign-in and display an appropriate message. The Admin re-enters the informa
 
 Administrative API calls still require session authentication. Access checking has no separate use case.
 
-![ UC04.1 ACTIVITY DIAGRAM — ENTER CREDENTIALS → VALIDATE → CREATE A SESSION OR DISPLAY AN INVALID CREDENTIALS MESSAGE.](imgs/uc04.1_act_cnpm.drawio.png)
+![ UC04.1 ACTIVITY DIAGRAM — ENTER CREDENTIALS → VALIDATE → CREATE A SESSION OR DISPLAY AN INVALID CREDENTIALS MESSAGE.](imgs/en_uc04.1_act_cnpm.drawio.png)
 
 ---
 
@@ -621,7 +621,7 @@ Administrative API calls still require session authentication. Access checking h
 
 Admins manage the information, images, coordinates, radius, and status of points.
 
-![ GROUP 05 USE CASE DIAGRAM — ADMIN CONNECTS DIRECTLY TO ADD, EDIT, DELETE, AND HIDE/SHOW. NO UC-S01.](imgs/uc05_cnpm.drawio.png)
+![ GROUP 05 USE CASE DIAGRAM — ADMIN CONNECTS DIRECTLY TO ADD, EDIT, DELETE, AND HIDE/SHOW. NO UC-S01.](imgs/en_uc05_cnpm.drawio.png)
 
 ### UC05.1 — Add a Point of Interest
 
@@ -739,7 +739,7 @@ Set the point to active. Display it on the visitor website only if it has a vali
 
 This group manages content from the Vietnamese draft through translation, audio, and publication.
 
-![GROUP 06 USE CASE DIAGRAM ](imgs/uc06_cnpm.drawio.png)
+![GROUP 06 USE CASE DIAGRAM ](imgs/en_uc06_cnpm.drawio.png)
 
 ### UC06.1 — Add a Narration Draft
 
@@ -952,7 +952,7 @@ List the languages or audio that still need work. Leave the public revision as i
 
 Reports show recorded visits rather than a count of individual people.
 
-![ GROUP 07 USE CASE DIAGRAM — DATE FILTER, HOURLY DISTRIBUTION, AND PEAK HOURS. NO QR CODE FILTER.](imgs/uc07_cnpm.drawio.png)
+![ GROUP 07 USE CASE DIAGRAM — DATE FILTER, HOURLY DISTRIBUTION, AND PEAK HOURS. NO QR CODE FILTER.](imgs/en_uc07_cnpm.drawio.png)
 
 ### UC07.1 — Filter by Date Range
 
@@ -1206,7 +1206,7 @@ The API is the backend's HTTP entry point. A separate API project does not add a
 
 This is the target architecture. Check the source code before claiming that every controller fully conforms.
 
-**[INSERT THREE-TIER ARCHITECTURE DIAGRAM — GUI, API ENTRY POINT, BUS, DAL, AND STORAGE AND INTEGRATION SYSTEMS.]**
+
 
 ## 9.3. Component Diagram
 
@@ -1326,11 +1326,6 @@ Missing / generating / valid / failed / invalidated.
 
 Each type of state serves a different purpose and cannot substitute for the others.
 
-**[INSERT STATE DIAGRAM — DRAFT, PUBLISHED, AND ARCHIVED REVISION LIFECYCLE.]**
-
-**[INSERT GPS AND AUDIO SEQUENCE DIAGRAM — GUI → API/BUS → PUBLIC DATA → PLAYER.]**
-
-**[INSERT AZURE SEQUENCE DIAGRAM — ADMIN → API/BUS → GENERATIONJOBS → AZURE → MEDIA AND TRANSLATIONS → UPDATE RESULTS.]**
 
 ## 9.8. User Interface
 
@@ -1341,11 +1336,6 @@ Each type of state serves a different purpose and cannot substitute for the othe
 - The Admin interface clearly distinguishes Draft, Published, and audio states.
 - Reports show the filter range, time zone, count unit, and demo data label.
 
-**[INSERT VISITOR INTERFACE — LANGUAGE, GPS, MAP, AND PLAYER.]**
-
-**[INSERT ADMIN INTERFACE — POINTS, DRAFTS, TRANSLATIONS, JOBS, AUDIO, AND PUBLICATION.]**
-
-**[INSERT REPORTING INTERFACE — TOTAL VISITS, 24 HOURLY BUCKETS, AND PEAK HOURS.]**
 
 ---
 

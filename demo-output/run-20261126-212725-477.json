@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-26T21:27:50.1415460+07:00",
+    "BackendWindowPid":  55036,
+    "FrontendWindowPid":  30328,
+    "TunnelWindowPid":  5760,
+    "Website":  "https://yrs-requires-formula-assume.trycloudflare.com",
+    "QrPage":  "https://yrs-requires-formula-assume.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261126-212725-477.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261126-212725-477.log",
+    "DemoAdmin":  false
+}
