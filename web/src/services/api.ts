@@ -15,15 +15,18 @@ export function mediaUrl(path: string): string {
 export class ApiError extends Error {
   public status: number;
   public code: string;
+  public readonly missingConditions: string[];
   constructor(
     status: number,
     code: string,
     message: string,
+    missingConditions: string[] = [],
   ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.missingConditions = missingConditions;
   }
 }
 
@@ -84,12 +87,16 @@ async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     let code = "UNKNOWN";
     let message = res.statusText;
+    let missingConditions: string[] = [];
     try {
       const body = await res.json();
       code    = body.code    ?? code;
       message = body.message ?? (body.errors ? Object.values(body.errors).flat().join(" ") : body.title) ?? message;
+      if (Array.isArray(body.missingConditions)) {
+        missingConditions = body.missingConditions.filter((item: unknown): item is string => typeof item === "string");
+      }
     } catch { /* ignore */ }
-    throw new ApiError(res.status, code, message);
+    throw new ApiError(res.status, code, message, missingConditions);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;

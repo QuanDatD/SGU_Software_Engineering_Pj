@@ -11,25 +11,26 @@ public enum DeletePlaceResult { Ok, NotFound, HasRevisions }
 
 public sealed class PlaceEditingService(ZooDbContext db, IMediaStorage storage)
 {
-    public async Task<Guid?> SaveAsync(Guid? id, SavePlaceRequest input, string? imageName, Stream? image, CancellationToken ct)
+    public async Task<(Guid? PlaceId, bool Processing)> SaveAsync(
+        Guid? id, Guid adminId, SavePlaceRequest input, string? imageName, Stream? image, CancellationToken ct)
     {
-        var place = id.HasValue ? await db.Places.Include(p => p.Revisions).ThenInclude(r => r.Translations)
-            .FirstOrDefaultAsync(p => p.Id == id, ct) : new Place { Code = "ZONE_" + Guid.NewGuid().ToString("N") };
-        if (place == null) return null;
+        var place = id.HasValue
+            ? await db.Places.Include(p => p.Revisions).ThenInclude(r => r.Translations)
+                .FirstOrDefaultAsync(p => p.Id == id, ct)
+            : new Place { Code = "ZONE_" + Guid.NewGuid().ToString("N") };
+        if (place == null) return (null, false);
+
+        var latest = place.Revisions.OrderByDescending(r => r.Version).FirstOrDefault();
+        var previousVi = latest?.Translations.FirstOrDefault(t => t.Language == "vi");
+        var title = input.NameVi.Trim();
+        var description = input.DescriptionVi.Trim();
+        var contentChanged = previousVi == null || previousVi.Title != title || previousVi.Description != description;
+        if (contentChanged && latest?.Status == RevisionStatus.Draft &&
+            await db.GenerationJobs.AnyAsync(j => j.RevisionId == latest.Id && j.Status == JobStatus.Processing, ct))
+            return (place.Id, true);
 
         if (!id.HasValue) db.Places.Add(place);
-        
-        // Store old Place state for comparison
-        var oldCategory = place.Category;
-        var oldLatitude = place.Latitude;
-        var oldLongitude = place.Longitude;
-        var oldRadiusMeters = place.RadiusMeters;
-        var oldMapX = place.MapX;
-        var oldMapY = place.MapY;
-        var oldPriority = place.Priority;
-        var oldImageUrl = place.ImageUrl;
-
-        // Update Place fields
+        var now = DateTime.UtcNow;
         place.Category = input.Category;
         place.Latitude = input.Latitude;
         place.Longitude = input.Longitude;
@@ -37,52 +38,47 @@ public sealed class PlaceEditingService(ZooDbContext db, IMediaStorage storage)
         place.MapX = input.MapX;
         place.MapY = input.MapY;
         place.Priority = input.Priority;
-        place.UpdatedAt = DateTime.UtcNow;
-        
+        place.UpdatedAt = now;
         if (image != null)
             place.ImageUrl = "/storage/" + await storage.SaveImageAsync(imageName!, image, ct);
 
-        // UC05: Detect nếu chỉ thay GPS, radius, image, priority → skip revision
-        var isNewPlace = !id.HasValue;
-        var gpsRadiusImageOnly = !isNewPlace && 
-            oldCategory == input.Category &&
-            oldLatitude == input.Latitude &&
-            oldLongitude == input.Longitude &&
-            oldRadiusMeters == input.RadiusMeters &&
-            oldMapX == input.MapX &&
-            oldMapY == input.MapY &&
-            oldPriority == input.Priority;
-
-        // UC05: Nếu chỉ GPS/radius/image/priority → update Place, NOT create revision
-        if (gpsRadiusImageOnly && id.HasValue)
+        if (contentChanged)
         {
-            await db.SaveChangesAsync(ct);
-            return place.Id;
+            var draft = latest?.Status == RevisionStatus.Draft ? latest : null;
+            var vi = draft == null ? null : previousVi;
+            if (draft == null)
+            {
+                draft = new NarrationRevision
+                {
+                    PlaceId = place.Id,
+                    Version = (latest?.Version ?? 0) + 1,
+                    CreatedByAdminId = adminId
+                };
+                db.NarrationRevisions.Add(draft);
+            }
+            if (vi == null)
+            {
+                var script = previousVi?.ScriptText ?? "";
+                vi = new NarrationTranslation
+                {
+                    RevisionId = draft.Id,
+                    Language = "vi",
+                    ScriptText = script,
+                    ContentHash = PublicationRules.Hash(script)
+                };
+                db.NarrationTranslations.Add(vi);
+            }
+
+            vi.Title = title;
+            vi.Description = description;
+            vi.UpdatedAt = now;
+            draft.UpdatedAt = now;
         }
 
-        // Otherwise: create or update Draft revision (NameVi, DescriptionVi changed or new place)
-        var latest = place.Revisions.OrderByDescending(r => r.Version).FirstOrDefault();
-        var revision = latest?.Status == RevisionStatus.Draft ? latest : null;
-        if (revision == null)
-        {
-            revision = new NarrationRevision { PlaceId = place.Id, Version = (latest?.Version ?? 0) + 1 };
-            revision.Translations.Add(new NarrationTranslation { RevisionId = revision.Id, Language = "vi",
-                ScriptText = latest?.Translations.FirstOrDefault(t => t.Language == "vi")?.ScriptText ?? "" });
-            place.Revisions.Add(revision);
-            db.NarrationRevisions.Add(revision);
-        }
-        
-        var vi = revision.Translations.FirstOrDefault(t => t.Language == "vi");
-        if (vi == null) { vi = new NarrationTranslation { RevisionId = revision.Id, Language = "vi" }; revision.Translations.Add(vi); db.NarrationTranslations.Add(vi); }
-        
-        // Update Vi translation with new NameVi, DescriptionVi
-        vi.Title = input.NameVi.Trim();
-        vi.Description = input.DescriptionVi.Trim();
-        vi.UpdatedAt = DateTime.UtcNow;
-        
         await db.SaveChangesAsync(ct);
-        return place.Id;
+        return (place.Id, false);
     }
+
     public async Task<bool> HideAsync(Guid id, CancellationToken ct)
     {
         var place = await db.Places.FindAsync([id], ct);

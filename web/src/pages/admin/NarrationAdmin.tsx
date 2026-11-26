@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { placeApi } from "../../services/placeApi";
-import { mediaUrl } from "../../services/api";
+import { ApiError, mediaUrl } from "../../services/api";
 import { narrationApi } from "../../services/narrationApi";
 import type { Place } from "../../types/place";
 import type { NarrationRevision, GenerationJob } from "../../types/narration";
@@ -13,6 +13,24 @@ const LANG_FLAG: Record<string, string> = {
     vi: "🇻🇳", en: "🇬🇧", zh: "🇨🇳", ko: "🇰🇷", ja: "🇯🇵",
 };
 const LANGS = ["vi", "en", "zh", "ko", "ja"];
+const PUBLISH_CONDITION: Record<string, string> = {
+    languages_not_ready: "Bản dịch hoặc audio chưa sẵn sàng",
+    jobs_not_completed: "Tác vụ chưa hoàn tất",
+    translations_need_review: "Bản dịch cần duyệt lại",
+    audio_files_missing: "Thiếu tệp audio",
+    not_draft_status: "Phiên bản đã rời trạng thái bản nháp",
+    revision_not_found: "Không tìm thấy phiên bản",
+};
+
+function publishProblems(error: unknown): string[] {
+    const message = error instanceof Error ? error.message : "Xuất bản thất bại.";
+    if (!(error instanceof ApiError)) return [message];
+    return [message, ...error.missingConditions.map(condition => {
+        const [key, detail] = condition.split(": ", 2);
+        const label = PUBLISH_CONDITION[key];
+        return label ? [label, detail].filter(Boolean).join(" — ") : condition;
+    })];
+}
 
 export default function NarrationAdmin() {
     const [places, setPlaces] = useState<Place[]>([]);
@@ -23,6 +41,8 @@ export default function NarrationAdmin() {
     const [editLang, setEditLang] = useState<string>("vi");
     const [editText, setEditText] = useState("");
     const [deleteRevId, setDeleteRevId] = useState<string | null>(null);
+    const [publishRevId, setPublishRevId] = useState<string | null>(null);
+    const [publishErrors, setPublishErrors] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
@@ -84,6 +104,18 @@ export default function NarrationAdmin() {
         finally { setBusy(false); }
     }
 
+    async function handleReviewTranslation(action: "KeepOld" | "UpdateToNew") {
+        if (!editRevId) return;
+        setBusy(true);
+        try {
+            await narrationApi.reviewTranslation(editRevId, editLang, action);
+            await loadRevisions(activeId);
+            setEditRevId(null);
+        } catch (error) {
+            alert(error instanceof Error ? error.message : "Duyệt bản dịch thất bại.");
+        } finally { setBusy(false); }
+    }
+
     /* Tạo audio (generate) */
     async function handleGenerate(revId: string) {
         setBusy(true);
@@ -94,14 +126,27 @@ export default function NarrationAdmin() {
         finally { setBusy(false); }
     }
 
-    /* Xuất bản */
-    async function handlePublish(revId: string) {
+    async function openPublish(revId: string) {
+        setPublishRevId(revId);
+        setPublishErrors([]);
         setBusy(true);
         try {
-            await narrationApi.publish(revId);
+            await narrationApi.validatePublish(revId);
+        } catch (error) {
+            setPublishErrors(publishProblems(error));
+        } finally { setBusy(false); }
+    }
+
+    async function handlePublish() {
+        if (!publishRevId || busy || publishErrors.length > 0) return;
+        setBusy(true);
+        try {
+            await narrationApi.publish(publishRevId);
+            setPublishRevId(null);
             await loadRevisions(activeId);
-        } catch (e) { alert(e instanceof Error ? e.message : "Xuất bản thất bại."); }
-        finally { setBusy(false); }
+        } catch (error) {
+            setPublishErrors(publishProblems(error));
+        } finally { setBusy(false); }
     }
 
     /* Retry job lỗi */
@@ -136,6 +181,8 @@ export default function NarrationAdmin() {
   );
 
     const activePlace = places.find((p) => p.id === activeId);
+    const translationNeedsReview = revisions.find(rev => rev.id === editRevId)
+        ?.translations.find(translation => translation.lang === editLang)?.needsReview;
 
     return (
         <div className= "admin-section" >
@@ -207,9 +254,9 @@ disabled = { busy || !sourceText.trim()}>
     </button>
                   )}
 {
-    rev.status === "draft" && LANGS.every(l => rev.translations.some(t => t.lang === l && t.isApproved)) && (
+    rev.status === "draft" && (
         <button className="admin-btn admin-btn--sm admin-btn--primary"
-    onClick = {() => handlePublish(rev.id)
+    onClick = {() => void openPublish(rev.id)
 } disabled = { busy } >
                       📢 Xuất bản
     </button>
@@ -248,7 +295,7 @@ disabled = { busy || !sourceText.trim()}>
 disabled = { busy || rev.status !== "draft"}
 onClick = {() => openEditTranslation(rev, l)}>
 { LANG_FLAG[l]} { l.toUpperCase() }
-{ tr?.text ? " ✓" : " +" }
+{ tr?.needsReview ? " · Cần duyệt lại" : tr?.text ? " ✓" : " +" }
 </button>
                     );
                   })}
@@ -300,6 +347,16 @@ onClick = {() => openEditTranslation(rev, l)}>
                             < textarea rows = { 6} value = { editText } onChange = {(e) => setEditText(e.target.value)
 } />
     </label>
+    {translationNeedsReview && (
+        <div className="admin-modal__actions">
+            <button className="admin-btn" disabled={busy} onClick={() => void handleReviewTranslation("KeepOld")}>
+                Giữ bản dịch hiện tại
+            </button>
+            <button className="admin-btn" disabled={busy} onClick={() => void handleReviewTranslation("UpdateToNew")}>
+                Đánh dấu để dịch lại
+            </button>
+        </div>
+    )}
     < div className = "admin-modal__actions" >
         <button className="admin-btn" onClick = {() => setEditRevId(null)}> Huỷ </button>
             < button className = "admin-btn admin-btn--primary" onClick = { handleSaveTranslation } disabled = { busy } >
@@ -309,6 +366,25 @@ onClick = {() => openEditTranslation(rev, l)}>
                 </div>
                 </div>
       )}
+
+{publishRevId && (
+    <div className="admin-modal-overlay">
+        <div className="admin-modal" role="dialog" aria-modal="true" aria-labelledby="publish-heading">
+            <h3 id="publish-heading">Xác nhận xuất bản</h3>
+            <p>Bản công khai hiện tại của điểm sẽ được lưu trữ khi xuất bản thành công.</p>
+            {publishErrors.length > 0 && (
+                <ul role="alert">
+                    {publishErrors.map(problem => <li key={problem}>{problem}</li>)}
+                </ul>
+            )}
+            <div className="admin-modal__actions">
+                <button className="admin-btn" onClick={() => setPublishRevId(null)} disabled={busy}>Hủy</button>
+                <button className="admin-btn admin-btn--primary" onClick={() => void handlePublish()}
+                    disabled={busy || publishErrors.length > 0}>Xác nhận</button>
+            </div>
+        </div>
+    </div>
+)}
 
 {/* Modal xác nhận xóa bản nháp (UC06.3) */}
 {deleteRevId && (
