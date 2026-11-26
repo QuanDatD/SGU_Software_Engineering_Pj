@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T05:30:12.5335100+07:00",
+    "BackendWindowPid":  19928,
+    "FrontendWindowPid":  7296,
+    "TunnelWindowPid":  17108,
+    "Website":  "https://persons-ratios-ave-promises.trycloudflare.com",
+    "QrPage":  "https://persons-ratios-ave-promises.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Đồ án\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-052944-557.config.mjs",
+    "TunnelLog":  "D:\\Đồ án\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-052944-557.log",
+    "DemoAdmin":  false
+}

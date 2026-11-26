@@ -330,7 +330,12 @@
 }
 
 /* Live SQL/API map: retain existing site colours and shared audio player. */
-.live-map { position:relative; height:calc(100dvh - 80px); min-height:550px; }
+.live-map {
+    position: relative;
+    isolation: isolate;
+    height: calc(100dvh - 80px);
+    min-height: 550px;
+}
 .live-map__canvas { position:absolute; inset:0; z-index:1; }
 .live-map__gps,.live-map__detail { position:absolute; z-index:500; padding:16px; background:#fffffff2; border:1px solid #168652; border-radius:16px; box-shadow:0 6px 24px #163d2526; color:#173d29; }
 .live-map__gps { top:12px; left:12px; max-width:320px; display:grid; gap:8px; }

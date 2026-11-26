@@ -1,4 +1,33 @@
 import { expect, test } from "@playwright/test";
+import { openMapWithoutGps } from "./fixtures";
+
+test.describe("Visitor menus on the map", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/places?*", route => route.fulfill({ json: [] }));
+    await page.route("**/api/site-texts?*", route => route.fulfill({ json: {} }));
+    await openMapWithoutGps(page);
+  });
+
+  test("navigation items can be clicked over the GPS panel", async ({ page }) => {
+    await page.getByRole("button", { name: "Mở menu" }).click();
+    const navigation = page.getByRole("navigation");
+    await navigation.getByRole("button", { name: "Home" }).click();
+    await expect(navigation).toBeHidden();
+    await expect(page.locator(".live-map")).toBeHidden();
+  });
+
+  test("language options can be clicked over the GPS simulator", async ({ page }) => {
+    const simulation = page.locator(".live-map__simulation");
+    await simulation.locator("summary").click();
+    await expect(simulation).toHaveJSProperty("open", true);
+
+    await page.getByRole("button", { name: /English/ }).click();
+    await page.getByRole("option", { name: /中文/ }).click();
+    await expect(page.getByRole("listbox")).toBeHidden();
+    await expect(page.getByRole("button", { name: /中文/ })).toBeVisible();
+    await expect(simulation).toHaveJSProperty("open", true);
+  });
+});
 
 test("TC02/TC03 language selection precedes denied GPS and the map still opens", async ({ page }) => {
   await page.addInitScript(() => {
