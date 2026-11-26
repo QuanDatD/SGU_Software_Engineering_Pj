@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-26T10:21:53.7893951+07:00",
+    "BackendWindowPid":  28224,
+    "FrontendWindowPid":  42920,
+    "TunnelWindowPid":  39196,
+    "Website":  "https://vacation-take-facilities-truly.trycloudflare.com",
+    "QrPage":  "https://vacation-take-facilities-truly.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261126-102135-508.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261126-102135-508.log",
+    "DemoAdmin":  false
+}
