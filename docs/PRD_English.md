@@ -528,7 +528,7 @@ Indicate that matching narration is unavailable. Do not autoplay audio in anothe
 
 **Alternative Flows and Exceptions:** None.
 
-![UC03.4 ACTIVITY DIAGRAM — PRESS RESUME → GET THE PLAYBACK POSITION → RESUME PLAYBACK.](en_imgs/uc03.4_act_cnpm.drawio.png)
+![UC03.4 ACTIVITY DIAGRAM — PRESS RESUME → GET THE PLAYBACK POSITION → RESUME PLAYBACK.](imgs/en_uc03.4_act_cnpm.drawio.png)
 
 ### UC03.5 — Replay Narration
 
@@ -552,7 +552,7 @@ Indicate that matching narration is unavailable. Do not autoplay audio in anothe
 
 Replaying does not clear visit history.
 
-![ UC03.5 ACTIVITY DIAGRAM — PRESS REPLAY → RETURN TO THE START → PLAY AUDIO.](en_imgs/uc03.5_act_cnpm.drawio.png)
+![ UC03.5 ACTIVITY DIAGRAM — PRESS REPLAY → RETURN TO THE START → PLAY AUDIO.](imgs/en_uc03.5_act_cnpm.drawio.png)
 
 ### UC03.6 — Change Narration Language
 
@@ -1206,7 +1206,7 @@ The API is the backend's HTTP entry point. A separate API project does not add a
 
 This is the target architecture. Check the source code before claiming that every controller fully conforms.
 
-**[INSERT THREE-TIER ARCHITECTURE DIAGRAM — GUI, API ENTRY POINT, BUS, DAL, AND STORAGE AND INTEGRATION SYSTEMS.]**
+
 
 ## 9.3. Component Diagram
 
@@ -1326,11 +1326,6 @@ Missing / generating / valid / failed / invalidated.
 
 Each type of state serves a different purpose and cannot substitute for the others.
 
-**[INSERT STATE DIAGRAM — DRAFT, PUBLISHED, AND ARCHIVED REVISION LIFECYCLE.]**
-
-**[INSERT GPS AND AUDIO SEQUENCE DIAGRAM — GUI → API/BUS → PUBLIC DATA → PLAYER.]**
-
-**[INSERT AZURE SEQUENCE DIAGRAM — ADMIN → API/BUS → GENERATIONJOBS → AZURE → MEDIA AND TRANSLATIONS → UPDATE RESULTS.]**
 
 ## 9.8. User Interface
 
@@ -1341,11 +1336,6 @@ Each type of state serves a different purpose and cannot substitute for the othe
 - The Admin interface clearly distinguishes Draft, Published, and audio states.
 - Reports show the filter range, time zone, count unit, and demo data label.
 
-**[INSERT VISITOR INTERFACE — LANGUAGE, GPS, MAP, AND PLAYER.]**
-
-**[INSERT ADMIN INTERFACE — POINTS, DRAFTS, TRANSLATIONS, JOBS, AUDIO, AND PUBLICATION.]**
-
-**[INSERT REPORTING INTERFACE — TOTAL VISITS, 24 HOURLY BUCKETS, AND PEAK HOURS.]**
 
 ---
 

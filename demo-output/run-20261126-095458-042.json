@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-26T09:55:26.5803412+07:00",
+    "BackendWindowPid":  14600,
+    "FrontendWindowPid":  46460,
+    "TunnelWindowPid":  6960,
+    "Website":  "https://defined-villa-printer-scenes.trycloudflare.com",
+    "QrPage":  "https://defined-villa-printer-scenes.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261126-095458-042.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261126-095458-042.log",
+    "DemoAdmin":  false
+}

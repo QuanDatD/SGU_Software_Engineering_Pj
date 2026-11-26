@@ -11,6 +11,7 @@ public class NarrationRevision
     public Guid? CreatedByAdminId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? PublishedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public Place Place { get; set; } = null!;
     public ICollection<NarrationTranslation> Translations { get; set; } = new List<NarrationTranslation>();
