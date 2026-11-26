@@ -5,4 +5,5 @@
 # Build files
 bin/
 obj/
+TestResults/
 
