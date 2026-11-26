@@ -21,6 +21,8 @@ interface MapPageProps {
     onAutoPlayChange: (enabled: boolean) => void;
     visitHistory: ReturnType<typeof useVisitHistory>;
     simulator: ReturnType<typeof useGpsSimulator>;
+    locationSignal: AbortSignal;
+    onRestartSimulation: () => void;
 
     onStartSimulation: (
         from: { lat: number; lng: number },
@@ -38,6 +40,8 @@ export default function MapPage({
     visitHistory,
     simulator,
     onStartSimulation,
+    onRestartSimulation,
+    locationSignal,
 }: MapPageProps) {
   const { lang } = useLang();
   const texts = useSiteTexts(lang);
@@ -58,6 +62,7 @@ export default function MapPage({
     enabled: autoPlay && !error,
     onEnter: setSelectedId,
     history: visitHistory,
+    locationSignal,
 });
 
   // One sequential request at a time. Refresh after publication from any other browser.
@@ -161,6 +166,7 @@ useEffect(() => {
         places={places}
         simulator={simulator}
         onStart={onStartSimulation}
+        onRestart={onRestartSimulation}
         onStop={stop}
       />
 

@@ -35,7 +35,7 @@ Theo BR-27 và §9.7, trạng thái `Pending` của PRD tương đương `JobSta
 | **4.1** Dấu nguồn và phiên QR, BR-20–BR-22/TC04/TC05 | `BR20 only entry marked source=qr sends a QR event to the API`, `TC04/TC05 QR entry creates a session and reopening the link reuses it`, `Tc04_ConcurrentQrRequestsCountOnlyOnce`, `Tc04_DatabasePreventsDuplicateQrSession` | Đạt | Quét mã bằng điện thoại và URL public vẫn cần kiểm thủ công. |
 | **4.1** Dọn QR sau 90 ngày, §8.4 | Chờ điểm kiểm thử | Chưa chạy | Chưa có dịch vụ, lịch chạy, command hoặc endpoint dọn dữ liệu. Cần kiểm mốc 90 ngày bằng thời điểm UTC cố định khi có chức năng. |
 | **4.2** GPS đầu tiên, UC02.2/TC07 | `TC07 first valid location is brought into the map viewport` | Không đạt | Nhận tọa độ ngay lần bấm đầu nhưng bản đồ chưa tự đưa dấu vị trí vào vùng nhìn thấy. GPS thiết bị thật vẫn cần kiểm thủ công. |
-| **4.3** Làm lại mô phỏng, §5.10/TC34 | `TC34 stopping and starting simulation resets route progress without requesting GPS` | Đạt cho Tắt rồi Bắt đầu | Chưa có nút Làm lại. Chờ luồng đặt lại audio/lịch sử demo và loại kết quả đánh giá vùng cũ khi làm lại. |
+| **4.3** Làm lại mô phỏng, §5.10/TC34 | `TC34 stopping and starting simulation resets route progress without requesting GPS` | Đạt trong lượt TV2 | Hai ca Làm lại và ca Tắt rồi Bắt đầu được liệt kê ở phần TV2 bên dưới. |
 | **4.4** Báo cáo chỉ đổi khi Áp dụng, UC07.1 | `UC07.1 report keeps the applied dates and chart until Apply` | Không đạt | Đổi ngày đã tự gửi request và đổi nhãn/biểu đồ. Sau khi bấm Áp dụng, test kiểm API nhận ngày kết thúc không bao gồm và nhãn UI hiển thị ngày kết thúc bao gồm. |
 | **4.4** Dữ liệu báo cáo, TC28–TC30/TC36 | `Tc28_InvalidRangeAndEmptyReportHaveDistinctResponses`, `Tc29_Tc30_Tc36_ReportingUsesVietnamMidnightAndExcludesDemoByDefault` | Đạt | Dữ liệu cố định sát nửa đêm Việt Nam, có đồng hạng và lượt demo. |
 | **PRD TC02, TC03, TC16, TC35** | Playwright `TC02/TC03 language selection precedes denied GPS and the map still opens`, `TC16/TC35 protected admin redirects and valid seed login opens the dashboard`; API `Tc16_Tc35_AdminRequiresValidCredentialsAndCsrf` | Đạt | Quyền vị trí được mô phỏng. |
@@ -74,3 +74,64 @@ npm run test:e2e
 Job tích hợp chạy trên SQL Server 2022, giữ TRX và báo cáo HTML kèm trace khi Chromium lỗi. BrowserHost khởi động API thật bằng Kestrel với Azure giả lập và âm thanh kiểm thử. Nó tạo database riêng và dọn database khi nhận tín hiệu dừng. Nếu Windows kết thúc tiến trình đột ngột, dọn đúng database thử nghiệm vừa tạo trước khi dùng lại tên đó. Các ca Chromium chạy tuần tự vì API dùng khóa ghi SQL dùng chung trong một database. Xem báo cáo từ thư mục `web` bằng `npx playwright show-report`.
 
 Patch lượt này áp trên commit nền cục bộ `35796cd67299b0be73a4bbb48abe5221e37f15b8`. Nội dung của commit đó là `cd91eaa` cộng patch 13 file `ci-github-actions.patch` của lượt trước.
+
+## TV2 — UC03.1–UC03.6 và UC04.1 (27/11/2026)
+
+Nhánh `feature/tv2-uc03-uc04` dùng nền CI mở rộng `40f2efd`. Ca trình duyệt chạy API và SQL Server thật với Azure giả lập, audio mẫu và tọa độ GPS do test điều khiển.
+
+| Ca | Kiểm thử đã chạy | Kết quả |
+|---|---|---|
+| TC08 | Unit kiểm ngoài, đúng biên và trong bán kính. Chromium kiểm phải có hai lần đánh giá liên tiếp cùng điểm trước khi tự phát. | Đạt |
+| TC09 | Unit kiểm tọa độ/sai số. Chromium kiểm GPS cũ 16 giây và sai số 26 m không gửi đánh giá vùng, sai số 25 m hợp lệ được xử lý. | Đạt |
+| TC10 | Unit kiểm ưu tiên, khoảng cách và ID ổn định khi hai vùng chồng nhau. | Đạt |
+| TC11 | Chromium kiểm không chen bài đang phát hoặc tạm dừng, không tự lặp bài, và audio tải trễ không phát sau khi rời vùng. | Đạt |
+| TC12 | Chromium kiểm điểm có audio tiếng Việt nhưng thiếu audio tiếng Anh không tự phát thay thế và nút nghe tiếng Anh bị vô hiệu. | Đạt |
+| TC13 | Chromium nghe thủ công, tạm dừng tại thời điểm hiện tại và tiếp tục từ đó. | Đạt |
+| TC14 | Chromium nghe lại từ đầu và giữ lịch sử đã nghe. | Đạt |
+| TC15 | Chromium đổi ngôn ngữ khi đang nghe, dừng bài cũ, giữ tài liệu hiện tại, tọa độ, điểm đã chọn và lịch sử. Nghe theo yêu cầu dùng audio ngôn ngữ mới. | Đạt |
+| TC16, TC35 | SQL/API kiểm active với mật khẩu đúng, sai mật khẩu, thiếu CSRF, Admin inactive với mật khẩu đúng và API Admin không có phiên. Luồng đăng nhập Chromium cũ vẫn chạy. | Đạt |
+| TC34 | Chromium bấm Làm lại, kiểm tọa độ xuất phát, audio dừng, lịch sử mô phỏng về 0 và lịch sử tham quan được giữ. Kiểm trả phản hồi HTTP cũ sau Làm lại và sau thoát mô phỏng, cùng ca Tắt rồi Bắt đầu hiện có. | Đạt |
+
+Build backend, BrowserHost, frontend, kiểm kiểu Playwright và `actionlint` đạt. Unit đạt 16/16. SQL/API đạt 20/41 với 21 ca đỏ có từ CI nền, thuộc các ràng buộc SQL và UC05–UC06. Chromium đạt 15/18. Ba ca Chromium đỏ ngoài phạm vi là TC07 đưa vị trí GPS lên bản đồ, UC06.7 xác nhận xuất bản và UC07.1 chỉ đổi báo cáo khi bấm Áp dụng. Toàn bộ các ca tự động đã chạy. GPS thực địa và trình duyệt trên thiết bị thật cần kiểm thủ công khi có thiết bị và địa điểm thử.
+
+### File sinh tự động đang được Git theo dõi
+
+Các mục bên dưới đã có trong commit nền. `git check-ignore -v` xác nhận `bin/`, `obj/`, `TestResults/`, `web/test-results/`, `web/playwright-report/` và `web/dist/` được bỏ qua. Mã nguồn, test, workflow, lockfile và migration vẫn xuất hiện trong cây Git.
+
+```text
+backend/.vs/ProjectEvaluation/zoo.metadata.v10.bin
+backend/.vs/ProjectEvaluation/zoo.projects.v10.bin
+backend/.vs/ProjectEvaluation/zoo.strings.v10.bin
+backend/.vs/Zoo/DesignTimeBuild/.dtbcache.v2
+backend/.vs/Zoo/v18/.futdcache.v2
+backend/.vs/Zoo/v18/.suo
+backend/.vs/Zoo/v18/DocumentLayout.backup.json
+backend/.vs/Zoo/v18/DocumentLayout.json
+backend/Zoo.BUS/.vs/Zoo.BUS.slnx/DesignTimeBuild/.dtbcache.v2
+backend/Zoo.BUS/.vs/Zoo.BUS.slnx/FileContentIndex/39dbfc02-9e50-4324-a738-02d57935bc94.vsidx
+backend/Zoo.BUS/.vs/Zoo.BUS.slnx/v18/.futdcache.v2
+backend/Zoo.BUS/.vs/Zoo.BUS.slnx/v18/.suo
+demo-output/index.html
+demo-output/link.txt
+demo-output/qr.png
+demo-output/run-20261030-055230-027.json
+demo-output/run-20261030-060505-917.json
+demo-output/run-20261030-063412-745.json
+demo-output/run-20261030-070504-555.json
+demo-output/tunnel-20261023-055339.log
+demo-output/tunnel-20261023-055925.log
+demo-output/tunnel-20261023-065955.log
+demo-output/tunnel-20261023-070049.log
+demo-output/tunnel-20261023-072032.log
+demo-output/tunnel-20261023-102819.log
+demo-output/tunnel-20261029-193734.log
+demo-output/tunnel-20261030-053634.log
+demo-output/tunnel-20261030-055230-027.log
+demo-output/tunnel-20261030-060505-917.log
+demo-output/tunnel-20261030-063412-745.log
+demo-output/tunnel-20261030-070504-555.log
+demo-output/vite-demo-20261030-055230-027.config.mjs
+demo-output/vite-demo-20261030-060505-917.config.mjs
+demo-output/vite-demo-20261030-063412-745.config.mjs
+demo-output/vite-demo-20261030-070504-555.config.mjs
+```

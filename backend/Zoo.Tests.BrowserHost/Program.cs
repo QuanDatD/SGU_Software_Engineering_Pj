@@ -55,7 +55,7 @@ internal sealed class BrowserSpeech : ISpeechClient
     private static byte[] CreatePreview()
     {
         const int sampleRate = 8000;
-        const int samples = sampleRate / 2;
+        const int samples = sampleRate * 12;
         const int dataBytes = samples * sizeof(short);
         using var stream = new MemoryStream();
         using var writer = new BinaryWriter(stream);

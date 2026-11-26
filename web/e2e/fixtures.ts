@@ -15,10 +15,10 @@ async function writeHeaders(page: Page) {
   return { "X-CSRF-TOKEN": (await csrf.json()).token as string };
 }
 
-export async function createDraft(page: Page, script = "CI narration") {
+export async function createDraft(page: Page, script = "CI narration", coordinates = { lat: 10.789, lng: 106.706 }) {
   const title = `CI place ${randomUUID()}`;
   const place = await page.request.post("/api/admin/places", {
-    multipart: { NameVi: title, Latitude: "10.789", Longitude: "106.706" },
+    multipart: { NameVi: title, Latitude: String(coordinates.lat), Longitude: String(coordinates.lng) },
     headers: await writeHeaders(page),
   });
   await expect(place).toBeOK();

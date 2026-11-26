@@ -21,7 +21,10 @@ export default function App() {
 
   const geolocation = useGeolocation();
   const simulator = useGpsSimulator();
-  const visitHistory = useVisitHistory();
+  const realHistory = useVisitHistory();
+  const demoHistory = useVisitHistory();
+  const visitHistory = simulator.enabled ? demoHistory : realHistory;
+  const [locationSession, setLocationSession] = useState(() => new AbortController());
   const [visitStarted, setVisitStarted] = useState(false);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [autoPlay, setAutoPlay] = useState(false);
@@ -33,7 +36,11 @@ export default function App() {
 });
   const [menuOpen, setMenuOpen] = useState(false);
   const { lang } = useLang();
-  const { stop: stopAudio } = useAudio();
+  const { stop: stopAudio, state: audioState, track } = useAudio();
+  const { markHeard } = visitHistory;
+  useEffect(() => {
+    if (audioState === "playing" && track) markHeard(track.placeId, track.lang, track.url);
+  }, [audioState, track, markHeard]);
     const previousLang = useRef(lang);
 
     useEffect(() => {
@@ -65,17 +72,31 @@ export default function App() {
   const t = (k: keyof typeof NAV) => NAV[k]?.[lang] ?? NAV[k]?.["en"] ?? "";
   
 
+    // Vô hiệu hóa đồng bộ phản hồi cũ trước khi React cập nhật chế độ hoặc tuyến.
+    function renewLocationSession() {
+        locationSession.abort();
+        setLocationSession(new AbortController());
+    }
+
     const activeGeolocation = {
         gps: simulator.enabled ? simulator.gps : geolocation.gps,
 
         start: () => {
-            simulator.stop();
+            renewLocationSession();
+            if (simulator.enabled) {
+                stopAudio();
+                simulator.stop();
+            }
             setAutoPlay(false);
             geolocation.start();
         },
 
         stop: () => {
-            simulator.stop();
+            renewLocationSession();
+            if (simulator.enabled) {
+                stopAudio();
+                simulator.stop();
+            }
             geolocation.stop();
             setAutoPlay(false);
         },
@@ -87,12 +108,21 @@ export default function App() {
         speed: number,
     ) {
         simulator.start(from, to, speed);
+        renewLocationSession();
+        stopAudio();
+        demoHistory.reset();
 
         geolocation.stop();
         setAutoPlay(false);
     }
 
 
+    function restartSimulation() {
+        renewLocationSession();
+        stopAudio();
+        demoHistory.reset();
+        simulator.restart();
+    }
 
 // Return giao diện chính phía dưới giữ nguyên.
   if (page !== "qr" && !visitStarted) {
@@ -191,6 +221,8 @@ export default function App() {
         visitHistory={visitHistory}
         simulator={simulator}
         onStartSimulation={startSimulation}
+        onRestartSimulation={restartSimulation}
+        locationSignal={locationSession.signal}
     />
     )}
 

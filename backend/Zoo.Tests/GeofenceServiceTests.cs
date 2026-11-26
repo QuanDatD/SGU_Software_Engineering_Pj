@@ -58,6 +58,38 @@ public class GeofenceServiceTests
         Assert.Equal((preferNear ? near : far).Id, result.PlaceId);
     }
 
+    [Theory]
+    [InlineData(0.999, true)]
+    [InlineData(1.0, true)]
+    [InlineData(1.001, false)]
+    public async Task Tc08_UsesAnInclusiveRadius(double radiusFactor, bool inZone)
+    {
+        const double latitude = 0.0001;
+        var halfAngle = latitude * Math.PI / 360;
+        var sin = Math.Sin(halfAngle);
+        var distance = 6371000 * (2 * Math.Atan2(Math.Sqrt(sin * sin), Math.Sqrt(1 - sin * sin)));
+        var place = new PlaceDto { Id = Guid.NewGuid(), Lat = latitude, RadiusMeters = distance / radiusFactor };
+        var service = new GeofenceService(new PublishedPlaces([place]));
+
+        var result = await service.EvaluateAsync(CreatePosition(0, 0, 5), TestContext.Current.CancellationToken);
+
+        Assert.True(result.Accepted);
+        Assert.Equal(inZone ? place.Id : (Guid?)null, result.PlaceId);
+        Assert.Equal(inZone ? "IN_ZONE" : "OUTSIDE_ZONES", result.ReasonCode);
+    }
+
+    [Fact]
+    public async Task Tc10_EqualPriorityAndDistanceUseStableId()
+    {
+        var first = new PlaceDto { Id = Guid.Parse("00000001-0000-0000-0000-000000000000"), RadiusMeters = 20 };
+        var second = new PlaceDto { Id = Guid.Parse("00000002-0000-0000-0000-000000000000"), RadiusMeters = 20 };
+        var service = new GeofenceService(new PublishedPlaces([second, first]));
+
+        var result = await service.EvaluateAsync(CreatePosition(0, 0, 5), TestContext.Current.CancellationToken);
+
+        Assert.Equal(first.Id, result.PlaceId);
+    }
+
     private static EvaluateVisitRequest CreatePosition(double latitude, double longitude, double accuracy) =>
         new()
         {

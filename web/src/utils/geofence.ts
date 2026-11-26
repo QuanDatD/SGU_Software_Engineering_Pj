@@ -25,13 +25,8 @@ function distanceMeters(
     );
 }
 
-// Dùng để kiểm tra lại vị trí ngay trước khi phát audio.
-// API vẫn là nơi đánh giá vùng chính trong luồng hiện tại.
-export function findCurrentZone(
-    position: GpsPosition | null,
-    places: PlaceDetail[],
-): PlaceDetail | null {
-    if (
+export function isEligiblePosition(position: GpsPosition | null): position is GpsPosition {
+    return !(
         !position ||
         !Number.isFinite(position.lat) ||
         !Number.isFinite(position.lng) ||
@@ -44,9 +39,16 @@ export function findCurrentZone(
         position.accuracy < 0 ||
         position.accuracy > 25 ||
         Date.now() - position.timestamp > 15000
-    ) {
-        return null;
-    }
+    );
+}
+
+// Dùng để kiểm tra lại vị trí ngay trước khi phát audio.
+// API vẫn là nơi đánh giá vùng chính trong luồng hiện tại.
+export function findCurrentZone(
+    position: GpsPosition | null,
+    places: PlaceDetail[],
+): PlaceDetail | null {
+    if (!isEligiblePosition(position)) return null;
 
     const candidates = places
         .filter((place) =>
