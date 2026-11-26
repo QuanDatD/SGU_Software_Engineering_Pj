@@ -8,14 +8,25 @@ namespace Zoo.BUS.Services;
 
 public sealed class QrVisitService(ZooDbContext db) : IQrVisitService
 {
+    private const int RetentionDays = 90;
+
     public async Task<RecordQrVisitResponse> RecordAsync(
         RecordQrVisitRequest request,
         CancellationToken ct = default)
     {
+        var sessionId = request.SessionId.Trim();
+        var nowUtc = DateTime.UtcNow;
+
+        // Dọn các lượt QR quá 90 ngày
+        var cutoffUtc = nowUtc.AddDays(-RetentionDays);
+        await db.QrVisits
+            .Where(v => v.VisitedAtUtc < cutoffUtc)
+            .ExecuteDeleteAsync(ct);
+
         // BR-21: mỗi SessionId chỉ ghi một lượt
         var exists = await db.QrVisits
             .AsNoTracking()
-            .AnyAsync(v => v.SessionId == request.SessionId, ct);
+            .AnyAsync(v => v.SessionId == sessionId, ct);
 
         if (exists)
             return new RecordQrVisitResponse(false, "Đã ghi nhận phiên này trước đó.");
@@ -24,8 +35,8 @@ public sealed class QrVisitService(ZooDbContext db) : IQrVisitService
         {
             db.QrVisits.Add(new QrVisit
             {
-                SessionId = request.SessionId.Trim(),
-                VisitedAtUtc = DateTime.UtcNow, // BR-23: server ghi UTC
+                SessionId = sessionId,
+                VisitedAtUtc = nowUtc,
                 IsDemo = request.IsDemo
             });
             await db.SaveChangesAsync(ct);
@@ -37,8 +48,6 @@ public sealed class QrVisitService(ZooDbContext db) : IQrVisitService
                || ex.InnerException?.Message.Contains("UNIQUE",
                       StringComparison.OrdinalIgnoreCase) == true)
         {
-            // BR-21: race condition — hai request cùng SessionId đến đồng thời
-            // Unique index bắt được → bỏ qua, không báo lỗi
             return new RecordQrVisitResponse(false, "Đã ghi nhận phiên này trước đó.");
         }
     }
