@@ -133,7 +133,7 @@ public sealed partial class ApiTests
         job.Status = JobStatus.Processing;
         await db.SaveChangesAsync();
 
-        using var rejected = await WriteAsync(client, HttpMethod.Post, $"{RevisionPath(revisionId)}/publish");
+        using var rejected = await PublishAsync(client, revisionId);
 
         Assert.False(rejected.IsSuccessStatusCode);
         Assert.Contains(rejected.StatusCode, new[] { HttpStatusCode.BadRequest, HttpStatusCode.Conflict });
@@ -207,6 +207,9 @@ public sealed partial class ApiTests
         Assert.Equal(HttpStatusCode.OK, preview.StatusCode);
         Assert.Equal("audio/mpeg", preview.Content.Headers.ContentType?.MediaType);
         Assert.NotEmpty(await preview.Content.ReadAsByteArrayAsync());
+
+        using var stalePreview = await admin.GetAsync($"{url}?hash=stale");
+        Assert.Equal(HttpStatusCode.BadRequest, stalePreview.StatusCode);
     }
 
     private async Task AssertCorruptAudioBlocksPublicationAsync(bool removeFile)
@@ -233,7 +236,7 @@ public sealed partial class ApiTests
             await db.SaveChangesAsync();
         }
 
-        using var rejected = await WriteAsync(client, HttpMethod.Post, $"{RevisionPath(revisionId)}/publish");
+        using var rejected = await PublishAsync(client, revisionId);
         Assert.Equal(HttpStatusCode.BadRequest, rejected.StatusCode);
         Assert.Contains("en", await rejected.Content.ReadAsStringAsync());
         await AssertUnpublishedAsync(db, revisionId);
@@ -269,6 +272,16 @@ public sealed partial class ApiTests
             JsonContent.Create(new { sourceText = "CI narration" }));
         return (await ReadAsync(draft)).GetProperty("id").GetGuid();
     }
+
+    private static Task<HttpResponseMessage> PublishAsync(HttpClient client, Guid revisionId) =>
+        WriteAsync(client, HttpMethod.Post, $"{RevisionPath(revisionId)}/publish",
+            JsonContent.Create(new Zoo.BUS.DTOs.PublishRevisionRequest
+            {
+                ConfirmAllLanguagesReady = true,
+                ConfirmAllAudioValid = true,
+                ConfirmAllJobsCompleted = true,
+                ConfirmAllTranslationsReviewed = true
+            }));
 
     private static string RevisionPath(Guid revisionId) => $"/api/admin/revisions/{revisionId}";
 

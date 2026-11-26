@@ -21,13 +21,27 @@ public sealed class AudioController(ZooDbContext db, IMediaStorage storage) : Co
     }
     [Authorize(Roles = "Admin")]
     [HttpGet("api/admin/revisions/{revisionId:guid}/audio/{lang}")]
-    public async Task<IActionResult> Preview(Guid revisionId, string lang, CancellationToken ct)
-        => await StreamAudio(await db.NarrationTranslations.AsNoTracking().FirstOrDefaultAsync(t => t.RevisionId == revisionId && t.Language == lang, ct), ct);
-    private async Task<IActionResult> StreamAudio(Zoo.DAL.Entities.NarrationTranslation? translation, CancellationToken ct)
+    public async Task<IActionResult> Preview(Guid revisionId, string lang, [FromQuery] string? hash, CancellationToken ct)
+    {
+        var language = lang.Trim().ToLowerInvariant();
+        if (!PublicationRules.Languages.Contains(language))
+            return BadRequest("Ngôn ngữ không hợp lệ.");
+
+        var translation = await db.NarrationTranslations.AsNoTracking()
+            .FirstOrDefaultAsync(t => t.RevisionId == revisionId && t.Language == language, ct);
+        return await StreamAudio(translation, ct, hash);
+    }
+    private async Task<IActionResult> StreamAudio(Zoo.DAL.Entities.NarrationTranslation? translation, CancellationToken ct, string? hash = null)
     {
         Response.Headers.CacheControl = "no-store";
         if (translation == null || !PublicationRules.Ready(translation)) return NotFound();
+        if (!string.IsNullOrWhiteSpace(hash) && hash != translation.AudioContentHash)
+            return BadRequest("Hash không hợp lệ.");
+
         var stream = await storage.OpenReadAudioAsync(translation.AudioPath!, ct);
-        return stream == null ? NotFound() : File(stream, "audio/mpeg", enableRangeProcessing: true);
+        if (stream == null) return NotFound();
+        if (stream.Length > 0) return File(stream, "audio/mpeg", enableRangeProcessing: true);
+        await stream.DisposeAsync();
+        return NotFound();
     }
 }

@@ -16,7 +16,7 @@ public sealed partial class ApiTests
         await LoginAsync(admin, "admin", SeedPassword);
         var oldId = await CreateNarrationAsync(admin);
         await GenerateAsync(admin, oldId);
-        using var first = await WriteAsync(admin, HttpMethod.Post, $"{RevisionPath(oldId)}/publish");
+        using var first = await PublishAsync(admin, oldId);
         first.EnsureSuccessStatusCode();
 
         await using var db = api.OpenDatabase();
@@ -35,7 +35,7 @@ public sealed partial class ApiTests
             EXEC sys.sp_executesql @statement;
             """);
 
-        using var failed = await WriteAsync(admin, HttpMethod.Post, $"{RevisionPath(newId)}/publish");
+        using var failed = await PublishAsync(admin, newId);
         Assert.False(failed.IsSuccessStatusCode);
 
         var place = await db.Places.AsNoTracking().SingleAsync(p => p.Id == placeId);

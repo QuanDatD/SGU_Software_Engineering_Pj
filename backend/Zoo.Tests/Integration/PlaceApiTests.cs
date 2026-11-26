@@ -46,7 +46,7 @@ public sealed partial class ApiTests
         await LoginAsync(client, "admin", SeedPassword);
         var revisionId = await CreateNarrationAsync(client);
         await GenerateAsync(client, revisionId);
-        using var published = await WriteAsync(client, HttpMethod.Post, $"{RevisionPath(revisionId)}/publish");
+        using var published = await PublishAsync(client, revisionId);
         published.EnsureSuccessStatusCode();
 
         await using var db = fixture.OpenDatabase();

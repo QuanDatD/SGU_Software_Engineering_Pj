@@ -114,14 +114,14 @@ public sealed partial class ApiTests(SqlApiFixture fixture)
             var path = $"/api/admin/revisions/{revisionId}";
             using var generated = await WriteAsync(admin, HttpMethod.Post, $"{path}/generate");
             generated.EnsureSuccessStatusCode();
-            using var published = await WriteAsync(admin, HttpMethod.Post, $"{path}/publish");
+            using var published = await PublishAsync(admin, revisionId);
             published.EnsureSuccessStatusCode();
             using var current = await visitor.GetAsync(publicPath);
             Assert.Equal(revisionId, (await ReadAsync(current)).GetProperty("revisionId").GetGuid());
         }
 
         var first = await CreateDraftAsync("First public narration");
-        using var missingAudio = await WriteAsync(admin, HttpMethod.Post, $"/api/admin/revisions/{first}/publish");
+        using var missingAudio = await PublishAsync(admin, first);
         Assert.Equal(HttpStatusCode.BadRequest, missingAudio.StatusCode);
         await GenerateAndPublishAsync(first);
 

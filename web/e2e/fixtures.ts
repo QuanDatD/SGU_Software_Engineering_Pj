@@ -33,9 +33,15 @@ export async function createDraft(page: Page, script = "CI narration", coordinat
   return { placeId, revisionId, sourceText, title };
 }
 
-export function runRevisionAction(page: Page, revisionId: string, action: "generate" | "publish") {
-  return writeHeaders(page).then(headers =>
-    page.request.post(`/api/admin/revisions/${revisionId}/${action}`, { headers }));
+export async function runRevisionAction(page: Page, revisionId: string, action: "generate" | "publish") {
+  const headers = await writeHeaders(page);
+  const data = action === "publish" ? {
+    confirmAllLanguagesReady: true,
+    confirmAllAudioValid: true,
+    confirmAllJobsCompleted: true,
+    confirmAllTranslationsReviewed: true,
+  } : undefined;
+  return page.request.post(`/api/admin/revisions/${revisionId}/${action}`, { headers, data });
 }
 
 export async function openNarrationDraft(page: Page, draft: Awaited<ReturnType<typeof createDraft>>) {

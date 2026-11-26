@@ -378,41 +378,6 @@ public class AdminNarrationController : ControllerBase
             errorMessage = j.LastError, audioUrl = (string?)null, createdAt = j.CreatedAt, updatedAt = j.UpdatedAt }));
     }
 
-    // 5b. Tải audio để nghe thử (có kiểm tra hash hợp lệ)
-    [HttpGet("revisions/{revisionId:guid}/audio/{lang}")]
-    public async Task<IActionResult> GetAudio(Guid revisionId, string lang, [FromQuery] string? hash, CancellationToken ct)
-    {
-        var targetLang = lang.ToLowerInvariant().Trim();
-        if (!AllLangs.Contains(targetLang))
-            return BadRequest("Ngôn ngữ không hợp lệ.");
-
-        var translation = await _db.NarrationTranslations.AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Revision.Id == revisionId && t.Language == targetLang, ct);
-
-        if (translation == null || !PublicationRules.Ready(translation))
-            return NotFound("Bản dịch không sẵn sàng.");
-
-        // Verify content hash to prevent replay attacks
-        if (!string.IsNullOrWhiteSpace(hash) && hash != translation.AudioContentHash)
-            return BadRequest("Hash không hợp lệ.");
-
-        if (string.IsNullOrWhiteSpace(translation.AudioPath))
-            return NotFound("File audio không tồn tại.");
-
-        try
-        {
-            await using var audioStream = await _storage.OpenReadAudioAsync(translation.AudioPath, ct);
-            if (audioStream == null || audioStream.Length == 0)
-                return NotFound("File audio rỗng.");
-
-            return File(audioStream, "audio/mpeg", $"{targetLang}_narration.mp3");
-        }
-        catch
-        {
-            return NotFound("Không tìm thấy file audio.");
-        }
-    }
-
     // 6. Retry 1 job bị lỗi
     [HttpPost("jobs/{jobId:guid}/retry")]
     public async Task<IActionResult> RetryJob(Guid jobId, CancellationToken ct)

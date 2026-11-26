@@ -55,6 +55,7 @@ public class ZooDbContext : DbContext
             e.HasKey(x => x.Id);
             e.HasAlternateKey(x => new { x.Id, x.PlaceId });
             e.HasIndex(x => new { x.PlaceId, x.Version }).IsUnique();
+            e.Property(x => x.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
 
             // Ràng buộc 1.3: Mỗi điểm có tối đa một bản Published (Status = 1)
             e.HasIndex(x => x.PlaceId)

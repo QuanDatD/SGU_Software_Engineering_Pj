@@ -35,7 +35,7 @@ public sealed partial class ApiTests
         await LoginAsync(client, "admin", SeedPassword);
         var publishedId = await CreateNarrationAsync(client);
         await GenerateAsync(client, publishedId);
-        using var firstPublication = await WriteAsync(client, HttpMethod.Post, $"{RevisionPath(publishedId)}/publish");
+        using var firstPublication = await PublishAsync(client, publishedId);
         firstPublication.EnsureSuccessStatusCode();
 
         await using var db = fixture.OpenDatabase();
@@ -44,7 +44,7 @@ public sealed partial class ApiTests
             JsonContent.Create(new { sourceText = "Replacement script" }));
         var replacementId = (await ReadAsync(draft)).GetProperty("id").GetGuid();
         await GenerateAsync(client, replacementId);
-        using var secondPublication = await WriteAsync(client, HttpMethod.Post, $"{RevisionPath(replacementId)}/publish");
+        using var secondPublication = await PublishAsync(client, replacementId);
         secondPublication.EnsureSuccessStatusCode();
 
         foreach (var (id, status, originalScript) in new[]
