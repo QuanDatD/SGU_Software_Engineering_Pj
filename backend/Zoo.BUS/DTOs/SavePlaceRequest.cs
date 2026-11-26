@@ -7,7 +7,7 @@ public class SavePlaceRequest
     [RegularExpression("^(animal|plant|facility)$")] public string Category { get; set; } = "animal";
     [Range(-90d, 90d)] public double Latitude { get; set; }
     [Range(-180d, 180d)] public double Longitude { get; set; }
-    [Range(5d, 500d)] public double RadiusMeters { get; set; } = 30;
+    [Range(0d, 500d, MinimumIsExclusive = true)] public double RadiusMeters { get; set; } = 30;
     [Range(0d, 1024d)] public double MapX { get; set; }
     [Range(0d, 643d)] public double MapY { get; set; }
     public int Priority { get; set; } = 1;

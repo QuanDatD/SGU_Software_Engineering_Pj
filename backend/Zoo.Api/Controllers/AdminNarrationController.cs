@@ -22,9 +22,6 @@ namespace Zoo.Api.Controllers;
 public class AdminNarrationController : ControllerBase
 {
     private readonly ZooDbContext _db;
-    private readonly IPlaceService _placeService;
-    private readonly ITranslationClient _translator;
-    private readonly ISpeechClient _speechClient;
     private readonly IMediaStorage _storage;
     private readonly NarrationEditingService _narrationEditing;
     private readonly GenerationService _generation;
@@ -34,18 +31,12 @@ public class AdminNarrationController : ControllerBase
 
     public AdminNarrationController(
         ZooDbContext db,
-        IPlaceService placeService,
-        ITranslationClient translator,
-        ISpeechClient speechClient,
         IMediaStorage storage,
         NarrationEditingService narrationEditing,
         GenerationService generation,
         PublicationService publication)
     {
         _db = db;
-        _placeService = placeService;
-        _translator = translator;
-        _speechClient = speechClient;
         _storage = storage;
         _narrationEditing = narrationEditing;
         _generation = generation;
@@ -78,7 +69,8 @@ public class AdminNarrationController : ControllerBase
             {
                 lang = t.Language,
                 text = t.ScriptText,
-                isApproved = PublicationRules.Ready(t)
+                needsReview = t.NeedsReview,
+                isApproved = !t.NeedsReview && PublicationRules.Ready(t)
             }),
             jobs = r.Jobs.Select(j =>
             {
@@ -171,49 +163,21 @@ public class AdminNarrationController : ControllerBase
         var targetLang = lang.ToLowerInvariant().Trim();
         if (!AllLangs.Contains(targetLang) || string.IsNullOrWhiteSpace(req.Text) || req.Text.Length > 20000)
             return BadRequest(new { message = "Ngôn ngữ hoặc nội dung không hợp lệ (tối đa 20.000 ký tự)." });
-        var revision = await _db.NarrationRevisions
-            .Include(r => r.Translations)
-            .Include(r => r.Place)
-            .FirstOrDefaultAsync(r => r.Id == revisionId, ct);
-
-        if (revision == null) return NotFound(new { message = "Không tìm thấy phiên bản." });
-        if (revision.Status != RevisionStatus.Draft)
-            return Conflict(new { message = "Chỉ sửa, tạo âm thanh hoặc xuất bản bản nháp. Hãy tạo phiên bản mới." });
-
-        var viTrans = revision.Translations.FirstOrDefault(t => t.Language == "vi");
-        var translation = revision.Translations.FirstOrDefault(t => t.Language == targetLang);
-
-        if (translation == null)
+        var (result, translation) = await _narrationEditing.UpdateTranslationAsync(revisionId, targetLang, req.Text, ct);
+        return result switch
         {
-            translation = new NarrationTranslation
+            UpdateContentResult.NotFound => NotFound(new { message = "Không tìm thấy phiên bản." }),
+            UpdateContentResult.NotDraft => Conflict(new { message = "Chỉ sửa nội dung trên bản nháp." }),
+            UpdateContentResult.HasProcessingJobs => Conflict(new { message = "Không thể sửa nội dung khi có tác vụ đang xử lý." }),
+            UpdateContentResult.Ok when translation != null => Ok(new
             {
-                RevisionId = revisionId,
-                Language = targetLang,
-                Title = targetLang == "vi" ? viTrans?.Title ?? revision.Place.Code : "",
-                Description = "",
-                UpdatedAt = DateTime.UtcNow
-            };
-            _db.NarrationTranslations.Add(translation);
-        }
-
-        translation.ScriptText = req.Text.Trim();
-        translation.IsEditedByAdmin = true;
-        translation.ContentHash = ComputeHash(translation.ScriptText);
-        PublicationRules.Invalidate(translation);
-        if (targetLang == "vi")
-            foreach (var other in revision.Translations.Where(t => t.Language != "vi"))
-            {
-                other.ScriptText = ""; other.IsEditedByAdmin = false;
-                PublicationRules.Invalidate(other);
-            }
-        var staleJobs = await _db.GenerationJobs.Where(j => j.RevisionId == revisionId
-            && (targetLang == "vi" || j.Language == targetLang)).ToListAsync(ct);
-        foreach (var job in staleJobs) { job.Status = JobStatus.Queued; job.LastError = null; }
-        translation.UpdatedAt = DateTime.UtcNow;
-
-        await _db.SaveChangesAsync(ct);
-
-        return Ok(new { lang = targetLang, text = translation.ScriptText, isApproved = false });
+                lang = targetLang,
+                text = translation.ScriptText,
+                needsReview = translation.NeedsReview,
+                isApproved = !translation.NeedsReview && PublicationRules.Ready(translation)
+            }),
+            _ => StatusCode(500)
+        };
     }
 
     // 4b. Duyệt lại bản dịch khi script tiếng Việt thay đổi (Admin chọn giữ cũ hoặc cập nhật sang mới)
@@ -221,8 +185,8 @@ public class AdminNarrationController : ControllerBase
     public async Task<IActionResult> ReviewTranslation(Guid revisionId, string lang, [FromBody] ReviewTranslationRequest req, CancellationToken ct)
     {
         var targetLang = lang.ToLowerInvariant().Trim();
-        if (!AllLangs.Contains(targetLang))
-            return BadRequest(new { message = "Ngôn ngữ không hợp lệ." });
+        if (!AllLangs.Contains(targetLang) || targetLang == "vi" || req.Action is not ("KeepOld" or "UpdateToNew"))
+            return BadRequest(new { message = "Ngôn ngữ hoặc thao tác duyệt không hợp lệ." });
 
         var result = await _narrationEditing.ReviewTranslationAsync(revisionId, targetLang, req, ct);
         
@@ -240,6 +204,8 @@ public class AdminNarrationController : ControllerBase
     [HttpPut("revisions/{revisionId:guid}/content/vi")]
     public async Task<IActionResult> UpdateViContent(Guid revisionId, [FromBody] NarrationContentRequest req, CancellationToken ct)
     {
+        if (req.ScriptText != null && (string.IsNullOrWhiteSpace(req.ScriptText) || req.ScriptText.Length > 20000))
+            return BadRequest(new { message = "Bài thuyết minh phải có từ 1 đến 20.000 ký tự." });
         var result = await _narrationEditing.UpdateViContentWithReviewAsync(revisionId, req, ct);
         
         return result switch
@@ -252,120 +218,24 @@ public class AdminNarrationController : ControllerBase
         };
     }
 
-    // 5. Dịch tự động qua Azure Translator & Tạo file MP3 qua Azure Speech
+    // 5. Dịch và tạo audio cho các ngôn ngữ của một bản nháp.
     [HttpPost("revisions/{revisionId:guid}/generate")]
-    public async Task<IActionResult> Generate(Guid revisionId, CancellationToken ct)
-    {
-        var revision = await _db.NarrationRevisions
-            .Include(r => r.Translations)
-            .Include(r => r.Jobs)
-            .Include(r => r.Place)
-            .FirstOrDefaultAsync(r => r.Id == revisionId, ct);
+    public Task<IActionResult> Generate(Guid revisionId, CancellationToken ct) =>
+        GenerateRevisionAsync(revisionId, null, ct);
 
+    private async Task<IActionResult> GenerateRevisionAsync(Guid revisionId, GenerationJob? selectedJob, CancellationToken ct)
+    {
+        var revision = await _db.NarrationRevisions.Include(r => r.Translations).Include(r => r.Jobs)
+            .FirstOrDefaultAsync(r => r.Id == revisionId, ct);
         if (revision == null) return NotFound(new { message = "Không tìm thấy phiên bản." });
         if (revision.Status != RevisionStatus.Draft)
-            return Conflict(new { message = "Chỉ sửa, tạo âm thanh hoặc xuất bản bản nháp. Hãy tạo phiên bản mới." });
+            return Conflict(new { message = "Chỉ tạo âm thanh cho bản nháp." });
 
-        var viTrans = revision.Translations.FirstOrDefault(t => t.Language == "vi");
-        if (viTrans == null || string.IsNullOrWhiteSpace(viTrans.ScriptText))
-        {
+        var source = revision.Translations.FirstOrDefault(t => t.Language == "vi");
+        if (source == null || string.IsNullOrWhiteSpace(source.ScriptText))
             return BadRequest(new { message = "Thiếu nội dung thuyết minh tiếng Việt gốc." });
-        }
 
-        foreach (var l in AllLangs)
-        {
-            var trans = revision.Translations.FirstOrDefault(t => t.Language == l);
-            if (trans == null)
-            {
-                trans = new NarrationTranslation
-                {
-                    RevisionId = revision.Id,
-                    Language = l,
-                    Title = viTrans.Title,
-                    Description = viTrans.Description,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                revision.Translations.Add(trans);
-                _db.NarrationTranslations.Add(trans);
-            }
-
-            var job = revision.Jobs.FirstOrDefault(j => j.Language == l);
-            if (job == null)
-            {
-                job = new GenerationJob
-                {
-                    RevisionId = revision.Id,
-                    Language = l,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                revision.Jobs.Add(job);
-                _db.GenerationJobs.Add(job);
-            }
-
-            // BR-27: reset job bị kẹt từ lần chạy trước (Processing → Queued)
-            if (job.Status == JobStatus.Processing)
-            {
-                job.Status = JobStatus.Queued;
-                job.LastError = null;
-            }
-
-            try
-            {
-                // Bước A: Dịch tự động cho en, zh, ko, ja
-                if (l != "vi" && (string.IsNullOrWhiteSpace(trans.ScriptText) || string.IsNullOrWhiteSpace(trans.Title)))
-                {
-                    job.Stage = JobStage.Translate;
-                    job.Status = JobStatus.Processing;
-
-                    var title = await _translator.TranslateAsync(viTrans.Title, "vi", l, ct);
-                    var script = trans.IsEditedByAdmin && !string.IsNullOrWhiteSpace(trans.ScriptText)
-                        ? trans.ScriptText : await _translator.TranslateAsync(viTrans.ScriptText, "vi", l, ct);
-                    var description = string.IsNullOrWhiteSpace(viTrans.Description) ? "" : await _translator.TranslateAsync(viTrans.Description, "vi", l, ct);
-                    trans.Title = title; trans.ScriptText = script; trans.Description = description;
-                    trans.ContentHash = ComputeHash(trans.ScriptText);
-                }
-
-                // Bước B: Tạo file MP3 bằng Azure Speech
-                var textHash = ComputeHash(trans.ScriptText);
-                bool fileExists = false;
-                if (!string.IsNullOrWhiteSpace(trans.AudioPath))
-                {
-                    await using var existing = await _storage.OpenReadAudioAsync(trans.AudioPath, ct);
-                    fileExists = existing != null && existing.Length > 0;
-                }
-                if (!PublicationRules.Ready(trans) || !fileExists)
-                {
-                    job.Status = JobStatus.Processing;
-                    job.Stage = JobStage.Synthesize;
-                    var audioBytes = await _speechClient.SynthesizeAsync(trans.ScriptText, l, ct);
-
-                    if (audioBytes.Length == 0) throw new InvalidOperationException("Azure trả về file rỗng.");
-                    job.Stage = JobStage.Store;
-                    var relativePath = await _storage.SaveAudioAsync(revision.PlaceId, revision.Id, l, audioBytes, ct);
-
-                    trans.AudioPath = relativePath;
-                    trans.AudioContentHash = textHash;
-                    trans.AudioStatus = AudioStatus.Ready;
-                }
-
-                trans.UpdatedAt = DateTime.UtcNow;
-                job.Status = JobStatus.Succeeded;
-                job.LastError = null;
-                job.UpdatedAt = DateTime.UtcNow;
-            }
-            catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-            catch (Exception ex)
-            {
-                trans.AudioStatus = AudioStatus.Failed;
-                job.Status = JobStatus.Failed;
-                job.LastError = GenerationError(ex);
-                HttpContext.RequestServices.GetRequiredService<ILogger<AdminNarrationController>>().LogError(ex, "Generation failed for {RevisionId}/{Language}", revisionId, l);
-                job.UpdatedAt = DateTime.UtcNow;
-            }
-            await _db.SaveChangesAsync(ct);
-        }
-
+        await _generation.GenerateAsync(revision, source, selectedJob, ct);
         return await GetRevisions(revision.PlaceId, ct);
     }
 
@@ -384,7 +254,9 @@ public class AdminNarrationController : ControllerBase
     {
         var job = await _db.GenerationJobs.FindAsync([jobId], ct);
         if (job == null) return NotFound();
-        return await Generate(job.RevisionId, ct);
+        if (job.Status != JobStatus.Failed)
+            return Conflict(new { message = "Chỉ thử lại tác vụ đã lỗi." });
+        return await GenerateRevisionAsync(job.RevisionId, job, ct);
     }
 
     // UC06.3 — Xóa bản nháp (chỉ Draft, không xóa Published/Archived — BR-25)
@@ -475,31 +347,7 @@ public class AdminNarrationController : ControllerBase
         return Ok(new { message = "Đã xuất bản thành công!" });
     }
 
-    private static string GenerationError(Exception ex)
-    {
-        // Return only known configuration messages/status codes; do not expose provider response bodies.
-        if (ex.Message == "Chưa cấu hình Azure Speech ApiKey." || ex.Message == "Chưa cấu hình Azure Translator ApiKey.")
-            return ex.Message + " Cấu hình key bằng User Secrets rồi khởi động lại backend.";
-        var match = System.Text.RegularExpressions.Regex.Match(ex.Message, @"^Lỗi Azure (Speech|Translator) \((\d{3})\)");
-        if (match.Success)
-        {
-            var service = match.Groups[1].Value;
-            var status = match.Groups[2].Value;
-            var action = status switch
-            {
-                "401" => "Kiểm tra key và region có thuộc đúng tài nguyên Azure đang gọi.",
-                "403" => "Kiểm tra quyền truy cập, trạng thái tài nguyên, mạng và hạn mức Azure.",
-                "429" => "Đang bị giới hạn yêu cầu. Kiểm tra hạn mức Azure và thử lại sau.",
-                "400" => "Azure từ chối nội dung hoặc cấu hình yêu cầu. Xem log backend để biết chi tiết.",
-                _ => "Kiểm tra dịch vụ Azure và log backend rồi thử lại."
-            };
-            return $"Azure {service} HTTP {status}. {action}";
-        }
-        if (ex is OperationCanceledException) return "Dịch vụ Azure phản hồi quá thời gian chờ. Hãy thử lại.";
-        if (ex is HttpRequestException) return "Không kết nối được Azure. Kiểm tra mạng, endpoint và region; xem log backend.";
-        if (ex is IOException || ex is UnauthorizedAccessException) return "Không đọc/ghi được file audio. Kiểm tra thư mục storage và quyền ghi; xem log backend.";
-        return "Không tạo được âm thanh. Xem log backend tại dòng Generation failed để biết nguyên nhân.";
-    }
+
 
     private static string ComputeHash(string text)
     {

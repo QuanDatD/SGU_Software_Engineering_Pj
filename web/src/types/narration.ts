@@ -17,6 +17,7 @@ export interface NarrationTranslation {
   lang: string;
   text: string;
   isApproved: boolean;
+  needsReview?: boolean;
 }
 
 export interface NarrationRevision {

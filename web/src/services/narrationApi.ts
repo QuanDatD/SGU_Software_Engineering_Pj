@@ -17,6 +17,9 @@ export const narrationApi = {
       { text },
     ),
 
+  reviewTranslation: (revisionId: string, lang: string, action: "KeepOld" | "UpdateToNew") =>
+    api.post<{ message: string }>(`/api/admin/revisions/${revisionId}/translations/${lang}/review`, { action }),
+
   /* Tạo công việc generate audio cho tất cả 5 ngôn ngữ */
   generate: (revisionId: string) =>
     api.post<NarrationRevision[]>(`/api/admin/revisions/${revisionId}/generate`, {}),
@@ -30,8 +33,16 @@ export const narrationApi = {
     api.post<void>(`/api/admin/jobs/${jobId}/retry`, {}),
 
   /* Xuất bản phiên bản */
+  validatePublish: (revisionId: string) =>
+    api.get<{ message: string }>(`/api/admin/revisions/${revisionId}/publish/validate`),
+
   publish: (revisionId: string) =>
-    api.post<{ message: string }>(`/api/admin/revisions/${revisionId}/publish`, {}),
+    api.post<{ message: string }>(`/api/admin/revisions/${revisionId}/publish`, {
+      confirmAllLanguagesReady: true,
+      confirmAllAudioValid: true,
+      confirmAllJobsCompleted: true,
+      confirmAllTranslationsReviewed: true,
+    }),
 
   /* Xóa bản nháp (UC06.3) */
   deleteRevision: (revisionId: string) =>

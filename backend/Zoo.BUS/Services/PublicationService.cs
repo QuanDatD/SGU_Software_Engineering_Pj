@@ -59,18 +59,16 @@ public class PublicationService
             {
                 missingLanguages.Add(lang);
             }
-            else if (!PublicationRules.Ready(trans))
-            {
-                // Kiểm tra chi tiết điều kiện
-                if (string.IsNullOrWhiteSpace(trans.Title))
-                    missingLanguages.Add($"{lang}_missing_title");
-                else if (string.IsNullOrWhiteSpace(trans.Description))
-                    missingLanguages.Add($"{lang}_missing_description");
-                else if (string.IsNullOrWhiteSpace(trans.ScriptText))
-                    missingLanguages.Add($"{lang}_missing_script");
-                else if (trans.AudioStatus != AudioStatus.Ready)
-                    missingLanguages.Add($"{lang}_audio_not_ready");
-            }
+            else if (string.IsNullOrWhiteSpace(trans.Title))
+                missingLanguages.Add($"{lang}_missing_title");
+            else if (string.IsNullOrWhiteSpace(trans.Description))
+                missingLanguages.Add($"{lang}_missing_description");
+            else if (string.IsNullOrWhiteSpace(trans.ScriptText))
+                missingLanguages.Add($"{lang}_missing_script");
+            else if (trans.AudioStatus != AudioStatus.Ready || string.IsNullOrWhiteSpace(trans.AudioPath))
+                missingLanguages.Add($"{lang}_audio_not_ready");
+            else if (trans.AudioContentHash != PublicationRules.Hash(trans.ScriptText))
+                missingLanguages.Add($"{lang}_audio_hash_mismatch");
         }
         if (missingLanguages.Count > 0)
             missing.Add($"languages_not_ready: {string.Join(", ", missingLanguages)}");
@@ -194,11 +192,15 @@ public class PublicationService
                 old.Status = RevisionStatus.Archived;
                 old.UpdatedAt = DateTime.UtcNow;
             }
+            // Chỉ mục duy nhất theo điểm yêu cầu lưu trạng thái Archived trước.
+            await _db.SaveChangesAsync(ct);
 
             // 4b. Set bản hiện tại thành Published
             revision.Status = RevisionStatus.Published;
             revision.PublishedAt = DateTime.UtcNow;
             revision.UpdatedAt = DateTime.UtcNow;
+            // Trigger trên Places phải đọc được trạng thái Published đã lưu trong giao dịch.
+            await _db.SaveChangesAsync(ct);
 
             // 4c. Trỏ PublishedRevisionId sang bản mới (SQL trigger sẽ validate)
             revision.Place.PublishedRevisionId = revision.Id;

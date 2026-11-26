@@ -68,6 +68,8 @@ public sealed partial class ApiTests
         Assert.Equal("Changed Vietnamese source", scripts["vi"].ScriptText);
         Assert.Equal("Manually reviewed translation", scripts["en"].ScriptText);
         Assert.True(scripts["en"].IsEditedByAdmin);
+        Assert.True(scripts["en"].NeedsReview);
+        Assert.Equal(PublicationRules.Hash("CI narration"), scripts["en"].SourceContentHash);
     }
 
     [SqlFact]
@@ -161,10 +163,13 @@ public sealed partial class ApiTests
             var successfulAudio = await LoadTranslationAsync(db, revisionId, "vi");
             Assert.True(PublicationRules.Ready(successfulAudio));
 
-            fixture.Azure.BeforeSynthesis = (language, _) =>
+            var inFlight = new List<GenerationJob>();
+            fixture.Azure.BeforeSynthesis = async (language, ct) =>
             {
                 synthesisCalls.Add(language);
-                return Task.CompletedTask;
+                await using var observedDb = fixture.OpenDatabase();
+                inFlight.Add(await observedDb.GenerationJobs.AsNoTracking()
+                    .SingleAsync(j => j.RevisionId == revisionId && j.Language == language, ct));
             };
             using var retried = await WriteAsync(client, HttpMethod.Post, $"/api/admin/jobs/{before["en"].Id}/retry");
             retried.EnsureSuccessStatusCode();
@@ -172,7 +177,12 @@ public sealed partial class ApiTests
             var after = await db.GenerationJobs.AsNoTracking().Where(j => j.RevisionId == revisionId)
                 .ToDictionaryAsync(j => j.Language);
             var retainedAudio = await LoadTranslationAsync(db, revisionId, "vi");
+            var running = Assert.Single(inFlight);
             Assert.Multiple(
+                () => Assert.Equal(before["en"].Id, running.Id),
+                () => Assert.Equal(JobStatus.Processing, running.Status),
+                () => Assert.Equal(JobStage.Synthesize, running.Stage),
+                () => Assert.Equal(before["en"].AttemptCount + 1, running.AttemptCount),
                 () => Assert.Equal(before.Values.Select(j => j.Id).Order(), after.Values.Select(j => j.Id).Order()),
                 () => Assert.Equal(JobStatus.Succeeded, after["en"].Status),
                 () => Assert.Equal(before["en"].AttemptCount + 1, after["en"].AttemptCount),

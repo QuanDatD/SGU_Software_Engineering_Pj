@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Zoo.BUS.DTOs;
 using Zoo.BUS.Interfaces;
 using Zoo.BUS.Services;
@@ -44,6 +45,7 @@ public sealed class AdminPlacesController(IAdminPlaceService places, PlaceEditin
     }
     private async Task<IActionResult> Save(Guid? id, PlaceForm form, CancellationToken ct)
     {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var adminId)) return Forbid();
         if (string.IsNullOrWhiteSpace(form.NameVi)) return BadRequest(new { message = "Cần nhập tên tiếng Việt." });
         await using var image = new MemoryStream();
         string? imageName = null;
@@ -60,7 +62,8 @@ public sealed class AdminPlacesController(IAdminPlaceService places, PlaceEditin
             if (extension == null) return BadRequest(new { message = "Chỉ nhận ảnh PNG, JPEG, WebP hợp lệ." });
             imageName = "place" + extension; image.Position = 0;
         }
-        var saved = await editing.SaveAsync(id, form, imageName, imageName == null ? null : image, ct);
-        return saved == null ? NotFound() : Ok(new { id = saved, message = "Đã lưu. Tạo âm thanh và xuất bản bản nháp để cập nhật nội dung User." });
+        var (placeId, processing) = await editing.SaveAsync(id, adminId, form, imageName, imageName == null ? null : image, ct);
+        if (processing) return Conflict(new { message = "Không thể sửa nội dung bản nháp khi còn tác vụ đang xử lý." });
+        return placeId == null ? NotFound() : Ok(new { id = placeId, message = "Đã lưu. Tạo âm thanh và xuất bản bản nháp để cập nhật nội dung User." });
     }
 }
