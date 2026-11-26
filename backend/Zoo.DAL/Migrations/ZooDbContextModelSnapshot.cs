@@ -92,7 +92,8 @@ namespace Zoo.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RevisionId");
+                    b.HasIndex("RevisionId", "Language")
+                        .IsUnique();
 
                     b.HasIndex("Status", "LockedUntilUtc");
 
@@ -127,10 +128,20 @@ namespace Zoo.DAL.Migrations
 
                     b.HasIndex("CreatedByAdminId");
 
+                    b.HasIndex("PlaceId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_NarrationRevisions_OnePublishedPerPlace")
+                        .HasFilter("[Status] = 1");
+
                     b.HasIndex("PlaceId", "Version")
                         .IsUnique();
 
-                    b.ToTable("NarrationRevisions");
+                    b.ToTable("NarrationRevisions", t =>
+                        {
+                            t.HasTrigger("TR_NarrationRevisions_ProtectImmutable");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("Zoo.DAL.Entities.NarrationTranslation", b =>
@@ -164,12 +175,19 @@ namespace Zoo.DAL.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<bool>("NeedsReview")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("RevisionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ScriptText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SourceContentHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -183,13 +201,17 @@ namespace Zoo.DAL.Migrations
                     b.HasIndex("RevisionId", "Language")
                         .IsUnique();
 
-                    b.ToTable("NarrationTranslations");
+                    b.ToTable("NarrationTranslations", t =>
+                        {
+                            t.HasTrigger("TR_NarrationTranslations_ProtectImmutable");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("Zoo.DAL.Entities.Place", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Category")
@@ -240,16 +262,47 @@ namespace Zoo.DAL.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.HasIndex("PublishedRevisionId");
+                    b.HasIndex("PublishedRevisionId", "Id");
 
                     b.ToTable("Places", t =>
                         {
+                            t.HasTrigger("TR_Places_ValidatePublished");
+
                             t.HasCheckConstraint("CK_Places_Latitude", "[Latitude] >= -90 AND [Latitude] <= 90");
 
                             t.HasCheckConstraint("CK_Places_Longitude", "[Longitude] >= -180 AND [Longitude] <= 180");
 
                             t.HasCheckConstraint("CK_Places_RadiusMeters", "[RadiusMeters] > 0 AND [RadiusMeters] <= 500");
                         });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
+                });
+
+            modelBuilder.Entity("Zoo.DAL.Entities.QrVisit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("VisitedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionId")
+                        .IsUnique();
+
+                    b.HasIndex("VisitedAtUtc");
+
+                    b.ToTable("QrVisits");
                 });
 
             modelBuilder.Entity("Zoo.DAL.Entities.SiteText", b =>
@@ -296,16 +349,16 @@ namespace Zoo.DAL.Migrations
 
             modelBuilder.Entity("Zoo.DAL.Entities.NarrationRevision", b =>
                 {
-                    b.HasOne("Zoo.DAL.Entities.Place", "Place")
-                        .WithMany("Revisions")
-                        .HasForeignKey("PlaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Zoo.DAL.Entities.AdminUser", null)
                         .WithMany()
                         .HasForeignKey("CreatedByAdminId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Zoo.DAL.Entities.Place", "Place")
+                        .WithMany("Revisions")
+                        .HasForeignKey("PlaceId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Place");
                 });
@@ -325,7 +378,8 @@ namespace Zoo.DAL.Migrations
                 {
                     b.HasOne("Zoo.DAL.Entities.NarrationRevision", "PublishedRevision")
                         .WithMany()
-                        .HasForeignKey("PublishedRevisionId")
+                        .HasForeignKey("PublishedRevisionId", "Id")
+                        .HasPrincipalKey("Id", "PlaceId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("PublishedRevision");
@@ -341,33 +395,6 @@ namespace Zoo.DAL.Migrations
             modelBuilder.Entity("Zoo.DAL.Entities.Place", b =>
                 {
                     b.Navigation("Revisions");
-                });
-
-            modelBuilder.Entity("Zoo.DAL.Entities.QrVisit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDemo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SessionId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("VisitedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SessionId")
-                        .IsUnique();
-
-                    b.HasIndex("VisitedAtUtc");
-
-                    b.ToTable("QrVisits");
                 });
 #pragma warning restore 612, 618
         }
