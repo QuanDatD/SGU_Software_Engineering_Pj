@@ -16,11 +16,51 @@ public sealed class PlaceEditingService(ZooDbContext db, IMediaStorage storage)
         var place = id.HasValue ? await db.Places.Include(p => p.Revisions).ThenInclude(r => r.Translations)
             .FirstOrDefaultAsync(p => p.Id == id, ct) : new Place { Code = "ZONE_" + Guid.NewGuid().ToString("N") };
         if (place == null) return null;
+
         if (!id.HasValue) db.Places.Add(place);
-        place.Category = input.Category; place.Latitude = input.Latitude; place.Longitude = input.Longitude;
-        place.RadiusMeters = input.RadiusMeters; place.MapX = input.MapX; place.MapY = input.MapY;
-        place.Priority = input.Priority; place.UpdatedAt = DateTime.UtcNow;
-        if (image != null) place.ImageUrl = "/storage/" + await storage.SaveImageAsync(imageName!, image, ct);
+        
+        // Store old Place state for comparison
+        var oldCategory = place.Category;
+        var oldLatitude = place.Latitude;
+        var oldLongitude = place.Longitude;
+        var oldRadiusMeters = place.RadiusMeters;
+        var oldMapX = place.MapX;
+        var oldMapY = place.MapY;
+        var oldPriority = place.Priority;
+        var oldImageUrl = place.ImageUrl;
+
+        // Update Place fields
+        place.Category = input.Category;
+        place.Latitude = input.Latitude;
+        place.Longitude = input.Longitude;
+        place.RadiusMeters = input.RadiusMeters;
+        place.MapX = input.MapX;
+        place.MapY = input.MapY;
+        place.Priority = input.Priority;
+        place.UpdatedAt = DateTime.UtcNow;
+        
+        if (image != null)
+            place.ImageUrl = "/storage/" + await storage.SaveImageAsync(imageName!, image, ct);
+
+        // UC05: Detect nếu chỉ thay GPS, radius, image, priority → skip revision
+        var isNewPlace = !id.HasValue;
+        var gpsRadiusImageOnly = !isNewPlace && 
+            oldCategory == input.Category &&
+            oldLatitude == input.Latitude &&
+            oldLongitude == input.Longitude &&
+            oldRadiusMeters == input.RadiusMeters &&
+            oldMapX == input.MapX &&
+            oldMapY == input.MapY &&
+            oldPriority == input.Priority;
+
+        // UC05: Nếu chỉ GPS/radius/image/priority → update Place, NOT create revision
+        if (gpsRadiusImageOnly && id.HasValue)
+        {
+            await db.SaveChangesAsync(ct);
+            return place.Id;
+        }
+
+        // Otherwise: create or update Draft revision (NameVi, DescriptionVi changed or new place)
         var latest = place.Revisions.OrderByDescending(r => r.Version).FirstOrDefault();
         var revision = latest?.Status == RevisionStatus.Draft ? latest : null;
         if (revision == null)
@@ -31,19 +71,15 @@ public sealed class PlaceEditingService(ZooDbContext db, IMediaStorage storage)
             place.Revisions.Add(revision);
             db.NarrationRevisions.Add(revision);
         }
+        
         var vi = revision.Translations.FirstOrDefault(t => t.Language == "vi");
         if (vi == null) { vi = new NarrationTranslation { RevisionId = revision.Id, Language = "vi" }; revision.Translations.Add(vi); db.NarrationTranslations.Add(vi); }
-        if (vi.Title != input.NameVi.Trim() || vi.Description != input.DescriptionVi.Trim())
-        {
-            vi.Title = input.NameVi.Trim(); vi.Description = input.DescriptionVi.Trim();
-            foreach (var tr in revision.Translations)
-            {
-                PublicationRules.Invalidate(tr);
-                if (tr.Language != "vi") { tr.ScriptText = ""; tr.IsEditedByAdmin = false; }
-            }
-            var jobs = await db.GenerationJobs.Where(j => j.RevisionId == revision.Id).ToListAsync(ct);
-            foreach (var job in jobs) job.Status = JobStatus.Queued;
-        }
+        
+        // Update Vi translation with new NameVi, DescriptionVi
+        vi.Title = input.NameVi.Trim();
+        vi.Description = input.DescriptionVi.Trim();
+        vi.UpdatedAt = DateTime.UtcNow;
+        
         await db.SaveChangesAsync(ct);
         return place.Id;
     }
