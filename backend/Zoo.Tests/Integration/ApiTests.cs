@@ -11,7 +11,7 @@ namespace Zoo.Tests.Integration;
 
 [Collection("SQL-backed API")]
 [Trait("Category", "API")]
-public sealed class ApiTests(SqlApiFixture fixture)
+public sealed partial class ApiTests(SqlApiFixture fixture)
 {
     private const string SeedPassword = "Admin@123";
     private const string AdminPlaces = "/api/admin/places";

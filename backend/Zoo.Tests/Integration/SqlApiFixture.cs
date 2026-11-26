@@ -27,15 +27,27 @@ public sealed class SqlApiCollection : ICollectionFixture<SqlApiFixture>;
 
 public sealed class SqlApiFixture : WebApplicationFactory<Program>
 {
-    private readonly string connection = new SqlConnectionStringBuilder(
+    private readonly string connection;
+    private readonly ISpeechClient? speech;
+    private readonly string mediaPath = Path.Combine(Path.GetTempPath(), $"ZooCi_{Guid.NewGuid():N}");
+    internal AzureDouble Azure { get; } = new();
+
+    public SqlApiFixture() : this(new SqlConnectionStringBuilder(
         Environment.GetEnvironmentVariable("ZOO_TEST_SQL")
         ?? throw new InvalidOperationException("ZOO_TEST_SQL is required."))
     {
         InitialCatalog = $"ZooCi_{Guid.NewGuid():N}"
-    }.ConnectionString;
+    })
+    {
+    }
 
-    private readonly string mediaPath = Path.Combine(Path.GetTempPath(), $"ZooCi_{Guid.NewGuid():N}");
-    internal AzureDouble Azure { get; } = new();
+    internal SqlApiFixture(SqlConnectionStringBuilder sql, ISpeechClient? speech = null)
+    {
+        if (!sql.InitialCatalog.StartsWith("ZooCi_", StringComparison.Ordinal))
+            throw new ArgumentException("Use a disposable test database with a ZooCi_ name.", nameof(sql));
+        connection = sql.ConnectionString;
+        this.speech = speech;
+    }
 
     internal ZooDbContext OpenDatabase() =>
         new(new DbContextOptionsBuilder<ZooDbContext>().UseSqlServer(connection).Options);
@@ -50,7 +62,7 @@ public sealed class SqlApiFixture : WebApplicationFactory<Program>
             services.RemoveAll<ITranslationClient>();
             services.RemoveAll<ISpeechClient>();
             services.AddSingleton<ITranslationClient>(Azure);
-            services.AddSingleton<ISpeechClient>(Azure);
+            services.AddSingleton<ISpeechClient>(speech ?? Azure);
         });
     }
 

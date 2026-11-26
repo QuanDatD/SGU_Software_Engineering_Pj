@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Zoo.Tests.BrowserHost" />
     <ProjectReference Include="../Zoo.Api/Zoo.Api.csproj" />
     <ProjectReference Include="../Zoo.BUS/Zoo.BUS.csproj" />
   </ItemGroup>

@@ -83,13 +83,13 @@ jobs:
           done
           docker logs "$SQL_CONTAINER"
           exit 1
-      - name: Build backend for integration tests
+      - name: Build backend and browser test host
         id: build
-        run: dotnet build backend/Zoo.sln --configuration Release -m:1 -nr:false
+        run: dotnet build backend/Zoo.Tests.BrowserHost/Zoo.Tests.BrowserHost.csproj --configuration Release -m:1 -nr:false
       - name: Run SQL and API tests
         env:
           ZOO_TEST_SQL: "Server=127.0.0.1,${{ job.services.sqlserver.ports['1433'] }};User ID=sa;Password=ZooCi_Only!2026;TrustServerCertificate=True"
-        run: dotnet test backend/Zoo.Tests/Zoo.Tests.csproj --configuration Release --filter 'Category=SQL|Category=API' --logger 'trx;LogFileName=integration.trx' --results-directory "${{ runner.temp }}/zoo-test-results"
+        run: dotnet test backend/Zoo.Tests/Zoo.Tests.csproj --configuration Release --no-build --filter 'Category=SQL|Category=API' --logger 'trx;LogFileName=integration.trx' --results-directory "${{ runner.temp }}/zoo-test-results"
       - name: Run Playwright
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         working-directory: web
