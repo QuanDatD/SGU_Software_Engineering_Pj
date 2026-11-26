@@ -91,7 +91,8 @@ WHERE ISNULL(CONVERT(varchar(36), p.PublishedRevisionId), '') <> ISNULL(CONVERT(
                 table: "NarrationRevisions",
                 column: "PlaceId",
                 principalTable: "Places",
-                principalColumn: "Id");
+                principalColumn: "Id",
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Places_NarrationRevisions_PublishedRevisionId_Id",
@@ -162,9 +163,9 @@ BEGIN
     END
 END;");
 
-            // 1.4: Chặn sửa/xóa bản dịch thuộc phiên bản đã Published (1) hoặc Archived (2)
+            // 1.5: Chặn sửa/xóa bản dịch thuộc phiên bản đã Published (1) hoặc Archived (2)
             migrationBuilder.Sql(@"
-CREATE TRIGGER TR_NarrationTranslations_ProtectImmutable
+CREATE TRIGGER TR_NarrationTranslations_ProtectPublishedArchived
 ON NarrationTranslations
 AFTER UPDATE, DELETE
 AS
@@ -187,7 +188,7 @@ END;");
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("DROP TRIGGER IF EXISTS TR_NarrationTranslations_ProtectImmutable;");
+            migrationBuilder.Sql("DROP TRIGGER IF EXISTS TR_NarrationTranslations_ProtectPublishedArchived;");
             migrationBuilder.Sql("DROP TRIGGER IF EXISTS TR_NarrationRevisions_ProtectImmutable;");
             migrationBuilder.Sql("DROP TRIGGER IF EXISTS TR_Places_ValidatePublished;");
             migrationBuilder.DropForeignKey(
