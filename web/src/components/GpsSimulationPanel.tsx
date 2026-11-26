@@ -17,6 +17,7 @@ interface Props {
         to: Coordinate,
         speed: number,
     ) => void;
+    onRestart: () => void;
     onStop: () => void;
 }
 
@@ -24,6 +25,7 @@ export default function GpsSimulationPanel({
     places,
     simulator,
     onStart,
+    onRestart,
     onStop,
 }: Props) {
     const { lang } = useLang();
@@ -194,6 +196,10 @@ export default function GpsSimulationPanel({
                                     : t("sim.resume")}
                             </button>
                         )}
+
+                        <button type="button" onClick={onRestart}>
+                            {t("sim.restart")}
+                        </button>
 
                         <button type="button" onClick={onStop}>
                             	{t("sim.stop")}

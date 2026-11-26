@@ -38,6 +38,8 @@ export default function MapPage({
     visitHistory,
     simulator,
     onStartSimulation,
+    onRestartSimulation,
+    locationSignal,
 }: MapPageProps) {
     const { lang } = useLang();
     const texts = useSiteTexts(lang);

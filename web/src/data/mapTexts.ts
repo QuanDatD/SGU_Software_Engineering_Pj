@@ -210,6 +210,7 @@ const rows = {
         "시뮬레이션 시작",
         "シミュレーション開始",
     ],
+    "sim.restart": ["Làm lại", "Restart simulation", "重新模拟", "다시 시작", "やり直す"],
     "sim.pause": [
         "Tạm dừng di chuyển",
         "Pause movement",

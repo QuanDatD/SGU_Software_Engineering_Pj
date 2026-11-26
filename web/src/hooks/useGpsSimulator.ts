@@ -105,6 +105,11 @@ export function useGpsSimulator() {
         setEnabled(true);
     }, []);
 
+    const restart = useCallback(() => {
+        const route = routeRef.current;
+        if (route) start(route.from, route.to, route.speedMetersPerSecond);
+    }, [start]);
+
     const pause = useCallback(() => {
         movingRef.current = false;
         setMoving(false);
@@ -195,6 +200,7 @@ export function useGpsSimulator() {
         progress,
         gps,
         start,
+        restart,
         pause,
         resume,
         stop,

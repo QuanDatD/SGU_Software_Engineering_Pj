@@ -129,6 +129,12 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         if (requestId !== requestIdRef.current) {
             return false;
         }
+        // Vùng hoặc chế độ có thể đổi trong lúc tải file.
+        if (canStart && !canStart()) {
+            setTrack(null);
+            setState("idle");
+            return false;
+        }
 
         // File đã tải trọn; trình phát sử dụng bản trong bộ nhớ.
         const blobUrl = URL.createObjectURL(blob);

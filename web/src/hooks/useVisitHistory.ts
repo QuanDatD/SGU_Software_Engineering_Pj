@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useAudio } from "../contexts/AudioContext";
+import { useCallback, useRef, useState } from "react";
 
 export function useVisitHistory() {
-    const audio = useAudio();
-
     // Khóa bài: điểm + ngôn ngữ + URL audio.
     const heard = useRef(new Set<string>());
 
@@ -34,17 +31,6 @@ export function useVisitHistory() {
         },
         [],
     );
-
-    // Ghi nhận cả khi khách nhấn nghe thủ công.
-    useEffect(() => {
-        if (audio.state !== "playing" || !audio.track) return;
-
-        markHeard(
-            audio.track.placeId,
-            audio.track.lang,
-            audio.track.url,
-        );
-    }, [audio.state, audio.track, markHeard]);
 
     const reset = useCallback(() => {
         heard.current.clear();
