@@ -29,7 +29,7 @@ public sealed class SqlApiFixture : WebApplicationFactory<Program>
 {
     private readonly string connection;
     private readonly ISpeechClient? speech;
-    private readonly string mediaPath = Path.Combine(Path.GetTempPath(), $"ZooCi_{Guid.NewGuid():N}");
+    private readonly string mediaDirectory = Path.Combine(Path.GetTempPath(), $"ZooCi_{Guid.NewGuid():N}");
     internal AzureDouble Azure { get; } = new();
 
     public SqlApiFixture() : this(new SqlConnectionStringBuilder(
@@ -56,7 +56,7 @@ public sealed class SqlApiFixture : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:DefaultConnection", connection);
-        builder.UseSetting("MediaStorageOptions:RootPath", mediaPath);
+        builder.UseSetting("MediaStorageOptions:RootPath", Path.Combine(mediaDirectory, "storage"));
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<ITranslationClient>();
@@ -76,8 +76,8 @@ public sealed class SqlApiFixture : WebApplicationFactory<Program>
         }
         finally
         {
-            if (Directory.Exists(mediaPath))
-                Directory.Delete(mediaPath, recursive: true);
+            if (Directory.Exists(mediaDirectory))
+                Directory.Delete(mediaDirectory, recursive: true);
         }
     }
 }
