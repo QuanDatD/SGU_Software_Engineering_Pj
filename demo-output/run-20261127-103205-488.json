@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T10:32:18.3778986+07:00",
+    "BackendWindowPid":  75988,
+    "FrontendWindowPid":  48528,
+    "TunnelWindowPid":  76124,
+    "Website":  "https://rap-limitation-sao-pipe.trycloudflare.com",
+    "QrPage":  "https://rap-limitation-sao-pipe.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-103205-488.config.mjs",
+    "TunnelLog":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-103205-488.log",
+    "DemoAdmin":  false
+}

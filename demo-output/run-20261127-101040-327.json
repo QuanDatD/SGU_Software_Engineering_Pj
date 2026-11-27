@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T10:10:53.3242908+07:00",
+    "BackendWindowPid":  18588,
+    "FrontendWindowPid":  43468,
+    "TunnelWindowPid":  77800,
+    "Website":  "https://mattress-terrace-eco-disclaimer.trycloudflare.com",
+    "QrPage":  "https://mattress-terrace-eco-disclaimer.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-101040-327.config.mjs",
+    "TunnelLog":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-101040-327.log",
+    "DemoAdmin":  false
+}

@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T09:42:19.8329250+07:00",
+    "BackendWindowPid":  43432,
+    "FrontendWindowPid":  78600,
+    "TunnelWindowPid":  68464,
+    "Website":  "https://mom-sole-urban-accompanying.trycloudflare.com",
+    "QrPage":  "https://mom-sole-urban-accompanying.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-094206-865.config.mjs",
+    "TunnelLog":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-094206-865.log",
+    "DemoAdmin":  false
+}
