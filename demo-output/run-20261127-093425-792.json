@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T09:34:43.1534508+07:00",
+    "BackendWindowPid":  70236,
+    "FrontendWindowPid":  39092,
+    "TunnelWindowPid":  58868,
+    "Website":  "https://maine-start-coordination-within.trycloudflare.com",
+    "QrPage":  "https://maine-start-coordination-within.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-093425-792.config.mjs",
+    "TunnelLog":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-093425-792.log",
+    "DemoAdmin":  false
+}

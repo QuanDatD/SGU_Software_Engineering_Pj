@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T10:03:21.3843469+07:00",
+    "BackendWindowPid":  78548,
+    "FrontendWindowPid":  79328,
+    "TunnelWindowPid":  67000,
+    "Website":  "https://fence-vessels-cod-corners.trycloudflare.com",
+    "QrPage":  "https://fence-vessels-cod-corners.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-100305-656.config.mjs",
+    "TunnelLog":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-100305-656.log",
+    "DemoAdmin":  false
+}

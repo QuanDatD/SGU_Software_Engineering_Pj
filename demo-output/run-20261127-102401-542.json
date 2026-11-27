@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T10:24:16.6797811+07:00",
+    "BackendWindowPid":  79396,
+    "FrontendWindowPid":  59556,
+    "TunnelWindowPid":  48848,
+    "Website":  "https://forecast-mount-councils-optimum.trycloudflare.com",
+    "QrPage":  "https://forecast-mount-councils-optimum.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-102401-542.config.mjs",
+    "TunnelLog":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-102401-542.log",
+    "DemoAdmin":  false
+}
