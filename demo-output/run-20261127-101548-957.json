@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T10:16:01.1141215+07:00",
+    "BackendWindowPid":  79080,
+    "FrontendWindowPid":  69276,
+    "TunnelWindowPid":  64220,
+    "Website":  "https://layout-eyes-incl-egg.trycloudflare.com",
+    "QrPage":  "https://layout-eyes-incl-egg.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-101548-957.config.mjs",
+    "TunnelLog":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-101548-957.log",
+    "DemoAdmin":  false
+}

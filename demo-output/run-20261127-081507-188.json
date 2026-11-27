@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T08:15:24.3399358+07:00",
+    "BackendWindowPid":  46308,
+    "FrontendWindowPid":  64972,
+    "TunnelWindowPid":  72888,
+    "Website":  "https://visual-chart-jurisdiction-pads.trycloudflare.com",
+    "QrPage":  "https://visual-chart-jurisdiction-pads.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-081507-188.config.mjs",
+    "TunnelLog":  "D:\\ACER\\Project\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-081507-188.log",
+    "DemoAdmin":  false
+}
