@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T09:48:32.5052919+07:00",
+    "BackendWindowPid":  6160,
+    "FrontendWindowPid":  34660,
+    "TunnelWindowPid":  20092,
+    "Website":  "https://silent-artistic-get-forever.trycloudflare.com",
+    "QrPage":  "https://silent-artistic-get-forever.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-094814-108.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-094814-108.log",
+    "DemoAdmin":  false
+}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import HomePage from "./pages/user/HomePage";
-import MapPage  from "./pages/user/MapPage";
+import MapPage from "./pages/user/MapPage";
 import QrPage from "./pages/user/QrPage";
 import { useLang } from "./contexts/LanguageContext";
 import LanguageSelector from "./components/LanguageSelector";
@@ -15,32 +15,33 @@ import "./styles/global.css";
 type Page = "home" | "map" | "qr";
 
 export default function App() {
-    
-  // UC01.3 — ghi nhận lượt truy cập qua QR ngay khi app mount
-  useQrVisit();
+    const [page, setPage] = useState<Page>(() => {
+        const path = window.location.pathname.replace(/\/+$/, "");
+        return path === "/qr" ? "qr" : "home";
+    });
 
-  const geolocation = useGeolocation();
-  const simulator = useGpsSimulator();
-  const realHistory = useVisitHistory();
-  const demoHistory = useVisitHistory();
-  const visitHistory = simulator.enabled ? demoHistory : realHistory;
-  const [locationSession, setLocationSession] = useState(() => new AbortController());
-  const [visitStarted, setVisitStarted] = useState(false);
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [autoPlay, setAutoPlay] = useState(false);
+    // UC01.3 — ghi nhận lượt truy cập qua QR & giới hạn phiên 1 phút
+    const { isExpired, remainingSeconds } = useQrVisit(page === "qr");
 
-  const [page, setPage] = useState<Page>(() => {
-    const path = window.location.pathname.replace(/\/+$/, "");
+    const geolocation = useGeolocation();
+    const simulator = useGpsSimulator();
+    const realHistory = useVisitHistory();
+    const demoHistory = useVisitHistory();
+    const visitHistory = simulator.enabled ? demoHistory : realHistory;
+    const [locationSession, setLocationSession] = useState(() => new AbortController());
+    const [visitStarted, setVisitStarted] = useState(false);
+    const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+    const [autoPlay, setAutoPlay] = useState(false);
 
-    return path === "/qr" ? "qr" : "home";
-});
-  const [menuOpen, setMenuOpen] = useState(false);
-  const { lang } = useLang();
-  const { stop: stopAudio, state: audioState, track } = useAudio();
-  const { markHeard } = visitHistory;
-  useEffect(() => {
-    if (audioState === "playing" && track) markHeard(track.placeId, track.lang, track.url);
-  }, [audioState, track, markHeard]);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const { lang } = useLang();
+    const { stop: stopAudio, state: audioState, track } = useAudio();
+    const { markHeard } = visitHistory;
+
+    useEffect(() => {
+        if (audioState === "playing" && track) markHeard(track.placeId, track.lang, track.url);
+    }, [audioState, track, markHeard]);
+
     const previousLang = useRef(lang);
 
     useEffect(() => {
@@ -55,22 +56,32 @@ export default function App() {
         stopAudio();
     }, [lang, stopAudio]);
 
-  function changePage(next: Page) {
-    setPage(next);
-    setMenuOpen(false);
-    window.scrollTo({ top: 0 });
-  }
+    // Khi hết 1 phút -> ngắt phiên, dừng audio & GPS
+    useEffect(() => {
+        if (!isExpired) return;
+        stopAudio();
+        geolocation.stop();
+        simulator.stop();
+        setAutoPlay(false);
+        setSelectedPlaceId(null);
+        setVisitStarted(false);
+    }, [isExpired, stopAudio, geolocation.stop, simulator.stop]);
 
-  const NAV = {
-    explore: { vi: "CÙNG KHÁM PHÁ", en: "EXPLORE", zh: "一起探索", ko: "함께 탐험", ja: "一緒に探検" },
-    home:    { vi: "Trang chủ",     en: "Home",    zh: "主页",    ko: "홈",      ja: "ホーム" },
-    map:     { vi: "Bản đồ",        en: "Map",     zh: "地图",    ko: "지도",    ja: "マップ" },
-    note:    { vi: "Một hành trình nhỏ,\nnhiều điều thú vị.", en: "A small journey,\nmany great discoveries.", zh: "小小旅程，\n大大发现。", ko: "작은 여정,\n큰 발견.", ja: "小さな旅、\n大きな発見。" },
-    tagline: { vi: "Khám phá thiên nhiên", en: "Explore nature", zh: "探索自然", ko: "자연 탐험", ja: "自然を探検" },
-    footer:  { vi: "Khám phá · Lắng nghe · Yêu thiên nhiên", en: "Explore · Listen · Love Nature", zh: "探索 · 倾听 · 热爱自然", ko: "탐험 · 듣기 · 자연 사랑", ja: "探検 · 聞く · 自然愛" },
-  };
-  const t = (k: keyof typeof NAV) => NAV[k]?.[lang] ?? NAV[k]?.["en"] ?? "";
-  
+    function changePage(next: Page) {
+        setPage(next);
+        setMenuOpen(false);
+        window.scrollTo({ top: 0 });
+    }
+
+    const NAV = {
+        explore: { vi: "CÙNG KHÁM PHÁ", en: "EXPLORE", zh: "一起探索", ko: "함께 탐험", ja: "一緒に探検" },
+        home: { vi: "Trang chủ", en: "Home", zh: "主页", ko: "홈", ja: "ホーム" },
+        map: { vi: "Bản đồ", en: "Map", zh: "地图", ko: "지도", ja: "マップ" },
+        note: { vi: "Một hành trình nhỏ,\nnhiều điều thú vị.", en: "A small journey,\nmany great discoveries.", zh: "小小旅程，\n大大发现。", ko: "작은 여정,\n큰 발견.", ja: "小さな旅、\n大きな発見。" },
+        tagline: { vi: "Khám phá thiên nhiên", en: "Explore nature", zh: "探索自然", ko: "자연 탐험", ja: "自然を探検" },
+        footer: { vi: "Khám phá · Lắng nghe · Yêu thiên nhiên", en: "Explore · Listen · Love Nature", zh: "探索 · 倾听 · 热爱自然", ko: "탐험 · 듣기 · 자연 사랑", ja: "探検 · 聞く · 自然愛" },
+    };
+    const t = (k: keyof typeof NAV) => NAV[k]?.[lang] ?? NAV[k]?.["en"] ?? "";
 
     // Vô hiệu hóa đồng bộ phản hồi cũ trước khi React cập nhật chế độ hoặc tuyến.
     function renewLocationSession() {
@@ -116,7 +127,6 @@ export default function App() {
         setAutoPlay(false);
     }
 
-
     function restartSimulation() {
         renewLocationSession();
         stopAudio();
@@ -124,122 +134,144 @@ export default function App() {
         simulator.restart();
     }
 
-// Return giao diện chính phía dưới giữ nguyên.
-  if (page !== "qr" && !visitStarted) {
+    if (isExpired) {
+        return <QrPage expired />;
+    }
+
+    if (page !== "qr" && !visitStarted) {
+        return (
+            <VisitSetup
+                geolocation={activeGeolocation}
+                onComplete={() => {
+                    setVisitStarted(true);
+                    setPage("map");
+                }}
+            />
+        );
+    }
+
     return (
-        <VisitSetup
-            geolocation={activeGeolocation}
-            onComplete={() => {
-                setVisitStarted(true);
-                setPage("map");
-            }}
-        />
-    );
-}
-  return (
-    <div className="app">
-      <header className="header">
-        <div className="header__left">
-          <button
-            className="menu-button"
-            type="button"
-            aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
-            aria-expanded={menuOpen}
-            aria-controls="navigation"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
+        <div className="app">
+            <header className="header">
+                <div className="header__left">
+                    <button
+                        className="menu-button"
+                        type="button"
+                        aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
+                        aria-expanded={menuOpen}
+                        aria-controls="navigation"
+                        onClick={() => setMenuOpen(!menuOpen)}
+                    >
+                        {menuOpen ? "✕" : "☰"}
+                    </button>
 
-          <button className="brand" type="button" onClick={() => changePage("home")}>
-            <span className="brand__icon" aria-hidden="true">🌿</span>
-            <span>
-              <strong>THẢO CẦM VIÊN</strong>
-              <small>{t("tagline")}</small>
-            </span>
-          </button>
+                    <button className="brand" type="button" onClick={() => changePage("home")}>
+                        <span className="brand__icon" aria-hidden="true">🌿</span>
+                        <span>
+                            <strong>THẢO CẦM VIÊN</strong>
+                            <small>{t("tagline")}</small>
+                        </span>
+                    </button>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {page !== "qr" && remainingSeconds > 0 && (
+                        <span
+                            style={{
+                                fontSize: 13,
+                                fontWeight: 700,
+                                padding: "4px 10px",
+                                borderRadius: 999,
+                                background: remainingSeconds <= 15 ? "#fdecec" : "#e8f4ec",
+                                color: remainingSeconds <= 15 ? "#b42318" : "#168652",
+                            }}
+                            title="Thời gian phiên tham quan còn lại"
+                        >
+                            ⏱️ {String(Math.floor(remainingSeconds / 60)).padStart(2, "0")}:
+                            {String(remainingSeconds % 60).padStart(2, "0")}
+                        </span>
+                    )}
+                    <LanguageSelector />
+                </div>
+            </header>
+
+            {menuOpen && (
+                <>
+                    <button
+                        className="menu-overlay"
+                        type="button"
+                        aria-label="Đóng menu"
+                        onClick={() => setMenuOpen(false)}
+                    />
+                    <nav
+                        id="navigation"
+                        className="navigation"
+                        aria-label="Điều hướng chính"
+                        onKeyDown={(e) => { if (e.key === "Escape") setMenuOpen(false); }}
+                    >
+                        <p className="navigation__title">{t("explore")}</p>
+
+                        <button
+                            type="button"
+                            className={page === "home" ? "is-active" : ""}
+                            aria-current={page === "home" ? "page" : undefined}
+                            onClick={() => changePage("home")}
+                        >
+                            <span aria-hidden="true">⌂</span> {t("home")}
+                        </button>
+
+                        <button
+                            type="button"
+                            className={page === "map" ? "is-active" : ""}
+                            aria-current={page === "map" ? "page" : undefined}
+                            onClick={() => changePage("map")}
+                        >
+                            <span aria-hidden="true">🗺️</span> {t("map")}
+                        </button>
+
+                        <div className="navigation__note">
+                            {t("note").split("\n").map((line, i) => (
+                                <span key={i}>{line}{i === 0 && <br />}</span>
+                            ))}
+                        </div>
+                    </nav>
+                </>
+            )}
+
+            <main>
+                {page === "home" && (
+                    <HomePage onOpenMap={() => changePage("map")} />
+                )}
+
+                {page === "map" && (
+                    <MapPage
+                        geolocation={activeGeolocation}
+                        selectedId={selectedPlaceId}
+                        onSelectPlace={setSelectedPlaceId}
+                        autoPlay={autoPlay}
+                        onAutoPlayChange={setAutoPlay}
+                        visitHistory={visitHistory}
+                        simulator={simulator}
+                        onStartSimulation={startSimulation}
+                        onRestartSimulation={restartSimulation}
+                        locationSignal={locationSession.signal}
+                    />
+                )}
+
+                {page === "qr" && <QrPage />}
+            </main>
+
+            <footer className="footer">
+                <strong>🌿 Thảo Cầm Viên</strong>
+                <span>{t("footer")}</span>
+                <a
+                    href="/admin/login"
+                    style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", textDecoration: "none" }}
+                    aria-label="Admin"
+                >
+                    ⚙️
+                </a>
+            </footer>
         </div>
-
-        <LanguageSelector />
-      </header>
-
-      {menuOpen && (
-        <>
-          <button
-            className="menu-overlay"
-            type="button"
-            aria-label="Đóng menu"
-            onClick={() => setMenuOpen(false)}
-          />
-          <nav
-            id="navigation"
-            className="navigation"
-            aria-label="Điều hướng chính"
-            onKeyDown={(e) => { if (e.key === "Escape") setMenuOpen(false); }}
-          >
-            <p className="navigation__title">{t("explore")}</p>
-
-            <button
-              type="button"
-              className={page === "home" ? "is-active" : ""}
-              aria-current={page === "home" ? "page" : undefined}
-              onClick={() => changePage("home")}
-            >
-              <span aria-hidden="true">⌂</span> {t("home")}
-            </button>
-
-            <button
-              type="button"
-              className={page === "map" ? "is-active" : ""}
-              aria-current={page === "map" ? "page" : undefined}
-              onClick={() => changePage("map")}
-            >
-              <span aria-hidden="true">🗺️</span> {t("map")}
-            </button>
-
-            <div className="navigation__note">
-              {t("note").split("\n").map((line, i) => (
-                <span key={i}>{line}{i === 0 && <br />}</span>
-              ))}
-            </div>
-          </nav>
-        </>
-      )}
-      
-      <main>
-         {page === "home" && (
-          <HomePage onOpenMap={() => changePage("map")} />
-          )}
-
-      {page === "map" && (
-    <MapPage
-        geolocation={activeGeolocation}
-        selectedId={selectedPlaceId}
-        onSelectPlace={setSelectedPlaceId}
-        autoPlay={autoPlay}
-        onAutoPlayChange={setAutoPlay}
-        visitHistory={visitHistory}
-        simulator={simulator}
-        onStartSimulation={startSimulation}
-        onRestartSimulation={restartSimulation}
-        locationSignal={locationSession.signal}
-    />
-    )}
-
-          {page === "qr" && <QrPage />}
-    </main>
-
-      <footer className="footer">
-        <strong>🌿 Thảo Cầm Viên</strong>
-        <span>{t("footer")}</span>
-        <a
-          href="/admin/login"
-          style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", textDecoration: "none" }}
-          aria-label="Admin"
-        >
-          ⚙️
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }

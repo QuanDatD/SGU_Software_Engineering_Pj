@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T07:52:20.0052053+07:00",
+    "BackendWindowPid":  21332,
+    "FrontendWindowPid":  16732,
+    "TunnelWindowPid":  24916,
+    "Website":  "https://power-vid-glossary-notes.trycloudflare.com",
+    "QrPage":  "https://power-vid-glossary-notes.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-075143-598.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-075143-598.log",
+    "DemoAdmin":  false
+}

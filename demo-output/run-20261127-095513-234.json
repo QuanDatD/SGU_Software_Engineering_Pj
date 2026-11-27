@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T09:55:28.9334407+07:00",
+    "BackendWindowPid":  29944,
+    "FrontendWindowPid":  11428,
+    "TunnelWindowPid":  38672,
+    "Website":  "https://towns-friendly-shirts-html.trycloudflare.com",
+    "QrPage":  "https://towns-friendly-shirts-html.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-095513-234.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-095513-234.log",
+    "DemoAdmin":  false
+}

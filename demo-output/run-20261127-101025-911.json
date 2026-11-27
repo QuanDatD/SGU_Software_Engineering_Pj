@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T10:10:52.3358018+07:00",
+    "BackendWindowPid":  48584,
+    "FrontendWindowPid":  45544,
+    "TunnelWindowPid":  36272,
+    "Website":  "https://mandatory-workout-news-days.trycloudflare.com",
+    "QrPage":  "https://mandatory-workout-news-days.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-101025-911.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-101025-911.log",
+    "DemoAdmin":  false
+}

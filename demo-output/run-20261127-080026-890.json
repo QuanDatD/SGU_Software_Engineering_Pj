@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T08:00:42.9751776+07:00",
+    "BackendWindowPid":  48220,
+    "FrontendWindowPid":  51404,
+    "TunnelWindowPid":  11348,
+    "Website":  "https://preferred-loud-mix-jam.trycloudflare.com",
+    "QrPage":  "https://preferred-loud-mix-jam.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-080026-890.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-080026-890.log",
+    "DemoAdmin":  false
+}

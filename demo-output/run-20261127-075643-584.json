@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T07:56:58.1859140+07:00",
+    "BackendWindowPid":  33908,
+    "FrontendWindowPid":  26756,
+    "TunnelWindowPid":  41428,
+    "Website":  "https://substances-utc-accuracy-congressional.trycloudflare.com",
+    "QrPage":  "https://substances-utc-accuracy-congressional.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-075643-584.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-075643-584.log",
+    "DemoAdmin":  false
+}

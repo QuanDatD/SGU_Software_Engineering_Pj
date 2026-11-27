@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T09:02:43.3055046+07:00",
+    "BackendWindowPid":  1368,
+    "FrontendWindowPid":  30736,
+    "TunnelWindowPid":  21852,
+    "Website":  "https://controlled-stands-spot-plant.trycloudflare.com",
+    "QrPage":  "https://controlled-stands-spot-plant.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-090223-555.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-090223-555.log",
+    "DemoAdmin":  false
+}

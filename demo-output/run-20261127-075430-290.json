@@ -1,0 +1,11 @@
+﻿{
+    "StartedAt":  "2026-11-27T07:54:47.5046749+07:00",
+    "BackendWindowPid":  38908,
+    "FrontendWindowPid":  46040,
+    "TunnelWindowPid":  56680,
+    "Website":  "https://saver-instead-shown-friday.trycloudflare.com",
+    "QrPage":  "https://saver-instead-shown-friday.trycloudflare.com/qr",
+    "RuntimeConfig":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\vite-demo-20261127-075430-290.config.mjs",
+    "TunnelLog":  "D:\\Learning\\SGU_Software_Engineering_Pj\\demo-output\\tunnel-20261127-075430-290.log",
+    "DemoAdmin":  false
+}
